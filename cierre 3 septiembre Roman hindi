@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zaroori Soochana - Barcelona Office</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+body { font-family: 'Poppins', Arial, sans-serif; background-color: #f4f5f7; margin: 0; padding: 0; }
+.container { max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); }
+.header { background-color: #e52e2e; color: #ffffff; padding: 30px 20px; text-align: center; }
+.header h1 { margin: 0; font-size: 52px; font-weight: 700; text-transform: uppercase; }
+.header h2 { margin: 0; font-size: 48px; font-weight: 700; text-transform: uppercase; }
+.content { padding: 20px 25px 30px 25px; color: #333333; line-height: 1.6; }
+.content p { margin: 0 0 18px; font-size: 15px; }
+.greeting { font-size: 18px; font-weight: 700; color: #e52e2e; margin-bottom: 15px !important; }
+.alert-box { background-color: #fff0f0; border-left: 5px solid #e52e2e; border-radius: 6px; padding: 20px; margin: 25px 0; text-align: center; }
+.alert-box strong { color: #e52e2e; font-size: 16px; display: block; margin-bottom: 8px; text-transform: uppercase; }
+.alert-box p { color: #721c24; font-weight: 600; margin: 0; font-size: 15px; }
+.voting-callout { background-color: #f0f7ff; border: 1px solid #cce5ff; border-radius: 8px; padding: 20px; margin: 25px 0; text-align: center; }
+.voting-callout strong { color: #004085; font-size: 16px; display: block; margin-bottom: 6px; }
+.voting-callout p { color: #004085; margin: 0 0 10px 0; font-size: 14px; }
+.voting-time { display: inline-block; background-color: #004085; color: #ffffff; font-weight: 700; padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+.hours-box { background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin-top: 25px; }
+.hours-box h3 { margin-top: 0; margin-bottom: 12px; color: #1a1a1a; font-size: 16px; font-weight: 600; }
+.hours-box ul { margin: 0; padding-left: 20px; color: #555555; }
+.hours-box li { margin-bottom: 6px; font-size: 14px; }
+.footer { background-color: #fafafa; border-top: 1px solid #eee; padding: 20px; text-align: center; font-size: 13px; color: #777777; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1>FLiiTS</h1>
+<h2>ZAROORI SOOCHANA</h2>
+</div>
+<div class="content">
+<p class="greeting">Namaste FLiiTER!!</p>
+<p>Hum aapko soochit karte hain ki aane wale <strong>Thursday, 3 September</strong> ko, hamara Barcelona office (location: <strong>Calle Vallespir 116, 08014</strong>) union elections ki wajah se normal service ke liye band rahega.</p>
+<div class="alert-box">
+<strong>Dhyan Dein!</strong>
+<p>KOI BHI INQUIRY YA KAAM NAHI KIYA JAYEGA.</p>
+<span style="font-size: 13px; color: #555; display: block; margin-top: 6px;">Office sirf voting ke liye hi khola jayega.</span>
+</div>
+<div class="voting-callout">
+<strong>🗳️ Voting ke liye zaroori reminder</strong>
+<p>Agar aapko hamare saath <strong>kaam karte hue 1 mahine se zyada ho gaya hai</strong>, toh aapka vote dena bahut zaroori hai. Is din aakar vote dene ki ahemiyat ko zaroor yaad rakhein.</p>
+<div class="voting-time">🕒 Voting Timing: 8:30 AM se 7:00 PM tak</div>
+</div>
+<p>Kisi bhi inquiry ya kaam ke liye, hum kisi bhi doosre din apne normal hours mein aapki madad karne ke liye tayar hain:</p>
+<div class="hours-box">
+<h3>Normal Opening Hours:</h3>
+<ul>
+<li><strong>Monday se Friday:</strong> 12:00 PM se 2:00 PM</li>
+<li><strong>Tuesday se Thursday:</strong> 1:00 PM se 5:00 PM</li>
+</ul>
+<p style="font-size: 12px; color: #888; margin-top: 10px; margin-bottom: 0;">*(3 September, Thursday ko chhodkar)*</p>
+</div>
+</div>
+<div class="footer">
+<p>Aapke sahyog aur samajh ke liye dhanyawad.</p>
+</div>
+</div>
+</body>
+</html>
