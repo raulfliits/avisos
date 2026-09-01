@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Important Notice - Barcelona Office</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+body { font-family: 'Poppins', Arial, sans-serif; background-color: #f4f5f7; margin: 0; padding: 0; }
+.container { max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); }
+.header { background-color: #e52e2e; color: #ffffff; padding: 30px 20px; text-align: center; }
+.header h1 { margin: 0; font-size: 52px; font-weight: 700; text-transform: uppercase; }
+.header h2 { margin: 0; font-size: 48px; font-weight: 700; text-transform: uppercase; }
+.content { padding: 20px 25px 30px 25px; color: #333333; line-height: 1.6; }
+.content p { margin: 0 0 18px; font-size: 15px; }
+.greeting { font-size: 18px; font-weight: 700; color: #e52e2e; margin-bottom: 15px !important; }
+.alert-box { background-color: #fff0f0; border-left: 5px solid #e52e2e; border-radius: 6px; padding: 20px; margin: 25px 0; text-align: center; }
+.alert-box strong { color: #e52e2e; font-size: 16px; display: block; margin-bottom: 8px; text-transform: uppercase; }
+.alert-box p { color: #721c24; font-weight: 600; margin: 0; font-size: 15px; }
+.voting-callout { background-color: #f0f7ff; border: 1px solid #cce5ff; border-radius: 8px; padding: 20px; margin: 25px 0; text-align: center; }
+.voting-callout strong { color: #004085; font-size: 16px; display: block; margin-bottom: 6px; }
+.voting-callout p { color: #004085; margin: 0 0 10px 0; font-size: 14px; }
+.voting-time { display: inline-block; background-color: #004085; color: #ffffff; font-weight: 700; padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+.hours-box { background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin-top: 25px; }
+.hours-box h3 { margin-top: 0; margin-bottom: 12px; color: #1a1a1a; font-size: 16px; font-weight: 600; }
+.hours-box ul { margin: 0; padding-left: 20px; color: #555555; }
+.hours-box li { margin-bottom: 6px; font-size: 14px; }
+.footer { background-color: #fafafa; border-top: 1px solid #eee; padding: 20px; text-align: center; font-size: 13px; color: #777777; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1>FLiiTS</h1>
+<h2>IMPORTANT NOTICE</h2>
+</div>
+<div class="content">
+<p class="greeting">Hello FLiiTER!!</p>
+<p>We inform you that next <strong>Thursday, September 3rd</strong>, our Barcelona office (located at <strong>Calle Vallespir 116, 08014</strong>) will be closed for regular customer service due to union elections.</p>
+<div class="alert-box">
+<strong>Attention!</strong>
+<p>NO INQUIRIES OR PROCEDURES WILL BE PROCESSED.</p>
+<span style="font-size: 13px; color: #555; display: block; margin-top: 6px;">The office will open exclusively for voting.</span>
+</div>
+<div class="voting-callout">
+<strong>🗳️ Important Voting Reminder</strong>
+<p>If you have been <strong>working with us for more than 1 month</strong>, your participation is essential. We remind you of the great importance of attending to vote during this day.</p>
+<div class="voting-time">🕒 Voting hours: 8:30 AM to 7:00 PM</div>
+</div>
+<p>To carry out any procedure or resolve queries, we will be happy to assist you during our regular opening hours on any other day:</p>
+<div class="hours-box">
+<h3>Regular Opening Hours:</h3>
+<ul>
+<li><strong>Monday to Friday:</strong> 12:00 PM to 2:00 PM</li>
+<li><strong>Tuesday to Thursday:</strong> 1:00 PM to 5:00 PM</li>
+</ul>
+<p style="font-size: 12px; color: #888; margin-top: 10px; margin-bottom: 0;">*(Except Thursday, September 3rd)*</p>
+</div>
+</div>
+<div class="footer">
+<p>Thank you in advance for your understanding and cooperation.</p>
+</div>
+</div>
+</body>
+</html>
