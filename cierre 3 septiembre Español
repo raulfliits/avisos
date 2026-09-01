@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aviso Importante - Oficina Barcelona</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+body {
+font-family: 'Poppins', Arial, sans-serif;
+background-color: #f4f5f7;
+margin: 0;
+padding: 0;
+-webkit-font-smoothing: antialiased;
+}
+.container {
+max-width: 600px;
+margin: 20px auto;
+background-color: #ffffff;
+border-radius: 12px;
+overflow: hidden;
+box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+.header {
+background-color: #e52e2e;
+color: #ffffff;
+padding: 30px 20px;
+text-align: center;
+}
+.header h1 {
+margin: 0;
+font-size: 52px;
+font-weight: 700;
+letter-spacing: 0.5px;
+text-transform: uppercase;
+}
+.header h2 {
+margin: 0;
+font-size: 48px;
+font-weight: 700;
+letter-spacing: 0.5px;
+text-transform: uppercase;
+}
+.lang-hero-box {
+background: #ffffff;
+border: 2px solid #f0f0f0;
+border-radius: 12px;
+padding: 20px 15px;
+margin: 25px 25px 10px 25px;
+text-align: center;
+box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+}
+.lang-hero-box p {
+margin: 0 0 12px 0;
+font-size: 13px;
+font-weight: 700;
+color: #555555;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+}
+.lang-grid {
+display: flex;
+flex-wrap: wrap;
+justify-content: center;
+gap: 8px;
+}
+.lang-btn {
+display: inline-flex;
+align-items: center;
+gap: 6px;
+background-color: #f8f9fa;
+border: 1px solid #e0e0e0;
+color: #333333;
+text-decoration: none;
+padding: 8px 14px;
+border-radius: 20px;
+font-size: 13px;
+font-weight: 600;
+transition: all 0.2s ease;
+}
+.lang-btn:hover {
+background-color: #e52e2e;
+color: #ffffff;
+border-color: #e52e2e;
+}
+.lang-btn .flag {
+font-size: 16px;
+line-height: 1;
+}
+.content {
+padding: 20px 25px 30px 25px;
+color: #333333;
+line-height: 1.6;
+}
+.content p {
+margin: 0 0 18px;
+font-size: 15px;
+}
+.greeting {
+font-size: 18px;
+font-weight: 700;
+color: #e52e2e;
+margin-bottom: 15px !important;
+}
+.alert-box {
+background-color: #fff0f0;
+border-left: 5px solid #e52e2e;
+border-radius: 6px;
+padding: 20px;
+margin: 25px 0;
+text-align: center;
+}
+.alert-box strong {
+color: #e52e2e;
+font-size: 16px;
+display: block;
+margin-bottom: 8px;
+text-transform: uppercase;
+}
+.alert-box p {
+color: #721c24;
+font-weight: 600;
+margin: 0;
+font-size: 15px;
+}
+.voting-callout {
+background-color: #f0f7ff;
+border: 1px solid #cce5ff;
+border-radius: 8px;
+padding: 20px;
+margin: 25px 0;
+text-align: center;
+}
+.voting-callout strong {
+color: #004085;
+font-size: 16px;
+display: block;
+margin-bottom: 6px;
+}
+.voting-callout p {
+color: #004085;
+margin: 0 0 10px 0;
+font-size: 14px;
+}
+.voting-time {
+display: inline-block;
+background-color: #004085;
+color: #ffffff;
+font-weight: 700;
+padding: 6px 14px;
+border-radius: 20px;
+font-size: 13px;
+}
+.hours-box {
+background-color: #f8f9fa;
+border: 1px solid #e9ecef;
+border-radius: 8px;
+padding: 20px;
+margin-top: 25px;
+}
+.hours-box h3 {
+margin-top: 0;
+margin-bottom: 12px;
+color: #1a1a1a;
+font-size: 16px;
+font-weight: 600;
+}
+.hours-box ul {
+margin: 0;
+padding-left: 20px;
+color: #555555;
+}
+.hours-box li {
+margin-bottom: 6px;
+font-size: 14px;
+}
+.footer {
+background-color: #fafafa;
+border-top: 1px solid #eee;
+padding: 20px;
+text-align: center;
+font-size: 13px;
+color: #777777;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<div class="header">
+<h1>FLiiTS</h1>
+<h2> AVISO importante</h2>
+</div>
+
+<div class="lang-hero-box">
+<p>🌐 Selecciona tu idioma / Select your language</p>
+<div class="lang-grid">
+<a href="https://tu-usuario.github.io/avisos-fliiter/en.html" target="_blank" class="lang-btn"><span class="flag">🇬🇧</span> English</a>
+<a href="https://tu-usuario.github.io/avisos-fliiter/hi.html" target="_blank" class="lang-btn"><span class="flag">🇮🇳</span> Roman Hindi</a>
+<a href="https://tu-usuario.github.io/avisos-fliiter/fr.html" target="_blank" class="lang-btn"><span class="flag">🇫🇷</span> Français</a>
+<a href="https://tu-usuario.github.io/avisos-fliiter/ar.html" target="_blank" class="lang-btn"><span class="flag">🇸🇦</span> العربية</a>
+</div>
+</div>
+
+<div class="content">
+<p class="greeting">¡Hola FLiiTER!</p>
+
+<p>Le informamos que el próximo <strong>jueves 3 de septiembre</strong>, nuestra oficina de Barcelona (ubicada en <strong>Calle Vallespir 116, 08014</strong>) permanecerá cerrada a la atención habitual debido a la celebración de las votaciones sindicales.</p>
+
+<div class="alert-box">
+<strong>¡Atención!</strong>
+<p>NO SE REALIZARÁ NINGUNA CONSULTA NI GESTIÓN.</p>
+<span style="font-size: 13px; color: #555; display: block; margin-top: 6px;">La oficina abrirá exclusivamente para proceder a las votaciones.</span>
+</div>
+
+<div class="voting-callout">
+<strong>🗳️ Recordatorio importante sobre el voto</strong>
+<p>Si llevas <strong>más de 1 mes trabajando con nosotros</strong>, tu participación es indispensable. Te recordamos la gran importancia de tu asistencia para acudir a votar durante esta jornada.</p>
+<div class="voting-time">🕒 Horario de votación: 8:30 h a 19:00 h</div>
+</div>
+
+<p>Para realizar cualquier trámite o resolver dudas, le atenderemos encantados en nuestro horario habitual cualquier otro día:</p>
+
+<div class="hours-box">
+<h3>Horario habitual de atención:</h3>
+<ul>
+<li><strong>Lunes a viernes:</strong> 12:00 h a 14:00 h</li>
+<li><strong>Martes a jueves:</strong> 13:00 h a 17:00 h</li>
+</ul>
+<p style="font-size: 12px; color: #888; margin-top: 10px; margin-bottom: 0;">*(Excepto el jueves 3 de septiembre)*</p>
+</div>
+</div>
+
+<div class="footer">
+<p>Agradecemos de antemano su comprensión y colaboración
+</html>
