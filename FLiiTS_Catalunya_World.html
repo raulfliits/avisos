@@ -165,6 +165,18 @@
 </style>
 
 <title>FLiiTS Catalunya World</title>
+<link rel="manifest" href="catalunya-world.webmanifest">
+<link rel="icon" href="cw-icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="cw-apple-touch-icon.png" sizes="180x180">
+<meta name="theme-color" content="#171213">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FLiiTS World">
+<script>
+// Instalable como app: guarda el juego para abrirlo sin conexión (solo si se sirve por https).
+if("serviceWorker" in navigator && (location.protocol==="https:"||location.hostname==="localhost")) addEventListener("load",()=>navigator.serviceWorker.register("cw-sw.js",{scope:"./FLiiTS_Catalunya_World.html"}).catch(()=>{}));
+</script>
 <script>
 /* Marco de la pantalla:
    · "frame-tv" → ordenador (ratón): televisor de tubo.
