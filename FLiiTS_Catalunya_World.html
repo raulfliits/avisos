@@ -619,6 +619,19 @@ body.editing [data-k]:focus{outline:2px solid var(--gold);background:rgba(0,0,0,
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
+<style id="arcade">
+/* Mini arcade: cada máquina es un canvas que se ajusta a la pantalla sin deformarse. */
+.modegame.arc .mg-panel{width:min(760px,98%);padding:10px 12px 8px;box-sizing:border-box}
+.modegame.arc .mg-panel h2{margin:2px 0 6px;font-size:clamp(10px,2.4cqw,20px)}
+.modegame.arc .kick{margin-bottom:4px}
+.modegame.arc #mgActions,.modegame.arc #mgTeam{display:none}
+.modegame.arc .mg-scene{display:block;min-height:0;padding:0;margin:6px 0;background:#000;border:3px solid #120b0c}
+.arc-wrap{width:min(100%,calc((100cqh - 200px)*var(--ar)));aspect-ratio:var(--ar);margin:0 auto}
+.arc-wrap canvas{display:block;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges}
+.modegame.arc .mg-status{font-family:var(--f-display);font-size:clamp(6px,1.25cqw,10px);line-height:1.8;min-height:0;color:#ffe6ea}
+.modegame.arc .foot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-family:var(--f-display);font-size:clamp(7px,1.3cqw,10px)}
+@media(max-width:700px){.arc-wrap{width:min(100%,calc((100cqh - 170px)*var(--ar)))}}
+</style>
 <style id="tema-gameboy">
 /* Tema Game Boy: al elegir RPG, selector, resultados, pausa y créditos pasan a los 4 tonos
    de la paleta del juego (--g0 claro … --g3 oscuro). Se redefinen las variables de color
@@ -1821,7 +1834,7 @@ function draw(){
 }
 function loop(){
   if(!gamePaused) frame++;
-  if(!gamePaused && open<0){ if(mg && !$("#modeGameOv").hidden && auto && mg.typ==="arcade" && frame%75===0){ if(mg.phase==="fight") customAttack(0,demoArcadeAction()); else if(mg.phase==="won") nextEncounter(); } if(mg&&mg.typ==="rpg"&&!$("#modeGameOv").hidden) rpgTick(); if(mode==="play"){ if(bossS.on) bossStep(); else physics(); moveDog(); } else if(mode==="final") finalStep(); else if(mode==="raul") raulStep(); }
+  if(!gamePaused && open<0){ if(mg&&mg.typ==="arcade"&&!$("#modeGameOv").hidden) arcTick(); if(mg&&mg.typ==="rpg"&&!$("#modeGameOv").hidden) rpgTick(); if(mode==="play"){ if(bossS.on) bossStep(); else physics(); moveDog(); } else if(mode==="final") finalStep(); else if(mode==="raul") raulStep(); }
   draw();
   requestAnimationFrame(loop);
 }
@@ -1863,65 +1876,304 @@ $("#selectBack").addEventListener("click",()=>{ $("#selOv").hidden=true; setThem
 $("#vehBack").addEventListener("click",()=>{ $("#vehOv").hidden=true; showSelect(); });
 $("#introContinue").addEventListener("click",continueIntro);
 
-/* ---------- MINI ARCADE ---------- */
-const ARCADE_OPTS={
-  0:["LANZAR CONTRATO"],
-  1:["ESCANEAR QR","COMPROBAR FECHA","VALIDAR CITA","ENVIAR A PEDIR CITA"],
-  2:["MOTO","BICI","PATINETE"],
-  3:["DISPARAR CASCO","DISPARAR CHAQUETA","DISPARAR MOCHILA","DISPARAR GUANTES"]
+/* ---------- MINI ARCADE: una máquina por personaje ----------
+   Ivan: pinball · Gerard: grúa de peluches · Azlan: shooter en primera persona · Raül: escáner de citas.
+   Al contratar a 3 (o al ordenar la cola de Raül) se gana la moneda y sale la página de resultados. */
+const ARC_INFO={
+ 0:{title:"PINBALL DE CONTRATACIÓN",w:180,h:300,help:"A: LANZAR LA BOLA · ← →: FLIPPERS · B: GOLPE DOBLE. ¡Dale a los aspirantes para contratarlos!"},
+ 2:{title:"GRÚA DE MOTOS",w:180,h:250,help:"← →: MOVER LA GRÚA · A: BAJAR. Solo cuentan las MOTOS: ¡saca 3!"},
+ 3:{title:"EPI SHOOTER",w:192,h:144,help:"↑ ↓: ANDAR · ← →: GIRAR · A: LANZAR EPI · B: CAMBIAR EPI. ¡Viste a 3 riders de FLiiTS!"},
+ 1:{title:"CONTROL DE CITAS",w:192,h:160,help:"FLECHAS: MOVER EL ESCÁNER · A: PASA A FORMACIÓN · B: NO PASA. Solo pasa quien tiene cita HOY."}
 };
-const ENEMIES={
-  0:["Solo Glovo","Documentación caducada","Licencia internacional","Alquilo cuenta!"],
-  2:["Equipo RTO de Uber","RTO · documentación","RTO · permisos","RTO · revisión final"],
-  3:["Rider sin casco","Rider sin chaqueta","Rider sin mochila","Rider sin guantes"],
-  1:["Aspirante sin QR","Código no validado","Cita para otro día","Sin cita previa"]
-};
-function customStart(ci){
- gamePaused=false; $("#pauseScreen").classList.remove("show");
- if(activeGameMode==="rpg"){ rpgStart(ci); return; }
- $("#modeGameOv").classList.remove("rpg-classic");
- mg={ci,typ:"arcade",round:0,enemyHp:100,team:[],phase:"fight",gear:{},message:"¡Se acerca el primer aspirante!"};
- $("#modeGameOv").hidden=false; $("#mgTeam").textContent=""; renderCustom();
+const ARC_GAMES={};
+const personCache=new Map();
+function personCv(look,gear,flip){ const key=look+"|"+Object.keys(gear||{}).filter(k=>gear[k]).sort().join()+"|"+(flip?1:0); let c=personCache.get(key); if(c) return c;
+ c=document.createElement("canvas"); c.width=16; c.height=27; drawPerson(c.getContext("2d"),LOOKS[look%LOOKS.length],0,3,!!flip,0,{...gear,mochila:0}); personCache.set(key,c); return c; }
+function arcText(g,t,x,y,col,align="center",size=8){ g.font=`${size}px "Press Start 2P"`; g.textAlign=align; g.textBaseline="top"; g.fillStyle="#000"; g.fillText(t,x+1,y+1); g.fillStyle=col; g.fillText(t,x,y); }
+function arcBubble(g,t,x,y,col="#fff",bg="#120b0c"){ g.font='8px "Press Start 2P"'; const w=Math.ceil(g.measureText(t).width)+8; const bx=Math.round(Math.max(2,Math.min(g.canvas.width-w-2,x-w/2)));
+ g.fillStyle=bg; g.fillRect(bx,y,w,13); g.strokeStyle=col; g.lineWidth=1; g.strokeRect(bx+.5,y+.5,w-1,12); g.fillStyle=col; g.textAlign="left"; g.textBaseline="top"; g.fillText(t,bx+4,y+3); }
+function drawItem(g,it,x,y,sc=1){ g.save(); g.translate(Math.round(x),Math.round(y)); g.scale(sc,sc); drawPal(g,ITEM[it],0,0,IPAL); g.restore(); }
+function customStart(ci){ gamePaused=false; $("#pauseScreen").classList.remove("show"); if(activeGameMode==="rpg"){ rpgStart(ci); return; } arcStart(ci); }
+function arcStart(ci){
+ const I=ARC_INFO[ci], ov=$("#modeGameOv"); ov.classList.remove("rpg-classic"); ov.classList.add("arc"); ov.hidden=false;
+ $("#mgKick").textContent="MINI ARCADE · "+nm(ci); $("#mgTitle").textContent=I.title;
+ $("#mgScene").innerHTML=`<div class="arc-wrap" style="--ar:${I.w}/${I.h}"><canvas id="arcCv" width="${I.w}" height="${I.h}"></canvas></div>`;
+ $("#mgStatus").textContent=I.help; $("#mgActions").innerHTML=""; $("#mgTeam").textContent="";
+ mg={typ:"arcade",ci,hires:0,c1:0,c2:0,t:0,state:"play",ban:null,G:null}; mg.G=ARC_GAMES[ci].init(); arcProgress();
 }
-// Acción que usa el modo DEMO en el arcade: siempre una que hace avanzar la partida.
-function demoArcadeAction(){
- const ci=mg.ci;
- if(ci===3){ const left=["CASCO","CHAQUETA","MOCHILA","GUANTES"].find(g=>!mg.gear[g.toLowerCase()]); return "DISPARAR "+left; }
- if(ci===1) return mg.round%2===0?"VALIDAR CITA":"COMPROBAR FECHA";
- return ARCADE_OPTS[ci][0];
+function arcProgress(){ if(!mg) return; $("#mgProgress").textContent=mg.ci===1?`ACIERTOS ${mg.c1} · FALLOS ${mg.c2}/3`:`CONTRATADOS ${mg.hires}/3`; }
+function arcBanner(t,sub,n=90){ mg.ban={t,sub,n,t0:mg.t}; }
+function arcHire(name){ mg.hires++; sfx.power(); arcProgress(); if(mg.hires>=3) arcWin(); else arcBanner("¡CONTRATADO!",(name?name+" · ":"")+mg.hires+"/3",80); }
+function arcWin(){ mg.state="won"; arcBanner(mg.ci===1?"¡OFICINA EN ORDEN!":"¡3 CONTRATADOS!","¡MONEDA DE ORO!",180); setTimeout(()=>{ sfx.win(); sfx.coin(); },250); mg.endAt=mg.t+180; }
+function arcLose(why){ mg.state="lost"; arcBanner("GAME OVER",why,1e9); sfx.hit(); }
+function arcDone(){ const ci=mg.ci, a=mg.c1, b=mg.c2; mg=null; const ov=$("#modeGameOv"); ov.hidden=true; ov.classList.remove("arc");
+ if(ci===1){ c1=a; c2=b; openRaulPanel(); return; } scr=SCREENS[SCREEN_OF[ci]]; c1=a; c2=b; openCityPanel(); }
+function arcTick(){
+ if(!mg||mg.typ!=="arcade") return; const cv=$("#arcCv"); if(!cv) return; mg.t++;
+ const g=cv.getContext("2d"), A=ARC_GAMES[mg.ci]; g.imageSmoothingEnabled=false;
+ if(mg.state==="play") A.update(mg.G);
+ A.draw(g,mg.G); arcDrawBanner(g,cv.width,cv.height);
+ if(mg&&mg.state==="won"&&mg.t>=mg.endAt) arcDone();
 }
-function renderCustom(){
- if(!mg||mg.typ!=="arcade")return;
- const c=CREW[mg.ci];
- $("#mgKick").textContent=MODE_NAMES.arcade; $("#mgTitle").textContent="MINI ARCADE · "+nm(mg.ci);
- $("#mgProgress").textContent=mg.phase==="finish"?"EQUIPO COMPLETO":`ENCUENTRO ${Math.min(4,mg.round+1)}/4`;
- const scene=$("#mgScene"); scene.innerHTML="";
- const makeActor=(i,label,hp)=>{const d=document.createElement("div");d.className="mg-actor";d.appendChild(standCanvas(i));const b=document.createElement("b");b.textContent=label;d.appendChild(b);if(hp!==null){const bar=document.createElement("div");bar.className="mg-hp";const fill=document.createElement("i");fill.style.width=hp+"%";bar.appendChild(fill);d.appendChild(bar);}scene.appendChild(d);};
- makeActor(mg.ci,nm(mg.ci),100);
- if(mg.phase==="fight") makeActor((mg.ci+1)%4,ENEMIES[mg.ci][mg.round],mg.enemyHp);
- else if(mg.phase==="finish") mg.team.forEach((_,i)=>makeActor((i+mg.ci+1)%4,"RIDER "+(i+1),100));
- $("#mgStatus").textContent=mg.message;
- const acts=$("#mgActions");acts.innerHTML="";
- const btn=(label,fn)=>{const b=document.createElement("button");b.type="button";b.textContent=label;b.addEventListener("click",fn);acts.appendChild(b);};
- if(mg.phase==="fight"){
-  ARCADE_OPTS[mg.ci].forEach((a,i)=>btn(a,()=>customAttack(i,a)));
-  if(mg.ci===0&&mg.enemyHp<=45) btn("FIRMAR CONTRATO",captureEnemy);
- }else if(mg.phase==="won") btn("SIGUIENTE ENCUENTRO",nextEncounter);
- else if(mg.phase==="finish") btn("CONTINUAR AL GRAN JEFE FINAL",()=>{ $("#modeGameOv").hidden=true; hideRaulUI(); startFinal(); });
+function arcPress(b){
+ if(!mg||mg.typ!=="arcade") return;
+ if(mg.state==="lost"){ if(b==="A"){ Object.assign(mg,{G:ARC_GAMES[mg.ci].init(),hires:0,c1:0,c2:0,state:"play",ban:null}); arcProgress(); sfx.select(); } else if(b==="B") leaveModeGame(); return; }
+ if(mg.state==="play"&&ARC_GAMES[mg.ci].press) ARC_GAMES[mg.ci].press(mg.G,b);
 }
-function customAttack(i,a){
- if(!mg||mg.typ!=="arcade"||mg.phase!=="fight")return;
- const ci=mg.ci, win=msg=>{mg.enemyHp=0;mg.phase="won";mg.team.push(true);mg.message=msg;};
- if(ci===0){mg.enemyHp=Math.max(0,mg.enemyHp-35);mg.message="¡El contrato golpea al aspirante!";if(mg.enemyHp<=0)win("¡RIDER CONTRATADO!");}
- else if(ci===2){if(a!=="MOTO")mg.message="Ese rider no tiene moto. ¡Prueba otra vez!";else win("¡RIDER CON MOTO CAPTURADO!");}
- else if(ci===3){const gear=a.replace("DISPARAR ","").toLowerCase();mg.gear[gear]=true;mg.message="¡EPI colocado: "+gear+"!";if(Object.keys(mg.gear).length>=4)win("¡RIDER COMPLETO!");}
- else if(ci===1){const valid=mg.round%2===0;if(a==="COMPROBAR FECHA"&&!valid)win("La fecha no coincide: no pasa. Enviar a pedir cita.");else if(a==="VALIDAR CITA"&&valid)win("¡CITA VALIDADA! Pasa a formación.");else mg.message="QR o cita no válida. Escanea QR para pedir cita.";}
- renderCustom();
+function arcDrawBanner(g,W,H){
+ const b=mg&&mg.ban; if(!b) return; if(mg.t-b.t0>b.n){ mg.ban=null; return; }
+ const y=Math.round(H*.36), lost=mg.state==="lost";
+ g.fillStyle="rgba(18,11,12,.86)"; g.fillRect(6,y-6,W-12,b.sub||lost?42:24); g.strokeStyle="#ffd23f"; g.lineWidth=2; g.strokeRect(7,y-5,W-14,(b.sub||lost?42:24)-2);
+ arcText(g,b.t,W/2,y,"#ffd23f"); if(b.sub) arcText(g,b.sub,W/2,y+14,"#fff");
+ if(lost) arcText(g,"A: OTRA · B: SALIR",W/2,y+26,(mg.t>>4)&1?"#fff":"#ff8a92");
 }
-function captureEnemy(){if(!mg)return;mg.enemyHp=0;mg.message="¡CONTRATO FIRMADO! RIDER CAPTURADO.";mg.phase="won";mg.team.push(true);renderCustom();}
-function nextEncounter(){if(!mg)return;mg.round++;if(mg.round>=4){mg.phase="finish";mg.message="¡Los cuatro encuentros superados! Los riders se unen al equipo.";mg.team=[1,2,3,4,5];}else{mg.phase="fight";mg.enemyHp=100;mg.gear={};mg.message="¡Nuevo encuentro!";}renderCustom();}
-function leaveModeGame(){ $("#modeGameOv").hidden=true; $("#modeGameOv").classList.remove("rpg-classic"); showSelect(); }
+function leaveModeGame(){ mg=null; const ov=$("#modeGameOv"); ov.hidden=true; ov.classList.remove("rpg-classic","arc"); showSelect(); }
 $("#mgExit").addEventListener("click",leaveModeGame);
+
+/* --- IVAN · PINBALL --- */
+function pinHit(b,x1,y1,x2,y2,rad,e,svx=0,svy=0){
+ const dx=x2-x1, dy=y2-y1, L2=dx*dx+dy*dy; let t=((b.x-x1)*dx+(b.y-y1)*dy)/L2; t=Math.max(0,Math.min(1,t));
+ const cx=x1+dx*t, cy=y1+dy*t; let nx=b.x-cx, ny=b.y-cy; const d=Math.hypot(nx,ny), R=3+rad;
+ if(d>=R||d===0) return false; nx/=d; ny/=d; b.x=cx+nx*R; b.y=cy+ny*R;
+ const rvx=b.vx-svx, rvy=b.vy-svy, vn=rvx*nx+rvy*ny; if(vn<0){ b.vx=rvx-(1+e)*vn*nx+svx; b.vy=rvy-(1+e)*vn*ny+svy; } return true;
+}
+const FLIP=[{x:50,y:256,rest:.5,up:-.45},{x:122,y:256,rest:Math.PI-.5,up:Math.PI+.45}], FL_LEN=24;
+ARC_GAMES[0]={
+ init(){ const G={W:180,H:300,balls:5,score:0,plP:0,plDir:1,ready:false,shot:0,flA:FLIP.map(f=>f.rest),flW:[0,0],flick:0,flash:[0,0,0],
+   segs:[[10,40,40,10],[40,10,140,10],[140,10,172,42],[10,40,10,228],[10,228,50,256],[156,58,156,300],[172,42,172,300],[156,228,122,256]],
+   bump:[[60,82,8],[118,82,8],[89,120,9]],
+   people:[[40,170],[90,186],[134,170]].map(([x,y],i)=>({x,y,bx:x,ph:i,look:(i*2+1)%LOOKS.length,hired:false,say:0}))};
+  G.ball={x:164,y:282,vx:0,vy:0}; return G; },
+ press(G,b){
+  if(b==="A"&&G.ready){ G.ball.vy=-(7.6+G.plP*3.4); G.ready=false; G.shot=12; slide(200,700,.25,.05); }
+  else if(b==="A"||b==="B"){ G.flick=9; tone(300,.04,0,"square",.04); } },
+ update(G){
+  const b=G.ball, L=keys.ArrowLeft||keys.a||G.flick>0, R=keys.ArrowRight||keys.d||G.flick>0; if(G.flick>0) G.flick--; if(G.shot>0) G.shot--;
+  [L,R].forEach((on,i)=>{ const tgt=on?FLIP[i].up:FLIP[i].rest, d=tgt-G.flA[i], st=Math.sign(d)*Math.min(Math.abs(d),.32); G.flW[i]=st; G.flA[i]+=st; });
+  G.ready=b.x>157&&b.y>=279&&Math.abs(b.vy)<.8;
+  if(G.ready){ b.y=282; b.vx=b.vy=0; G.plP+=.016*G.plDir; if(G.plP>=1||G.plP<=0){ G.plDir*=-1; G.plP=Math.max(0,Math.min(1,G.plP)); } }
+  else { const SUB=6;
+   for(let s=0;s<SUB;s++){ b.vy+=.11/SUB; b.x+=b.vx/SUB; b.y+=b.vy/SUB;
+    G.segs.forEach(([a,c,d,e])=>pinHit(b,a,c,d,e,1,.45));
+    if(b.y>=282&&b.x>157){ b.y=282; b.vy=0; b.vx=0; }
+    G.bump.forEach(([x,y,r],i)=>{ let nx=b.x-x, ny=b.y-y; const dd=Math.hypot(nx,ny); if(dd<r+3&&dd>0){ nx/=dd; ny/=dd; b.x=x+nx*(r+3); b.y=y+ny*(r+3); const vn=b.vx*nx+b.vy*ny; if(vn<0){ b.vx-=2*vn*nx; b.vy-=2*vn*ny; } b.vx+=nx*1.9; b.vy+=ny*1.9; if(!G.flash[i]){ tone(660+i*120,.05,0,"square",.05); G.score+=100; } G.flash[i]=8; } });
+    FLIP.forEach((f,i)=>{ const a=G.flA[i], tx=f.x+Math.cos(a)*FL_LEN, ty=f.y+Math.sin(a)*FL_LEN;
+     const dx=tx-f.x, dy=ty-f.y; let t=((b.x-f.x)*dx+(b.y-f.y)*dy)/(FL_LEN*FL_LEN); t=Math.max(0,Math.min(1,t));
+     const cx=f.x+dx*t, cy=f.y+dy*t, w=G.flW[i]; pinHit(b,f.x,f.y,tx,ty,3,.25,-w*(cy-f.y),w*(cx-f.x)); });
+    G.people.forEach(p=>{ if(p.hired) return; const cx=Math.max(p.x-6,Math.min(p.x+6,b.x)), cy=Math.max(p.y-11,Math.min(p.y+11,b.y)); let nx=b.x-cx, ny=b.y-cy; const dd=Math.hypot(nx,ny);
+     if(dd<3){ if(dd>0){ nx/=dd; ny/=dd; } else { nx=0; ny=1; } b.x=cx+nx*3; b.y=cy+ny*3; const vn=b.vx*nx+b.vy*ny; if(vn<0){ b.vx-=1.7*vn*nx; b.vy-=1.7*vn*ny; }
+      p.hired=true; p.say=90; mg.c1++; G.score+=500; arcHire(RPG_NPCS[p.look].name.toUpperCase()); } }); }
+   const sp=Math.hypot(b.vx,b.vy); if(sp>8){ b.vx*=8/sp; b.vy*=8/sp; } }
+  G.flash=G.flash.map(f=>Math.max(0,f-1));
+  G.people.forEach(p=>{ if(!p.hired) p.x=p.bx+Math.sin((mg.t+p.ph*60)/45)*10; if(p.say>0) p.say--; });
+  if(b.y>G.H+6){ G.balls--; sfx.back();
+   if(G.balls<=0) return arcLose("¡TE HAS QUEDADO SIN BOLAS!");
+   arcBanner("BOLA PERDIDA",`QUEDAN ${G.balls}`,60); G.ball={x:164,y:282,vx:0,vy:0}; }
+ },
+ draw(g,G){
+  const W=G.W,H=G.H, gr=g.createLinearGradient(0,0,0,H); gr.addColorStop(0,"#241a52"); gr.addColorStop(1,"#0b0820"); g.fillStyle=gr; g.fillRect(0,0,W,H);
+  for(let i=0;i<40;i++){ g.fillStyle=((mg.t>>3)+i)%7?"#3a3080":"#ffd23f"; g.fillRect((i*53+7)%150+12,(i*97+20)%230+14,1,1); }
+  g.fillStyle="#1a1440"; g.fillRect(157,56,15,H-56);
+  g.globalAlpha=.25; arcText(g,"FLiiTS",84,146,"#d62839"); g.globalAlpha=1;
+  // luces de las calles laterales
+  for(let i=0;i<6;i++){ g.fillStyle=((mg.t>>4)+i)&1?"#ff4a5c":"#5a1020"; g.fillRect(14,60+i*26,3,3); g.fillRect(150,60+i*26,3,3); }
+  g.strokeStyle="#c9d2ff"; g.lineWidth=2; g.lineCap="round"; g.beginPath(); G.segs.forEach(([a,b,c,d])=>{ g.moveTo(a,b); g.lineTo(c,d); }); g.stroke();
+  G.bump.forEach(([x,y,r],i)=>{ g.fillStyle="#ffd23f"; g.beginPath(); g.arc(x,y,r+1.5,0,7); g.fill(); g.fillStyle=G.flash[i]?"#ffffff":"#d62839"; g.beginPath(); g.arc(x,y,r,0,7); g.fill(); g.fillStyle="#fff"; g.fillRect(x-1,y-4,2,2); });
+  G.people.forEach(p=>{ g.drawImage(personCv(p.look,p.hired?{casco:1,chaqueta:1,guantes:1}:{}),Math.round(p.x-8),Math.round(p.y-15));
+   if(p.say>0) arcBubble(g,"¡CONTRATADO!",p.x,p.y-30,"#62d26f"); else if(!p.hired&&(mg.t+p.ph*90)%300<60) arcBubble(g,"¡BUSCO CURRO!",p.x,p.y-30,"#fff"); });
+  FLIP.forEach((f,i)=>{ const a=G.flA[i], tx=f.x+Math.cos(a)*FL_LEN, ty=f.y+Math.sin(a)*FL_LEN; g.lineCap="round";
+   g.strokeStyle="#ffd23f"; g.lineWidth=7; g.beginPath(); g.moveTo(f.x,f.y); g.lineTo(tx,ty); g.stroke(); g.strokeStyle="#d62839"; g.lineWidth=3; g.beginPath(); g.moveTo(f.x,f.y); g.lineTo(tx,ty); g.stroke(); });
+  // lanzador: se ve cómo se tensa el muelle y cómo empuja la bola
+  const pull=G.ready?Math.round(G.plP*12):0, kick=G.shot>6?-8:0, py=286+pull+kick;
+  g.strokeStyle="#9aa3b5"; g.lineWidth=1; g.beginPath(); for(let y=py+4,k=0;y<H-2;y+=2,k++){ g.lineTo(k&1?161:167,y); } g.stroke();
+  g.fillStyle="#d62839"; g.fillRect(159,py,10,4); g.fillStyle="#fff"; g.fillRect(159,py,10,1);
+  if(G.ready){ g.fillStyle="#120b0c"; g.fillRect(174,240,5,44); const h=Math.round(G.plP*42); g.fillStyle=G.plP>.75?"#62d26f":G.plP>.4?"#ffd23f":"#ff4a5c"; g.fillRect(175,283-h,3,h); if((mg.t>>4)&1) arcText(g,"A",176,228,"#ffd23f"); }
+  const b=G.ball; g.fillStyle="#cfd6e2"; g.beginPath(); g.arc(b.x,b.y,3,0,7); g.fill(); g.fillStyle="#fff"; g.fillRect(Math.round(b.x)-2,Math.round(b.y)-2,2,2);
+  arcText(g,`BOLAS ${G.balls}`,4,288,"#ffd23f","left"); arcText(g,String(G.score).padStart(5,"0"),150,288,"#fff","right");
+ }
+};
+
+/* --- GERARD · GRÚA DE PELUCHES (motos, bicis y patinetes) --- */
+function drawPlush(g,p,x,y){
+ x=Math.round(x); y=Math.round(y); const L=LOOKS[p.look%LOOKS.length], K="#1b1212", hired=p.hired;
+ const wheel=(cx,cy,r)=>{ g.fillStyle=K; g.beginPath(); g.arc(cx,cy,r,0,7); g.fill(); g.fillStyle="#9aa3b5"; g.fillRect(cx-.5,cy-.5,1,1); };
+ if(p.type==="moto"){ g.fillStyle=K; g.fillRect(x-7,y,14,5); g.fillStyle=hired?"#d62839":"#2f6fe0"; g.fillRect(x-6,y+1,12,3); g.fillStyle="#ffd23f"; g.fillRect(x+5,y+1,2,2); wheel(x-5,y+7,3); wheel(x+5,y+7,3); }
+ else if(p.type==="bici"){ g.strokeStyle="#1f9e8f"; g.lineWidth=1; g.beginPath(); g.moveTo(x-5,y+7); g.lineTo(x,y+2); g.lineTo(x+5,y+7); g.moveTo(x-2,y+2); g.lineTo(x+3,y+2); g.stroke(); g.strokeStyle=K; [[-5],[5]].forEach(([d])=>{ g.beginPath(); g.arc(x+d,y+7,3,0,7); g.stroke(); }); }
+ else { g.fillStyle=K; g.fillRect(x-7,y+6,14,2); g.fillRect(x+5,y-3,1,9); g.fillRect(x+3,y-3,4,1); g.fillStyle="#58c4ff"; g.fillRect(x-6,y+6,4,1); wheel(x-6,y+9,1.5); wheel(x+6,y+9,1.5); }
+ g.fillStyle=K; g.fillRect(x-4,y-5,8,6); g.fillStyle=hired?"#d62839":L.C; g.fillRect(x-3,y-4,6,5);
+ g.fillStyle=K; g.beginPath(); g.arc(x,y-9,4.5,0,7); g.fill(); g.fillStyle=L.S; g.beginPath(); g.arc(x,y-9,3.5,0,7); g.fill();
+ g.fillStyle=hired?"#d62839":L.H; g.fillRect(x-4,y-13,8,hired?4:3); if(hired){ g.fillStyle="#ff8a92"; g.fillRect(x-2,y-13,2,1); }
+ g.fillStyle=K; g.fillRect(x-2,y-9,1,1); g.fillRect(x+1,y-9,1,1);
+ if(hired){ g.fillStyle="#d62839"; g.fillRect(x-7,y-5,3,5); }
+}
+ARC_GAMES[2]={
+ init(){ const types=["moto","moto","moto","moto","bici","bici","bici","bici","pat","pat","pat","pat"].sort(()=>Math.random()-.5);
+  const pos=[]; for(let i=0;i<6;i++) pos.push([62+i*19,212]); for(let i=0;i<5;i++) pos.push([71+i*19,196]); pos.push([100,180]);
+  return {W:180,H:250,cx:110,cy:44,phase:"move",t:0,coins:9,open:1,grab:null,fall:null,drop:null,tray:[],
+   prizes:pos.map(([x,y],i)=>({x,y,ox:x,oy:y,type:types[i],look:i}))}; },
+ press(G,b){ if(b==="A"&&G.phase==="move"&&G.coins>0&&!G.drop){ G.coins--; G.phase="down"; G.open=1; slide(500,250,.3,.05); } },
+ update(G){
+  const L=keys.ArrowLeft||keys.a, R=keys.ArrowRight||keys.d;
+  if(G.phase==="move"){ if(L) G.cx-=1.3; if(R) G.cx+=1.3; G.cx=Math.max(56,Math.min(166,G.cx)); }
+  else if(G.phase==="down"){ G.cy+=1.4; const under=G.prizes.filter(p=>Math.abs(p.x-G.cx)<9), floor=under.length?Math.min(...under.map(p=>p.y-12)):216;
+   if(G.cy+14>=floor||G.cy>=206){ G.phase="close"; G.t=0; tone(150,.08); } }
+  else if(G.phase==="close"){ G.t++; G.open=Math.max(0,1-G.t/16);
+   if(G.t===18){ const tipY=G.cy+16; let best=null, bd=99; G.prizes.forEach(p=>{ const d=Math.hypot(p.x-G.cx,(p.y-4)-tipY); if(d<bd){ bd=d; best=p; } });
+    if(best&&bd<13&&Math.random()<(bd<6?.9:.55)){ G.grab=best; G.slip=Math.random()<(bd<6?.08:.45); G.prizes=G.prizes.filter(p=>p!==best); }
+    G.phase="up"; } }
+  else if(G.phase==="up"){ G.cy-=1.2;
+   if(G.grab&&G.slip&&G.cy<120){ G.fall={p:G.grab,vy:0}; G.grab=null; sfx.back(); arcBanner("¡SE ESCAPA!","",50); }
+   if(G.cy<=44){ G.cy=44; G.phase=G.grab?"carry":"move"; if(!G.grab&&!G.fall) tone(220,.1); } }
+  else if(G.phase==="carry"){ G.cx-=1.4; if(G.cx<=29){ G.cx=29; G.phase="drop"; G.t=0; } }
+  else if(G.phase==="drop"){ G.t++; G.open=Math.min(1,G.t/10); if(G.t===10){ G.drop={p:G.grab,vy:0}; G.grab=null; } if(G.t>30) G.phase="move"; }
+  if(G.grab){ G.grab.x=G.cx; G.grab.y=G.cy+26; }
+  if(G.fall){ const f=G.fall; f.vy+=.25; f.p.x+=(f.p.ox-f.p.x)*.1; f.p.y+=f.vy; if(f.p.y>=f.p.oy){ f.p.y=f.p.oy; f.p.x=f.p.ox; G.prizes.push(f.p); G.fall=null; tone(120,.06); } }
+  if(G.drop){ const d=G.drop; d.vy+=.25; d.p.y+=d.vy; if(d.p.y>=214){ const p=d.p; G.drop=null;
+   if(p.type==="moto"){ p.hired=true; G.tray.push(p); mg.c1++; arcHire("MOTO"); }
+   else { mg.c2++; sfx.back(); arcBanner(p.type==="bici"?"UNA BICI...":"UN PATINETE...","¡SOLO CUENTAN LAS MOTOS!",80); } } }
+  if(mg.state==="play"&&G.coins<=0&&G.phase==="move"&&!G.drop&&!G.fall&&!G.grab) arcLose("¡SIN FICHAS!");
+ },
+ draw(g,G){
+  const W=G.W,H=G.H, K="#1b1212";
+  g.fillStyle="#8c0a1e"; g.fillRect(0,0,W,H); g.fillStyle="#d0102c"; g.fillRect(0,0,W,24);
+  for(let i=0;i<18;i++){ g.fillStyle=((mg.t>>3)+i)&1?"#ffd23f":"#6e1c18"; g.fillRect(4+i*10,2,4,3); g.fillRect(4+i*10,19,4,3); }
+  arcText(g,"FLiiTS · GRÚA",W/2,8,"#fff");
+  const gl=g.createLinearGradient(0,26,0,232); gl.addColorStop(0,"#bfe6ff"); gl.addColorStop(1,"#5fa8d8"); g.fillStyle=gl; g.fillRect(8,26,164,206);
+  g.fillStyle="#c9a46a"; g.fillRect(48,220,124,12); g.fillStyle="#6e1c18"; g.fillRect(12,150,36,82); g.fillStyle="#2a0b10"; g.fillRect(15,150,30,6);
+  g.save(); g.translate(30,200); g.rotate(-Math.PI/2); arcText(g,"PREMIO",0,-4,"#ffd23f"); g.restore();
+  G.prizes.forEach(p=>drawPlush(g,p,p.x,p.y)); if(G.fall) drawPlush(g,G.fall.p,G.fall.p.x,G.fall.p.y);
+  g.fillStyle=K; g.fillRect(8,30,164,3); g.fillStyle="#555a66"; g.fillRect(G.cx-6,28,12,6);
+  g.strokeStyle="#333"; g.lineWidth=1; g.beginPath(); g.moveTo(G.cx,33); g.lineTo(G.cx,G.cy); g.stroke();
+  if(G.grab) drawPlush(g,G.grab,G.grab.x,G.grab.y);
+  const o=G.open, cx=Math.round(G.cx), cy=Math.round(G.cy);
+  g.fillStyle="#9aa3b5"; g.fillRect(cx-5,cy,10,6); g.fillStyle=K; g.fillRect(cx-5,cy+5,10,1);
+  g.strokeStyle="#cfd6e2"; g.lineWidth=2; g.beginPath(); g.moveTo(cx-4,cy+6); g.lineTo(cx-4-5*o,cy+12); g.lineTo(cx-2-3*o,cy+17); g.moveTo(cx+4,cy+6); g.lineTo(cx+4+5*o,cy+12); g.lineTo(cx+2+3*o,cy+17); g.stroke();
+  if(G.drop) drawPlush(g,G.drop.p,G.drop.p.x,G.drop.p.y);
+  g.fillStyle="rgba(255,255,255,.22)"; g.fillRect(16,34,3,180); g.fillRect(24,34,1,120);
+  g.fillStyle="#2a0b10"; g.fillRect(0,232,W,18); arcText(g,`FICHAS ${G.coins}`,6,237,"#ffd23f","left");
+  G.tray.forEach((p,i)=>drawPlush(g,p,118+i*20,246)); if(!G.tray.length) arcText(g,"MOTOS 0/3",174,237,"#fff","right");
+ }
+};
+
+/* --- AZLAN · EPI SHOOTER (primera persona, laberinto del almacén) --- */
+const DMAP=["############","#....#.....#","#.##.#.###.#","#.#........#","#.#.####.#.#","#...#..#.#.#","###.#..#.#.#","#......#...#","#.####.###.#","#.#........#","#...#..#...#","############"];
+const EPIS3=["casco","chaqueta","guantes"], EPI_NAME={casco:"EL CASCO",chaqueta:"LA CHAQUETA",guantes:"LOS GUANTES"};
+const dWall=(x,y)=>{ const r=DMAP[Math.floor(y)]; return !r||r[Math.floor(x)]!=="."; };
+ARC_GAMES[3]={
+ init(){ return {W:192,H:144,px:1.5,py:1.5,pa:0,item:0,proj:[],hand:0,bob:0,msg:"",msgT:0,zb:new Float32Array(192),
+   people:[[6.5,1.5,{}],[10.5,3.5,{guantes:1}],[3.5,7.5,{casco:1}],[9.5,9.5,{}],[5.5,10.5,{chaqueta:1}]].map(([x,y,gear],i)=>({x,y,gear:{...gear},look:i,hired:false,t:0}))}; },
+ press(G,b){
+  if(b==="B"){ G.item=(G.item+1)%3; tone(500,.04); }
+  if(b==="A"&&G.hand<=0){ G.proj.push({x:G.px+Math.cos(G.pa)*.3,y:G.py+Math.sin(G.pa)*.3,dx:Math.cos(G.pa)*.16,dy:Math.sin(G.pa)*.16,item:EPIS3[G.item],life:70}); G.hand=14; slide(500,900,.12,.05); } },
+ update(G){
+  const fw=(keys.ArrowUp||keys.w)?1:(keys.ArrowDown||keys.s)?-1:0, tr=(keys.ArrowLeft||keys.a)?-1:(keys.ArrowRight||keys.d)?1:0;
+  G.pa+=tr*.05; if(G.hand>0) G.hand--;
+  if(fw){ const sp=.05*fw, nx=G.px+Math.cos(G.pa)*sp, ny=G.py+Math.sin(G.pa)*sp, m=.22;
+   if(!dWall(nx+Math.sign(nx-G.px)*m,G.py)) G.px=nx; if(!dWall(G.px,ny+Math.sign(ny-G.py)*m)) G.py=ny; G.bob+=.25; }
+  G.proj=G.proj.filter(p=>{ p.x+=p.dx; p.y+=p.dy; if(--p.life<=0||dWall(p.x,p.y)) return false;
+   const h=G.people.find(q=>!q.hired&&Math.hypot(q.x-p.x,q.y-p.y)<.42); if(!h) return true;
+   const name=RPG_NPCS[h.look].name.toUpperCase();
+   if(h.gear[p.item]){ G.msg=`¡${name} YA TIENE ${EPI_NAME[p.item]}!`; G.msgT=90; sfx.back(); return false; }
+   h.gear[p.item]=1; mg.c1++; sfx.coin();
+   if(EPIS3.every(k=>h.gear[k])){ h.hired=true; h.t=80; mg.c2++; G.msg=`${name}: ¡GRACIAS!`; G.msgT=80; arcHire(name); }
+   else { G.msg=`¡${EPI_NAME[p.item]} PUESTO!`; G.msgT=60; } return false; });
+  G.people=G.people.filter(q=>!(q.hired&&--q.t<=0));
+  if(G.msgT>0) G.msgT--;
+  else { const seen=q=>{ for(let k=1;k<12;k++){ const t=k/12; if(dWall(G.px+(q.x-G.px)*t,G.py+(q.y-G.py)*t)) return false; } return true; };
+   const near=G.people.filter(q=>!q.hired&&seen(q)).map(q=>({q,d:Math.hypot(q.x-G.px,q.y-G.py)})).sort((a,b)=>a.d-b.d)[0];
+   G.near=near&&near.d<3.2?near.q:null; }
+ },
+ draw(g,G){
+  const W=G.W,H=G.H, dx=Math.cos(G.pa), dy=Math.sin(G.pa), plx=-dy*.66, ply=dx*.66;
+  let gr=g.createLinearGradient(0,0,0,H/2); gr.addColorStop(0,"#16161f"); gr.addColorStop(1,"#3a3a4a"); g.fillStyle=gr; g.fillRect(0,0,W,H/2);
+  gr=g.createLinearGradient(0,H/2,0,H); gr.addColorStop(0,"#2b2622"); gr.addColorStop(1,"#5a4d40"); g.fillStyle=gr; g.fillRect(0,H/2,W,H/2);
+  for(let x=0;x<W;x++){ const cam=2*x/W-1, rx=dx+plx*cam, ry=dy+ply*cam; let mx=Math.floor(G.px), my=Math.floor(G.py);
+   const ddx=Math.abs(1/rx), ddy=Math.abs(1/ry); let sx,sy,sdx,sdy;
+   if(rx<0){ sx=-1; sdx=(G.px-mx)*ddx; } else { sx=1; sdx=(mx+1-G.px)*ddx; } if(ry<0){ sy=-1; sdy=(G.py-my)*ddy; } else { sy=1; sdy=(my+1-G.py)*ddy; }
+   let side=0; for(let k=0;k<40;k++){ if(sdx<sdy){ sdx+=ddx; mx+=sx; side=0; } else { sdy+=ddy; my+=sy; side=1; } if(DMAP[my][mx]!==".") break; }
+   const dist=side?(my-G.py+(1-sy)/2)/ry:(mx-G.px+(1-sx)/2)/rx, h=Math.min(H*3,H/dist), top=Math.round(H/2-h/2);
+   let wx=side?G.px+dist*rx:G.py+dist*ry; wx-=Math.floor(wx);
+   const poster=(mx*7+my*3)%6===0;
+   g.fillStyle=poster&&wx>.2&&wx<.8?"#d62839":side?"#6e2d21":"#8c3a2a"; g.fillRect(x,top,1,Math.ceil(h));
+   if(poster&&wx>.2&&wx<.8){ g.fillStyle="#fff"; if(((wx*20)|0)%3===0) g.fillRect(x,Math.round(H/2-h*.12),1,Math.max(1,Math.round(h*.24))); }
+   else { g.fillStyle="rgba(30,15,10,.55)"; const rows=4; for(let r=1;r<rows;r++) g.fillRect(x,Math.round(top+h*r/rows),1,1); const off=((Math.floor(wx*4)+(0))%2); if(((wx*4)%1)<.08) g.fillRect(x,top,1,Math.ceil(h)); }
+   if(dist>2){ g.fillStyle=`rgba(0,0,0,${Math.min(.75,(dist-2)/9)})`; g.fillRect(x,top,1,Math.ceil(h)); }
+   G.zb[x]=dist; }
+  const inv=1/(plx*dy-dx*ply), spr=[...G.people.map(q=>({q,d:(q.x-G.px)**2+(q.y-G.py)**2})),...G.proj.map(p=>({p,d:(p.x-G.px)**2+(p.y-G.py)**2}))].sort((a,b)=>b.d-a.d);
+  spr.forEach(s=>{ const o=s.q||s.p, rx=o.x-G.px, ry=o.y-G.py, tx=inv*(dy*rx-dx*ry), ty=inv*(-ply*rx+plx*ry); if(ty<=.15) return;
+   const scx=Math.round(W/2*(1+tx/ty)), size=H/ty;
+   if(s.q){ const q=s.q, img=personCv(q.look,q.gear,false), h=size*.92, w=h*16/27, top=Math.round(H/2+size/2-h), x0=Math.round(scx-w/2);
+    if(q.hired&&(q.t>>2)&1) return;
+    for(let c=Math.max(0,x0);c<Math.min(W,x0+w);c++){ if(ty>=G.zb[c]) continue; const sx=Math.floor((c-x0)/w*16); g.drawImage(img,sx,0,1,27,c,top,1,Math.ceil(h)); }
+    if(!q.hired&&ty<G.zb[Math.max(0,Math.min(W-1,scx))]){ const need=EPIS3.filter(k=>!q.gear[k]), sc=Math.max(1,Math.min(3,Math.round(size/40))); need.forEach((k,i)=>drawItem(g,k,scx-need.length*4*sc+i*8*sc,top-8*sc,sc)); }
+    if(q.hired&&ty<G.zb[Math.max(0,Math.min(W-1,scx))]) arcText(g,"¡FLiiTS!",scx,Math.max(2,top-12),"#62d26f"); }
+   else { const p=s.p, sc=Math.max(1,Math.round(size/22)); if(ty<G.zb[Math.max(0,Math.min(W-1,scx))]) drawItem(g,p.item,scx-3*sc,Math.round(H/2+size*.05),sc); } });
+  // manos: la izquierda lleva la mochila FLiiTS; la derecha, el EPI que vas a lanzar
+  const bob=Math.round(Math.sin(G.bob)*2), skin="#9c6640", K="#1b1212", th=G.hand>0?Math.round(Math.sin(G.hand/14*Math.PI)*14):0;
+  g.save(); g.translate(6,H-34+bob); g.scale(2,2); fbox(g,0,0); g.restore();
+  g.fillStyle=K; g.fillRect(14,H-40+bob,18,8); g.fillStyle=skin; g.fillRect(15,H-39+bob,16,6); g.fillStyle="#7d4f2f"; g.fillRect(19,H-39+bob,1,6); g.fillRect(24,H-39+bob,1,6);
+  const hx=144-th, hy=H-28-bob-th; g.fillStyle=K; g.fillRect(hx-2,hy+8,22,24); g.fillStyle=skin; g.fillRect(hx-1,hy+9,20,23); g.fillStyle="#7d4f2f"; g.fillRect(hx+4,hy+9,1,8); g.fillRect(hx+9,hy+9,1,8); g.fillRect(hx+14,hy+9,1,8);
+  if(G.hand<=4) drawItem(g,EPIS3[G.item],hx+1,hy-6,2.4);
+  g.fillStyle="#fff"; g.fillRect(W/2-3,H/2,7,1); g.fillRect(W/2,H/2-3,1,7);
+  g.fillStyle="rgba(18,11,12,.8)"; g.fillRect(W/2-34,H-13,68,12); arcText(g,EPIS3[G.item].toUpperCase(),W/2,H-11,"#ffd23f");
+  const txt=G.msgT>0?G.msg:G.near?`${RPG_NPCS[G.near.look].name.toUpperCase()}: ¡ME FALTA ${EPI_NAME[EPIS3.find(k=>!G.near.gear[k])]}!`:"";
+  if(txt){ g.font='8px "Press Start 2P"'; const words=txt.split(" "), lines=[""]; words.forEach(w=>{ const t=(lines[lines.length-1]+" "+w).trim(); if(g.measureText(t).width>W-12) lines.push(w); else lines[lines.length-1]=t; });
+   g.fillStyle="rgba(18,11,12,.85)"; g.fillRect(2,2,W-4,lines.length*11+5); lines.forEach((l,i)=>arcText(g,l,W/2,5+i*11,"#fff")); }
+ }
+};
+
+/* --- RAÜL · ESCÁNER DE CITAS (como el control de un aeropuerto) --- */
+const SCAN_TODAY="MIÉ 12/11";
+ARC_GAMES[1]={
+ init(){ const kinds=["ok","mal","sin","ok","mal","ok","sin","mal"].sort(()=>Math.random()-.5), BAD=["JUE 13/11","LUN 10/11","MIÉ 19/11","VIE 14/11"], spots=[[8,13],[11,19],[4,22],[3,12],[12,9],[8,24]];
+  return {W:192,H:160,idx:0,phase:"enter",px:-24,sx:118,sy:60,found:false,beepT:0,react:"",reactWho:"",reactT:0,leaveDir:1,face:"",
+   queue:kinds.map((k,i)=>({kind:k,look:(i*5+1)%LOOKS.length,date:k==="ok"?SCAN_TODAY:k==="mal"?BAD[i%BAD.length]:null,hour:["10:00","12:00","16:00","19:30"][i%4],spot:spots[(i*5)%spots.length]}))}; },
+ press(G,b){ if(G.phase!=="scan"||(b!=="A"&&b!=="B")) return;
+  const P=G.queue[G.idx], pass=b==="A", valid=P.kind==="ok", ok=pass===valid;
+  if(ok){ mg.c1++; mg.hires=mg.c1; sfx.coin(); G.face="happy"; G.reactWho="raul"; G.react=pass?"¡A FORMACIÓN!":P.kind==="sin"?"SIN CITA NO SE ENTRA":"¡HOY NO ES TU DÍA!"; }
+  else { mg.c2++; sfx.hit(); if(pass){ G.face="angry"; G.reactWho="raul"; G.react=P.kind==="sin"?"¡¡NO TENÍA CITA!!":"¡¡NO ERA SU DÍA!!"; } else { G.face="sad"; G.reactWho="person"; G.react="¡¡TENGO CITA HOY!!"; } }
+  arcProgress(); G.reactT=90; G.leaveDir=pass?1:-1; G.phase="leave"; },
+ update(G){
+  const P=G.queue[G.idx];
+  if(G.phase==="enter"){ G.px+=1.3; if(G.px>=72){ G.px=72; G.phase="scan"; G.found=false; } }
+  else if(G.phase==="scan"){
+   if(keys.ArrowLeft||keys.a) G.sx-=1.6; if(keys.ArrowRight||keys.d) G.sx+=1.6; if(keys.ArrowUp||keys.w) G.sy-=1.6; if(keys.ArrowDown||keys.s) G.sy+=1.6;
+   G.sx=Math.max(56,Math.min(140,G.sx)); G.sy=Math.max(26,Math.min(112,G.sy));
+   if(P.date){ const tx=72+P.spot[0]*3, ty=30+P.spot[1]*3, d=Math.hypot(G.sx-tx,G.sy-ty);
+    if(d<7&&!G.found){ G.found=true; tone(1400,.08); tone(1800,.12,.08); }
+    if(d<46&&--G.beepT<=0){ G.beepT=Math.max(4,Math.round(d/1.6)); tone(900+Math.max(0,46-d)*12,.03,0,"square",.035); G.led=4; } }
+   if(G.led>0) G.led--; }
+  else if(G.phase==="leave"){ if(G.reactT>40) G.reactT--; else { G.px+=G.leaveDir*1.6; G.reactT--; if(G.px>200||G.px<-30){ G.idx++; G.face=""; G.react="";
+     if(mg.c2>=3) return arcLose("¡3 FALLOS EN LA PUERTA!");
+     if(G.idx>=G.queue.length) return arcWin();
+     G.phase="enter"; G.px=-24; G.sx=118; G.sy=60; } } }
+ },
+ draw(g,G){
+  const W=G.W,H=G.H, K="#1b1212", P=G.queue[Math.min(G.idx,G.queue.length-1)];
+  g.fillStyle="#e8dcc6"; g.fillRect(0,14,W,96); g.fillStyle="#d4c6ac"; for(let x=0;x<W;x+=24) g.fillRect(x,14,1,96);
+  g.fillStyle="#9a9286"; g.fillRect(0,110,W,50); g.fillStyle="#857d71"; for(let x=0;x<W;x+=16) g.fillRect(x,110,1,50); g.fillRect(0,126,W,1); g.fillRect(0,142,W,1);
+  g.fillStyle=K; g.fillRect(2,48,26,62); g.fillStyle="#6e4527"; g.fillRect(4,50,22,60); g.fillStyle="#ffd23f"; g.fillRect(22,80,2,3);
+  g.fillStyle=K; g.fillRect(168,48,22,62); g.fillStyle="#2f6b3a"; g.fillRect(170,50,18,60); arcText(g,"FORM",179,38,"#2f6b3a"); g.fillStyle="#fff"; g.fillRect(173,70,12,10);
+  // arco del escáner
+  g.fillStyle="#555a66"; g.fillRect(58,24,6,88); g.fillRect(128,24,6,88); g.fillRect(58,20,76,8); g.fillStyle=G.phase==="scan"&&G.led>0?"#62d26f":"#9aa3b5"; g.fillRect(92,22,8,3);
+  if(G.idx<G.queue.length){ const walk=G.phase!=="scan"?((mg.t>>3)&1?1:-1):0; const img=personCv(P.look,{},G.leaveDir<0&&G.phase==="leave");
+   g.drawImage(img,0,0,16,27,Math.round(G.px),30,48,81);
+   if(walk){ g.fillStyle="#9a9286"; g.fillRect(Math.round(G.px)+(walk>0?12:28),108,8,3); }
+   if(G.found&&P.date){ const tx=72+P.spot[0]*3, ty=30+P.spot[1]*3; g.fillStyle="#ffd23f"; g.fillRect(tx-3,ty-2,6,4);
+    g.fillStyle=K; g.fillRect(1,16,82,31); g.fillStyle="#fff"; g.fillRect(2,17,80,29); arcText(g,"CITA",42,19,"#d62839"); g.font='8px "Press Start 2P"'; g.fillStyle=K; g.textAlign="center"; g.textBaseline="top"; g.fillText(P.date,42,29); g.fillText(P.hour,42,38); }
+   if(G.reactT>0&&G.react){ if(G.reactWho==="person") arcBubble(g,G.react,G.px+24,18,"#ff8a92"); } }
+  // escáner de mano
+  if(G.phase==="scan"){ const x=Math.round(G.sx), y=Math.round(G.sy); g.fillStyle=K; g.fillRect(x-7,y-4,14,8); g.fillStyle="#333"; g.fillRect(x-6,y-3,12,6); g.fillStyle=G.led>0?"#62d26f":"#d62839"; g.fillRect(x-2,y-2,4,2);
+   g.fillStyle=K; g.fillRect(x+6,y-1,16,3); g.fillStyle="#ffd23f"; g.fillRect(x+16,y-1,4,3); }
+  // Raül vigila la puerta
+  g.save(); g.translate(136,104); g.scale(2,2); drawSpr(g,CREW[1].spr,0,0,true); g.restore();
+  if(G.face==="angry"){ g.fillStyle="#d62839"; g.fillRect(142,110,8,2); g.fillRect(154,110,8,2); arcText(g,"!!",152,90,"#ff4a5c"); }
+  if(G.face==="happy") arcText(g,"OK",152,92,"#62d26f");
+  if(G.reactT>0&&G.react&&G.reactWho==="raul") arcBubble(g,G.react,140,92,G.face==="angry"?"#ff8a92":"#62d26f");
+  g.fillStyle="#120b0c"; g.fillRect(0,0,W,14); arcText(g,"HOY: "+SCAN_TODAY,4,3,"#ffd23f","left"); arcText(g,`${Math.min(G.idx+1,G.queue.length)}/${G.queue.length}`,W-4,3,"#fff","right");
+  if(G.phase==="scan"){ g.fillStyle="rgba(18,11,12,.85)"; g.fillRect(0,H-12,W,12); arcText(g,"A: PASA · B: NO PASA",W/2,H-10,"#fff"); }
+ }
+};
 
 
 /* ---------- RPG · PORTÁTIL CLÁSICO (pantalla 160×144, 4 tonos) ----------
@@ -2526,11 +2778,10 @@ function showSelect(){
   buildRoster(); justUnlocked=false; $("#pilotNote").textContent=raulOpen()?`¡${nm(1)} desbloqueado! Su pantalla lleva al jefe final.`:`Consigue las 3 monedas de oro para desbloquear un personaje secreto: llevas ${gold()}/3.`;
 }
 function confirmPick(force){
-  if(activeGameMode==="arcade"){ $("#selOv").hidden=true; sfx.select(); customStart(pick); return; }
   if(pick===1){ if(force) FORCED[activeGameMode]=true; if(!raulOpen()){ toast("BLOQUEADO"); sfx.back(); return; } forceFinal=!!force; $("#selOv").hidden=true; sfx.open();
-    if(activeGameMode==="rpg") rpgStart(1); else startRaul(); return; }
+    if(activeGameMode==="platform") startRaul(); else customStart(1); return; }
   $("#selOv").hidden=true; sfx.select();
-  if(activeGameMode==="rpg") rpgStart(pick); else showVeh();
+  if(activeGameMode==="platform") showVeh(); else customStart(pick);
 }
 function buildVeh(){
   const r=$("#vroster"); r.innerHTML="";
@@ -2676,6 +2927,8 @@ document.addEventListener("keydown",e=>{
     if(mg&&mg.typ==="rpg"){ const btn=RPG_KEYS[k]; if(!btn) return; e.preventDefault();
       if(["UP","DOWN","LEFT","RIGHT"].includes(btn)) keys[k]=true;
       if(!e.repeat||["UP","DOWN","LEFT","RIGHT"].includes(btn)) rpgPress(btn); return; }
+    if(mg&&mg.typ==="arcade"){ if(k==="Escape"){ leaveModeGame(); return; } const btn=RPG_KEYS[k]; if(!btn) return; e.preventDefault();
+      if(["UP","DOWN","LEFT","RIGHT"].includes(btn)) keys[k]=true; if(!e.repeat) arcPress(btn); return; }
     if(k==="Escape") leaveModeGame(); return; }
   if(!$("#selOv").hidden){
     const p=SEL.indexOf(pick);
@@ -2775,8 +3028,7 @@ function controllerConfirm(which){
  if(!$("#vehOv").hidden){confirmVeh();return;}
  if(!$("#modeGameOv").hidden&&mg){
   if(mg.typ==="rpg"){ rpgPress(which==="jump"?"B":which==="start"?"START":"A"); return; }
-  if(mg.phase==="won") nextEncounter();
-  else { const target=$("#mgActions").querySelector("button:not(:disabled)"); if(target) target.click(); }
+  if(mg.typ==="arcade") arcPress(which==="jump"?"B":which==="start"?"START":"A");
   return;
  }
  if(which==="jump"&&mode==="play"&&pl.on){pl.vy=-5.6;pl.on=false;sfx.jump();}
