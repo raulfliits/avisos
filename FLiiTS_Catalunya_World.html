@@ -1,56 +1,4 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
-/* Classic top-down RPG presentation */
-.modegame.rpg-classic .mg-panel{background:#e8e8df;color:#171717;border:5px solid #222;box-shadow:0 0 0 4px #777;padding:12px}
-.modegame.rpg-classic .mg-panel h2,.modegame.rpg-classic .mg-panel .kick{color:#171717}
-.rpg-world{width:min(100%,720px);margin:0 auto;position:relative;background:#111;border:4px solid #202020;box-shadow:inset 0 0 0 3px #fff;image-rendering:pixelated}
-.rpg-world canvas{display:block;width:100%;height:auto;image-rendering:pixelated;touch-action:none}
-.rpg-hud{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font: bold 12px monospace;color:#171717;background:#f4f1df;border:3px solid #222;padding:7px 10px}
-.rpg-dialog{font: bold 13px monospace;color:#171717;background:#f7f4e8;border:4px solid #222;padding:12px;min-height:48px;text-align:left;line-height:1.4}
-.rpg-battle{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-.rpg-battle .rpg-mon{background:#f7f4e8;border:3px solid #252525;padding:8px;text-align:left;font: bold 12px monospace;color:#171717}
-.rpg-battle .rpg-mon canvas{display:block;width:100px;height:100px;image-rendering:pixelated;margin:0 auto}
-.rpg-hp{height:9px;border:2px solid #252525;background:#aaa;margin-top:5px}
-.rpg-hp i{display:block;height:100%;background:#4cae54}
-.rpg-menu{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:#f7f4e8;border:4px solid #222;padding:8px}
-.rpg-menu button,.rpg-actions button{font: bold 13px monospace;color:#171717;background:#f7f4e8;border:2px solid #777;padding:10px 8px;cursor:pointer;text-align:left}
-.rpg-menu button:before{content:"▶ ";color:#222}
-.rpg-menu button:hover,.rpg-actions button:hover{background:#d8e6d0;border-color:#222}
-.rpg-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.rpg-actions button{background:#fff}
-.rpg-note{font:12px monospace;color:#171717;background:#f7f4e8;padding:6px;border:2px solid #222}
-@media(max-width:600px){.rpg-battle .rpg-mon canvas{width:70px;height:70px}.rpg-menu button,.rpg-actions button{font-size:11px;padding:9px 5px}.rpg-dialog{font-size:11px}}
-
-
-.modegame.rpg-classic .mg-scene{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
-.modegame.rpg-classic .rpg-battle-scene{max-width:720px;background:#d9e8d1}
-.modegame.rpg-classic .rpg-menu button:disabled{opacity:.45;cursor:wait}
-.modegame.rpg-classic .rpg-dialog{white-space:pre-line}
-.modegame.rpg-classic .rpg-menu{max-width:720px;margin:0 auto;width:100%;box-sizing:border-box}
-.modegame.rpg-classic .rpg-actions{max-width:720px;margin:0 auto;width:100%}
-
-/* Battle screen: recreate the handheld layout from the supplied video, with FLiiTS people replacing creatures. */
-.modegame.rpg-classic .mg-panel{width:min(1040px,96vw);background:#ead9e8;border-color:#30243a;box-shadow:0 0 0 5px #b56f9b,0 0 0 9px #30243a;padding:12px}
-.modegame.rpg-classic .rpg-battle-scene{width:min(100%,820px);max-width:820px;margin:0 auto;border:5px solid #49334d;background:#f4e6f2;box-shadow:0 0 0 3px #bd83ad;overflow:hidden;padding:0;aspect-ratio:820/320}
-.modegame.rpg-classic .rpg-battle-scene canvas{width:100%;height:100%;display:block;image-rendering:pixelated}
-.modegame.rpg-classic .rpg-battle-lower{width:min(100%,820px);margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:102px;background:#f8eef7;border:4px solid #49334d;box-shadow:0 0 0 2px #bd83ad}
-.modegame.rpg-classic .rpg-battle-lower .rpg-dialog{margin:0;min-height:96px;border:0;border-right:4px solid #49334d;padding:13px 15px;display:flex;align-items:center;background:#f8eef7;font-size:clamp(11px,1.4vw,15px);line-height:1.45}
-.modegame.rpg-classic .rpg-battle-lower .rpg-menu{width:100%;max-width:none;margin:0;padding:7px;align-content:center;grid-template-columns:1fr 1fr;gap:6px;background:#f8eef7;border:0}
-.modegame.rpg-classic .rpg-battle-lower .rpg-menu button{font: bold clamp(10px,1.35vw,14px) monospace;min-height:34px;padding:6px 7px;background:#f8eef7;border:2px solid #9c83a0;color:#241b2d;line-height:1.25;text-align:left;white-space:normal}
-.modegame.rpg-classic .rpg-battle-lower .rpg-menu button:before{content:"▶ ";color:#30243a}
-.modegame.rpg-classic .rpg-battle-lower .rpg-menu button:disabled{opacity:.38}
-.modegame.rpg-classic .rpg-battle-lower .rpg-menu button .move-meta{display:block;font-size:.78em;color:#66556a;padding-left:13px;margin-top:2px}
-.modegame.rpg-classic .rpg-battle-lower .rpg-note{grid-column:1/-1;background:#f8eef7;border:0;font-size:11px;line-height:1.5}
-.modegame.rpg-classic .rpg-contract-ball{position:absolute;z-index:8;left:27%;top:65%;width:25px;height:25px;border:3px solid #29202e;border-radius:50%;background:linear-gradient(#e63946 0 47%,#fff 48% 100%);box-shadow:2px 2px 0 #6b526c;display:grid;place-items:center;color:#20182a;font:bold 7px monospace;animation:rpg-ball-flight .85s steps(8,end) forwards}
-.modegame.rpg-classic .rpg-contract-ball:after{content:"";position:absolute;left:-3px;right:-3px;top:9px;height:3px;background:#29202e}
-@keyframes rpg-ball-flight{0%{transform:translate(0,0) rotate(0) scale(.65)}45%{transform:translate(145px,-85px) rotate(360deg) scale(1.05)}100%{transform:translate(315px,-118px) rotate(720deg) scale(.82)}}
-@media(max-width:640px){
- .modegame.rpg-classic .mg-panel{width:98vw;padding:7px}
- .modegame.rpg-classic .rpg-battle-lower{grid-template-columns:1fr 1fr;min-height:92px}
- .modegame.rpg-classic .rpg-battle-lower .rpg-dialog{font-size:10px;padding:7px;min-height:90px}
- .modegame.rpg-classic .rpg-battle-lower .rpg-menu{padding:4px;gap:4px}
- .modegame.rpg-classic .rpg-battle-lower .rpg-menu button{font-size:9px;min-height:30px;padding:4px}
- .modegame.rpg-classic .rpg-battle-lower .rpg-menu button .move-meta{font-size:7px}
-}
 
 </style>
 <style>
@@ -60,36 +8,7 @@
 .intro-scene .crew-c{left:37%;bottom:31%;}
 .intro-scene #introRaul{left:50%;z-index:3;}
 .intro-scene .crew-a,.intro-scene .crew-b,.intro-scene .crew-c{z-index:2;}
-.modegame.rpg-classic .mg-panel{width:min(1120px,98vw);padding:clamp(8px,1.3vw,16px);max-height:95%;overflow:auto;background:linear-gradient(145deg,#f3e7f1 0%,#e8d6eb 55%,#dfc8df 100%);}
-.modegame.rpg-classic .rpg-world.rpg-battle-scene{width:min(100%,1000px);max-width:1000px;aspect-ratio:960/500;border:6px solid #49334d;box-shadow:0 0 0 3px #bd83ad, inset 0 0 0 3px #fff;}
-.modegame.rpg-classic .rpg-battle-scene canvas{width:100%;height:100%;image-rendering:pixelated;}
-.modegame.rpg-classic .rpg-map-shell{width:min(100%,1000px);margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 116px;gap:8px;padding:8px;box-sizing:border-box;background:#bb92b8;border:4px solid #49334d;box-shadow:0 0 0 3px #bd83ad;}
-.modegame.rpg-classic .rpg-world.rpg-map-world{width:100%;max-width:none;margin:0;aspect-ratio:820/512;border:4px solid #293d32;box-shadow:inset 0 0 0 3px #fff;}
-.modegame.rpg-classic .rpg-map-world canvas{width:100%;height:100%;display:block;image-rendering:pixelated;}
-.modegame.rpg-classic .rpg-party-side{background:#f5e6f2;border:3px solid #49334d;padding:6px;display:flex;flex-direction:column;gap:7px;min-width:0;}
-.modegame.rpg-classic .rpg-party-head{font:900 10px monospace;text-align:center;color:#382641;border-bottom:2px solid #a87ea5;padding:4px 0 7px;}
-.modegame.rpg-classic .rpg-party-card{background:#fff8fc;border:2px solid #856783;padding:5px 3px;text-align:center;min-height:54px;display:grid;align-content:center;gap:3px;color:#2b2130;}
-.modegame.rpg-classic .rpg-party-card .avatar{width:28px;height:28px;margin:auto;border:2px solid #49334d;border-radius:50%;background:radial-gradient(circle at 50% 30%,#f0c49a 0 34%,#30221e 35% 51%,#cf3341 52% 100%);}
-.modegame.rpg-classic .rpg-party-card b{font:900 8px monospace;overflow-wrap:anywhere;}
-.modegame.rpg-classic .rpg-party-card small{font:7px monospace;color:#63536a;}
-.modegame.rpg-classic .rpg-party-card.active{outline:3px solid #f0bd35;background:#fff2c9;}
-.modegame.rpg-classic .rpg-map-hud{width:min(100%,1000px);margin:6px auto 0;}
-.modegame.rpg-classic .rpg-map-controls{width:min(100%,1000px);margin:6px auto 0;}
-.modegame.rpg-classic .rpg-battle-lower{width:min(100%,1000px);min-height:116px;border:5px solid #49334d;box-shadow:0 0 0 3px #bd83ad;}
-.modegame.rpg-classic .rpg-battle-lower .rpg-dialog{min-height:108px;font-size:clamp(12px,1.45vw,16px);}
-.modegame.rpg-classic .rpg-battle-lower .rpg-menu button{min-height:40px;font-size:clamp(11px,1.4vw,15px);}
-.modegame.rpg-classic .mg-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;}
-.modegame.rpg-classic .mg-actions button,#selectBack,#vehBack{border:3px solid #49334d;background:#f5e7f2;color:#30243a;font:bold 11px monospace;padding:9px 13px;box-shadow:2px 3px 0 #a67c9d;}
-.modegame.rpg-classic .foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;}
-@media(max-width:700px){
- .modegame.rpg-classic .rpg-map-shell{grid-template-columns:minmax(0,1fr) 76px;gap:4px;padding:4px;}
- .modegame.rpg-classic .rpg-party-side{padding:3px;gap:4px;}
- .modegame.rpg-classic .rpg-party-card{min-height:44px;padding:2px;}
- .modegame.rpg-classic .rpg-party-card .avatar{width:22px;height:22px;}
- .modegame.rpg-classic .rpg-party-card b{font-size:7px;}
- .modegame.rpg-classic .rpg-party-card small{font-size:6px;}
- .modegame.rpg-classic .rpg-battle-lower{grid-template-columns:1fr 1fr;}
-}
+#selectBack,#vehBack{border:3px solid #49334d;background:#f5e7f2;color:#30243a;font:bold 11px monospace;padding:9px 13px;box-shadow:2px 3px 0 #a67c9d;}
 
 
 </style>
@@ -113,23 +32,7 @@
 .mode-card b{font-family:var(--f-display);font-size:clamp(14px,2.1vw,26px);letter-spacing:.08em;color:#263d32;text-shadow:2px 2px 0 #c9b77e;line-height:1.5}
 .mode-card span{display:none!important}
 .mode-ov>div>p{font-family:var(--f-display);font-size:clamp(8px,1vw,12px);color:#d7dfc5;letter-spacing:.12em}
-.modegame.rpg-classic .mg-panel{background:linear-gradient(145deg,#eee8d4,#ddd5b9 65%,#c8c9ab);border-color:#283c31;box-shadow:0 0 0 5px #789064,0 0 0 9px #1d3026;color:#1b2d22}
-.modegame.rpg-classic .mg-panel h2,.modegame.rpg-classic .mg-panel .kick{color:#243c2e}
-.modegame.rpg-classic .rpg-battle-scene{background:#a9cfa0;border-color:#263d32;box-shadow:0 0 0 3px #789064}
-.modegame.rpg-classic .rpg-battle-lower{background:#f3ecd8;border-color:#263d32;box-shadow:0 0 0 2px #789064}
-.modegame.rpg-classic .rpg-battle-lower .rpg-dialog,.modegame.rpg-classic .rpg-battle-lower .rpg-menu{background:#f3ecd8;color:#1b2d22}
-.modegame.rpg-classic .rpg-battle-lower .rpg-menu button{background:#eee5ce;border-color:#77876b;color:#1b2d22}
-.modegame.rpg-classic .rpg-battle-lower .rpg-menu button:before{color:#31543b}
-.modegame.rpg-classic .rpg-battle-lower .rpg-menu button .move-meta{color:#5a6b54}
-.modegame.rpg-classic .rpg-map-shell{width:min(100%,1080px);background:#8da77a;border-color:#263d32;box-shadow:0 0 0 3px #789064}
-.modegame.rpg-classic .rpg-world.rpg-map-world{border-color:#263d32}
-.modegame.rpg-classic .rpg-party-side{background:#e9e1ca;border-color:#263d32}
-.modegame.rpg-classic .rpg-party-head{color:#263d32;border-color:#91a17b}
-.modegame.rpg-classic .rpg-party-card{background:#fbf5e5;border-color:#81916e;color:#25382b}
-.modegame.rpg-classic .rpg-party-card small{color:#65745c}
-.modegame.rpg-classic .rpg-map-hud{background:#f2ead5;border-color:#263d32;color:#1d3026}
-.modegame.rpg-classic .mg-actions button,#selectBack,#vehBack{border-color:#263d32;background:#eee5ce;color:#243c2e;box-shadow:2px 3px 0 #87946d}
-.modegame.rpg-classic .rpg-battle-lower .rpg-menu button:hover{background:#d6e4c7}
+#selectBack,#vehBack{border-color:#263d32;background:#eee5ce;color:#243c2e;box-shadow:2px 3px 0 #87946d}
 @media(max-width:700px){
  .mode-grid{grid-template-columns:1fr;max-width:520px;margin:18px auto}
  .mode-card{min-height:76px}
@@ -141,12 +44,10 @@
 
 <style>
 /* Ajustes finales de composición: combate e introducción */
-.modegame.rpg-classic .rpg-battle-scene{background:#a9cfa0!important;border-color:#263d32!important;}
-.modegame.rpg-classic .rpg-battle-scene canvas{image-rendering:pixelated;}
-.intro-ov{background:radial-gradient(ellipse at 50% 40%,rgba(208,16,44,.92),rgba(18,11,12,.97))!important;text-align:center;}
+.intro-ov{background:radial-gradient(ellipse at 50% 40%,#c11431,#120b0c)!important;text-align:center;}
 .intro-ov .intro-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100%;}
 .intro-ov .intro-brand{font-family:var(--f-display);font-size:clamp(28px,6vw,72px);color:#fff;text-shadow:4px 4px 0 #8c0a1e,8px 8px 0 #120b0c;line-height:1.2;margin:0 auto 12px;}
-.intro-ov .intro-brand span{font-size:.34em;letter-spacing:.45em;color:#f1c65b;margin-top:8px;}
+.intro-ov .intro-brand span{text-shadow:2px 2px 0 #8c0a1e;font-size:.34em;letter-spacing:.45em;color:#f1c65b;margin-top:8px;}
 .intro-ov .intro-scene{width:min(900px,94vw);height:min(38vh,270px);border:0;box-shadow:none;background:transparent;overflow:visible;margin:0 auto 8px;}
 .intro-ov .intro-scene canvas{width:clamp(66px,9vw,104px);image-rendering:pixelated;bottom:7%;}
 .intro-ov .intro-scene #introRaul{left:50%;z-index:5;}
@@ -197,10 +98,10 @@
   display:block;
   width:100%;
   text-align:center !important;
-  font-size:clamp(23px,3.2vw,38px) !important;
+  font-size:clamp(14px,1.9vw,28px) !important;
   line-height:1.15 !important;
   letter-spacing:.045em !important;
-  overflow-wrap:anywhere;
+  white-space:nowrap;
 }
 @media(max-width:700px){
   .mode-ov .mode-grid .mode-card{min-height:88px !important;padding:12px !important;}
@@ -225,23 +126,6 @@
  .intro-ov .intro-scene .crew-c{left:85%!important}
  .intro-ov .intro-scene .intro-dog{left:29%!important;width:clamp(58px,17vw,76px)!important}
  .intro-ov .press{position:relative;z-index:90}
-}
-/* En móvil, el mapa RPG ocupa casi todo el ancho del emulador; el equipo pasa debajo */
-@media(max-width:700px){
- #modeGameOv.rpg-classic{padding:5px 4px 190px!important;align-items:flex-start!important}
- #modeGameOv.rpg-classic .mg-panel{width:100%!important;max-width:none!important;max-height:calc(100dvh - 188px)!important;padding:6px!important;overflow:auto!important}
- #modeGameOv.rpg-classic .rpg-map-shell{width:100%!important;max-width:none!important;display:flex!important;flex-direction:column!important;gap:5px!important;padding:4px!important}
- #modeGameOv.rpg-classic .rpg-world.rpg-map-world{width:100%!important;max-width:none!important;aspect-ratio:820/512!important;min-height:0!important;height:auto!important}
- #modeGameOv.rpg-classic .rpg-map-world canvas{width:100%!important;height:100%!important;display:block!important}
- #modeGameOv.rpg-classic .rpg-party-side{width:100%!important;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:3px!important;padding:3px!important}
- #modeGameOv.rpg-classic .rpg-party-head{grid-column:1/-1;padding:2px!important;font-size:8px!important}
- #modeGameOv.rpg-classic .rpg-party-card{min-height:38px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:3px!important;padding:2px!important}
- #modeGameOv.rpg-classic .rpg-party-card .avatar{width:18px!important;height:18px!important;margin:0!important;flex:none}
- #modeGameOv.rpg-classic .rpg-party-card b{font-size:6px!important}
- #modeGameOv.rpg-classic .rpg-party-card small{font-size:5px!important}
- #modeGameOv.rpg-classic .rpg-map-hud,#modeGameOv.rpg-classic .rpg-map-controls{width:100%!important;margin:3px auto!important}
- #modeGameOv.rpg-classic .rpg-map-controls button{padding:6px!important;font-size:8px!important}
- #modeGameOv.rpg-classic .rpg-battle-scene{width:100%!important;max-width:none!important}
 }
 </style>
 
@@ -278,72 +162,15 @@
   .stage{overflow:hidden!important;place-items:center!important;}
   .map{max-width:100%!important;max-height:100%!important;}
 }
-@media(max-width:700px){
-  /* On the RPG map, keep the whole handheld screen for the framed map and recruited riders. */
-  #modeGameOv.rpg-classic.rpg-map-roam{
-    padding:0 0 var(--watch-pad-height)!important;
-    align-items:stretch!important;justify-content:stretch!important;
-    overflow:hidden!important;
-  }
-  #modeGameOv.rpg-classic.rpg-map-roam .mg-panel{
-    width:100%!important;max-width:none!important;
-    height:100%!important;max-height:none!important;
-    margin:0!important;padding:4px!important;
-    display:flex!important;flex-direction:column!important;
-    overflow:hidden!important;border-width:3px!important;
-  }
-  #modeGameOv.rpg-classic.rpg-map-roam .mg-panel>.kick,
-  #modeGameOv.rpg-classic.rpg-map-roam .mg-panel>h2,
-  #modeGameOv.rpg-classic.rpg-map-roam #mgStatus,
-  #modeGameOv.rpg-classic.rpg-map-roam #mgActions,
-  #modeGameOv.rpg-classic.rpg-map-roam #mgTeam,
-  #modeGameOv.rpg-classic.rpg-map-roam .mg-panel>.foot{display:none!important;}
-  #modeGameOv.rpg-classic.rpg-map-roam #mgScene{
-    flex:1 1 auto!important;min-height:0!important;height:100%!important;
-    display:flex!important;flex-direction:column!important;
-    gap:4px!important;margin:0!important;padding:3px!important;
-    overflow:hidden!important;
-  }
-  #modeGameOv.rpg-classic.rpg-map-roam .rpg-map-hud{display:none!important;}
-  #modeGameOv.rpg-classic.rpg-map-roam .rpg-map-shell{
-    display:flex!important;flex:1 1 auto!important;flex-direction:column!important;
-    width:100%!important;height:100%!important;min-height:0!important;
-    gap:4px!important;padding:3px!important;overflow:hidden!important;
-  }
-  #modeGameOv.rpg-classic.rpg-map-roam .rpg-world.rpg-map-world{
-    flex:1 1 auto!important;width:100%!important;height:auto!important;
-    min-height:0!important;max-height:none!important;aspect-ratio:auto!important;
-    margin:0!important;
-  }
-  #modeGameOv.rpg-classic.rpg-map-roam .rpg-map-world canvas{
-    display:block!important;width:100%!important;height:100%!important;
-    object-fit:fill!important;image-rendering:pixelated!important;
-  }
-  #modeGameOv.rpg-classic.rpg-map-roam .rpg-party-side{
-    flex:0 0 auto!important;width:100%!important;min-width:0!important;
-    display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
-    gap:3px!important;padding:3px!important;
-  }
-  #modeGameOv.rpg-classic.rpg-map-roam .rpg-party-head{
-    grid-column:1/-1!important;font-size:8px!important;padding:2px!important;
-  }
-  #modeGameOv.rpg-classic.rpg-map-roam .rpg-party-card{
-    min-height:34px!important;display:flex!important;align-items:center!important;
-    justify-content:center!important;gap:3px!important;padding:2px!important;
-  }
-  #modeGameOv.rpg-classic.rpg-map-roam .rpg-party-card .avatar{
-    width:18px!important;height:18px!important;margin:0!important;flex:none!important;
-  }
-  #modeGameOv.rpg-classic.rpg-map-roam .rpg-party-card b{font-size:6px!important;}
-  #modeGameOv.rpg-classic.rpg-map-roam .rpg-party-card small{font-size:5px!important;}
-}
 </style>
 
-</head><body>
 <title>FLiiTS Catalunya World</title>
+<style>/* Fuentes incrustadas (SIL OFL): funcionan sin conexión */
+@font-face{font-family:'Press Start 2P';font-style:normal;font-weight:400;font-display:swap;src:url(data:font/woff2;base64,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) format('woff2')}
+@font-face{font-family:'VT323';font-style:normal;font-weight:400;font-display:swap;src:url(data:font/woff2;base64,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) format('woff2')}
+</style>
+</head><body>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
 <style>
 /* Layout: one-screen arcade cabinet — HUD strip, side-scrolling Catalan world, control hints; levels open as RPG dialogue windows */
 :root{
@@ -469,11 +296,11 @@ button{font:inherit;color:inherit}
 
 /* Overlays */
 .ov{position:fixed;inset:0;display:grid;place-items:center;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));z-index:20;overflow:auto}
-.title-ov{background:radial-gradient(ellipse at 50% 40%,rgba(208,16,44,.92),rgba(18,11,12,.97));text-align:center}
+.title-ov{background:radial-gradient(ellipse at 50% 40%,#c11431,#120b0c);text-align:center}
 .title-ov .t1{font-family:var(--f-display);font-size:clamp(28px,6vw,72px);color:#fff;text-shadow:4px 4px 0 #8c0a1e,8px 8px 0 var(--edge);line-height:1.2;text-wrap:balance}
 .title-ov .t2{font-family:var(--f-display);font-size:clamp(11px,1.6vw,18px);margin-top:26px;color:var(--ink);line-height:1.8}
 .title-ov .t3{font-size:clamp(20px,2.4vw,30px);color:var(--dim);margin-top:18px}
-.press{font-family:var(--f-display);font-size:clamp(11px,1.5vw,16px);margin-top:44px;color:var(--ink);animation:blink 1s steps(2) infinite;background:none;border:0;cursor:pointer}
+.press{font-family:var(--f-display);font-size:clamp(11px,1.5vw,16px);line-height:1.9;margin-top:44px;color:var(--ink);animation:blink 1s steps(2) infinite;background:none;border:0;cursor:pointer}
 .senyera{display:flex;justify-content:center;margin:22px auto 0;width:min(320px,70vw);height:10px}
 .senyera i{flex:1;background:var(--gold)} .senyera i:nth-child(even){background:var(--red)}
 @keyframes blink{50%{opacity:0}}
@@ -673,6 +500,51 @@ body.editing [data-k]:focus{outline:2px solid var(--gold);background:rgba(0,0,0,
   .hint{font-size:16px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<style id="rpg-portatil">
+/* RPG · consola portátil de 4 tonos. Las medidas del interior van en cqw (ancho de la pantalla)
+   para que el texto mantenga la rejilla de 160 px a cualquier tamaño. */
+#modeGameOv.rpg-classic{background:#101311;align-items:center;padding:8px}
+#modeGameOv.rpg-classic .mg-panel{width:min(640px,98vw);max-height:100%;overflow:auto;background:#cfccc2;border:0;border-radius:10px 10px 44px 10px;box-shadow:inset 0 -6px 0 #b4b1a6,0 12px 40px rgba(0,0,0,.6);padding:14px 14px 10px;color:#3a3946;text-align:center}
+#modeGameOv.rpg-classic .mg-panel>.kick,#modeGameOv.rpg-classic .mg-panel>h2,#modeGameOv.rpg-classic #mgStatus,#modeGameOv.rpg-classic #mgActions,#modeGameOv.rpg-classic #mgTeam{display:none}
+#modeGameOv.rpg-classic .mg-scene{display:block;min-height:0;margin:0;padding:0;background:none;border:0}
+#modeGameOv.rpg-classic .foot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;font-family:var(--f-display);font-size:8px;line-height:1.6;color:#55546a;text-align:left}
+#modeGameOv.rpg-classic #mgExit{background:#55546a;color:#efede4;border:0;border-radius:12px;font-family:var(--f-display);font-size:8px;padding:8px 12px}
+.gb-bezel{background:#57566a;border-radius:8px 8px 30px 8px;padding:clamp(10px,3.4vw,24px) clamp(12px,5vw,40px) 8px}
+.gb-scr{position:relative;width:min(100%,calc((100dvh - 210px)*160/144));aspect-ratio:160/144;margin:0 auto;container-type:inline-size;background:var(--g0,#e0f8d0);overflow:hidden;box-shadow:0 0 0 2px #2a2a33}
+.gb-scr canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges}
+.gb-brand{font-family:var(--f-display);font-style:italic;font-size:clamp(7px,1.6vw,11px);color:#d8d5ca;text-align:left;margin-top:8px;letter-spacing:.06em}
+.gb-help{font-family:var(--f-display);font-size:clamp(6px,1.25vw,8px);line-height:1.8;color:#55546a;margin-top:8px}
+.gb-help .tp{display:none}
+.gb-ov{position:absolute;inset:0;text-align:left;font-family:"Press Start 2P",monospace;font-size:4.6cqw;line-height:1.75;color:var(--g3);user-select:none}
+.gbx{position:absolute;box-sizing:border-box;background:var(--g0);color:var(--g3);border:1.4cqw double var(--g3);padding:1.2cqw 2.4cqw}
+.gb-text{left:0;top:66.667%;width:100%;height:33.333%;white-space:pre;padding:2.6cqw 3.2cqw;cursor:pointer}
+.gb-more{position:absolute;right:3.2cqw;bottom:2.4cqw;width:3.4cqw;height:2.2cqw;background:var(--g3);clip-path:polygon(0 0,100% 0,50% 100%);animation:blink .55s steps(2) infinite}
+.gb-menu{display:flex;flex-direction:column;justify-content:center}
+.gb-it{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.gb-it::before{content:"";display:inline-block;width:2.4cqw;height:3.2cqw;margin-right:1.4cqw;vertical-align:-.2em}
+.gb-it.on::before{background:var(--g3);clip-path:polygon(0 0,100% 50%,0 100%)}
+.gb-it.dis{color:var(--g1)}
+.gb-root{left:36%;top:66.667%;width:64%;height:33.333%;display:grid;grid-template-columns:1fr 1fr;align-content:center;font-size:3.5cqw;padding:1.2cqw 1.4cqw}
+.gb-low{left:0;top:58.333%;width:100%;height:41.667%}
+.gb-info{left:0;top:36%;width:60%;height:22.5%;font-size:3.8cqw;line-height:1.8;display:flex;align-items:center}
+.gb-side{right:0;top:0;width:66%;min-height:30%;font-size:4.2cqw}
+.gb-full{left:0;top:0;width:100%;height:66.667%;justify-content:flex-start;font-size:3.9cqw}
+.gb-banner{left:2%;top:2%;max-width:96%;font-size:4cqw}
+.gb-ebox{left:2%;top:2%;width:58%;font-size:4cqw;line-height:1.6}
+.gb-hbox{left:45%;top:39%;width:53%;font-size:4cqw;line-height:1.6}
+.gb-nm{display:flex;justify-content:space-between;gap:2cqw}.gb-nm b{font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gb-bar{display:flex;align-items:center;gap:1.4cqw;font-size:3.2cqw}
+.gbhp{flex:1;height:2.6cqw;border:.7cqw solid var(--g3);background:var(--g0);box-sizing:border-box}
+.gbhp i{display:block;height:100%;background:var(--g2)}
+.gbhp i.low{background:var(--g3);animation:blink .5s steps(2) infinite}
+.gb-hpn{text-align:right;white-space:pre}
+@media(max-width:700px){
+ #modeGameOv.rpg-classic{align-items:flex-start;padding:4px 4px var(--watch-pad-height,190px)}
+ #modeGameOv.rpg-classic .mg-panel{width:100%;max-height:none;padding:8px 8px 6px;border-radius:8px 8px 26px 8px}
+ .gb-scr{width:min(100%,calc((100dvh - var(--watch-pad-height,190px) - 120px)*160/144))}
+ .gb-help .kb{display:none}.gb-help .tp{display:inline}
+}
 </style>
 
 <div class="app">
@@ -1743,11 +1615,12 @@ function draw(){
   if(mode!=="play"&&mode!=="final"){ bossLbl.hidden=true; }
   bubbles=bubbles.filter(b=>{ if(frame>b.until){ b.el.remove(); return false; }
     const x=typeof b.wx==="function"?b.wx():b.wx, y=typeof b.wy==="function"?b.wy():b.wy;
-    b.el.style.left=((x-cam)/VW*100)+"%"; b.el.style.top=(y/VH*100)+"%"; return true; });
+    const minTop=map.clientHeight?(b.el.offsetHeight+10)/map.clientHeight*100:0;
+    b.el.style.left=((x-cam)/VW*100)+"%"; b.el.style.top=Math.max(y/VH*100,minTop)+"%"; return true; });
 }
 function loop(){
   if(!gamePaused) frame++;
-  if(!gamePaused && open<0){ if(mg && !$("#modeGameOv").hidden && auto && mg.typ!=="rpg" && frame%75===0){ if(mg.phase==="fight"){ const a=RPG_ATTACKS[mg.ci][0]; customAttack(0,a); } else if(mg.phase==="won") nextEncounter(); } if(mg&&mg.typ==="rpg"&&!$("#modeGameOv").hidden&&mg.phase==="roam") updateRpgWorld(); if(mode==="play"){ if(bossS.on) bossStep(); else physics(); moveDog(); } else if(mode==="final") finalStep(); else if(mode==="raul") raulStep(); }
+  if(!gamePaused && open<0){ if(mg && !$("#modeGameOv").hidden && auto && mg.typ==="arcade" && frame%75===0){ if(mg.phase==="fight") customAttack(0,demoArcadeAction()); else if(mg.phase==="won") nextEncounter(); } if(mg&&mg.typ==="rpg"&&!$("#modeGameOv").hidden) rpgTick(); if(mode==="play"){ if(bossS.on) bossStep(); else physics(); moveDog(); } else if(mode==="final") finalStep(); else if(mode==="raul") raulStep(); }
   draw();
   requestAnimationFrame(loop);
 }
@@ -1761,6 +1634,13 @@ function fit(){
  map.style.height=(w/ratio)+"px";
 }
 addEventListener("resize",fit);
+// VW/VH se fijan al cargar: si el móvil cambia de orientación, recargamos desde los menús
+// (no hay partida que perder) y durante el juego avisamos en vez de cortar la partida.
+matchMedia("(max-width:700px) and (orientation:portrait)").addEventListener("change",e=>{
+  if(e.matches===MOBILE_PORTRAIT) return;
+  const inMenus=!$("#titleOv").hidden||!$("#introOv").hidden||!$("#modeOv").hidden||!$("#selOv").hidden;
+  if(inMenus) location.reload(); else toast("GIRA EL MÓVIL DE NUEVO");
+});
 if(window.visualViewport) visualViewport.addEventListener("resize",fit);
 
 
@@ -1782,11 +1662,12 @@ $("#selectBack").addEventListener("click",()=>{ $("#selOv").hidden=true; $("#mod
 $("#vehBack").addEventListener("click",()=>{ $("#vehOv").hidden=true; showSelect(); });
 $("#introContinue").addEventListener("click",continueIntro);
 
-const RPG_ATTACKS={
-  0:["Glovo","Uber","30h!","Moto empres!","Sueldo garantizado!"],
-  2:["Documento caducado","Permiso de trabajo con pasaporte","NIE","Permiso de trabajo"],
-  3:["Casco","Chaqueta","Mochila","Guantes"],
-  1:["Escanea QR","Ingresa código de la cita","Pon tu NIE!","Vuelve el día que te toca!"]
+/* ---------- MINI ARCADE ---------- */
+const ARCADE_OPTS={
+  0:["LANZAR CONTRATO"],
+  1:["ESCANEAR QR","COMPROBAR FECHA","VALIDAR CITA","ENVIAR A PEDIR CITA"],
+  2:["MOTO","BICI","PATINETE"],
+  3:["DISPARAR CASCO","DISPARAR CHAQUETA","DISPARAR MOCHILA","DISPARAR GUANTES"]
 };
 const ENEMIES={
   0:["Solo Glovo","Documentación caducada","Licencia internacional","Alquilo cuenta!"],
@@ -1796,549 +1677,476 @@ const ENEMIES={
 };
 function customStart(ci){
  gamePaused=false; $("#pauseScreen").classList.remove("show");
- const typ=activeGameMode;
- if(typ==="rpg"){
-  pick=ci; mg={ci,heroId:ci,typ,round:0,hp:100,maxHp:100,enemyHp:100,team:[],phase:"roam",mapPos:0,ball:false,gear:{},message:"Explora el pueblo. Habla con los personajes que encuentres.",player:{x:320,y:250,dir:0,step:0},npcs:[],encounterCount:0,items:{monster:2,contract:-1},inventory:[],battleMenu:"root",worldTick:0,defeated:[],moves:rpgMovesFor(ci).map(m=>({...m}))};
-  setupRpgMap(); $("#modeGameOv").classList.add("rpg-classic"); $("#modeGameOv").hidden=false; renderRpg(); return;
- }
+ if(activeGameMode==="rpg"){ rpgStart(ci); return; }
  $("#modeGameOv").classList.remove("rpg-classic");
- mg={ci,typ,round:0,hp:100,enemyHp:100,done:false,team:[],phase:"fight",mapPos:0,ball:false,gear:{},message:"¡Se acerca el primer aspirante!"};
+ mg={ci,typ:"arcade",round:0,enemyHp:100,team:[],phase:"fight",gear:{},message:"¡Se acerca el primer aspirante!"};
  $("#modeGameOv").hidden=false; $("#mgTeam").textContent=""; renderCustom();
 }
+// Acción que usa el modo DEMO en el arcade: siempre una que hace avanzar la partida.
+function demoArcadeAction(){
+ const ci=mg.ci;
+ if(ci===3){ const left=["CASCO","CHAQUETA","MOCHILA","GUANTES"].find(g=>!mg.gear[g.toLowerCase()]); return "DISPARAR "+left; }
+ if(ci===1) return mg.round%2===0?"VALIDAR CITA":"COMPROBAR FECHA";
+ return ARCADE_OPTS[ci][0];
+}
 function renderCustom(){
- if(!mg)return; if(mg.typ==="rpg"){renderRpg();return;}
- const c=CREW[mg.ci], title=mg.typ==="rpg"?"RPG · "+c.name:"MINI ARCADE · "+c.name;
- $("#mgKick").textContent=MODE_NAMES[mg.typ]; $("#mgTitle").textContent=title;
+ if(!mg||mg.typ!=="arcade")return;
+ const c=CREW[mg.ci];
+ $("#mgKick").textContent=MODE_NAMES.arcade; $("#mgTitle").textContent="MINI ARCADE · "+nm(mg.ci);
  $("#mgProgress").textContent=mg.phase==="finish"?"EQUIPO COMPLETO":`ENCUENTRO ${Math.min(4,mg.round+1)}/4`;
  const scene=$("#mgScene"); scene.innerHTML="";
- const makeActor=(i,label,hp)=>{const d=document.createElement("div");d.className="mg-actor";const cv=standCanvas(i);d.appendChild(cv);const b=document.createElement("b");b.textContent=label;d.appendChild(b);if(hp!==null){const bar=document.createElement("div");bar.className="mg-hp";const fill=document.createElement("i");fill.style.width=hp+"%";bar.appendChild(fill);d.appendChild(bar);}scene.appendChild(d);};
- if(mg.phase==="map"){
-  scene.innerHTML=`<div class="rpg-map"><div class="map-node ${mg.mapPos===0?"here":""}">🏙️<b>CIUDAD</b></div><div class="map-node ${mg.mapPos===1?"here":""}">🏡<b>PUEBLO</b></div><div class="map-node ${mg.mapPos===2?"here":""}">🛣️<b>PUNTO MEDIO</b></div><div class="map-hero">🧍 ${c.name}</div></div>`;
- }else{
-  makeActor(mg.ci,c.name,100);
-  if(mg.phase==="fight") makeActor((mg.ci+1)%4,ENEMIES[mg.ci][mg.round],mg.enemyHp);
-  else if(mg.phase==="finish") mg.team.forEach((_,i)=>makeActor((i+mg.ci+1)%4,"RIDER "+(i+1),100));
- }
+ const makeActor=(i,label,hp)=>{const d=document.createElement("div");d.className="mg-actor";d.appendChild(standCanvas(i));const b=document.createElement("b");b.textContent=label;d.appendChild(b);if(hp!==null){const bar=document.createElement("div");bar.className="mg-hp";const fill=document.createElement("i");fill.style.width=hp+"%";bar.appendChild(fill);d.appendChild(bar);}scene.appendChild(d);};
+ makeActor(mg.ci,nm(mg.ci),100);
+ if(mg.phase==="fight") makeActor((mg.ci+1)%4,ENEMIES[mg.ci][mg.round],mg.enemyHp);
+ else if(mg.phase==="finish") mg.team.forEach((_,i)=>makeActor((i+mg.ci+1)%4,"RIDER "+(i+1),100));
  $("#mgStatus").textContent=mg.message;
  const acts=$("#mgActions");acts.innerHTML="";
- if(mg.phase==="map"){
-  ["◀ ZONA ANTERIOR","ZONA SIGUIENTE ▶","ENTRAR EN ENCUENTRO"].forEach((label,i)=>{const b=document.createElement("button");b.textContent=label;b.addEventListener("click",()=>{if(i===0)mg.mapPos=(mg.mapPos+2)%3;else if(i===1)mg.mapPos=(mg.mapPos+1)%3;else{mg.phase="fight";mg.enemyHp=100;mg.message="¡Un aspirante aparece en "+["la ciudad","el pueblo","el punto medio"][mg.mapPos]+"!";}renderCustom();});acts.appendChild(b);});
- }else if(mg.phase==="fight"){
-  let opts=RPG_ATTACKS[mg.ci].slice();
-  if(mg.ci===3) opts=["Casco","Chaqueta","Mochila","Guantes"];
-  if(mg.ci===1) opts=["Escanea QR","Ingresa código de la cita","Pon tu NIE!","Vuelve el día que te toca!"];
-  if(mg.ci===2) opts=["Documento caducado","Permiso de trabajo con pasaporte","NIE","Permiso de trabajo"];
-  if(mg.ci===0) opts=mg.typ==="arcade"?["LANZAR BOLA · ASPIRANTE"]:["Glovo","Uber","30h!","Moto empres!","Sueldo garantizado!"];
-  if(mg.typ==="arcade"&&mg.ci===2) opts=["MOTO","BICI","PATINETE"];
-  if(mg.typ==="arcade"&&mg.ci===3) opts=["DISPARAR CASCO","DISPARAR CHAQUETA","DISPARAR MOCHILA","DISPARAR GUANTES"];
-  if(mg.typ==="arcade"&&mg.ci===1) opts=["ESCANEAR QR","COMPROBAR FECHA","VALIDAR CITA","ENVIAR A PEDIR CITA"];
-  opts.forEach((a,i)=>{const b=document.createElement("button");b.textContent=a;b.addEventListener("click",()=>customAttack(i,a));acts.appendChild(b);});
-  if(mg.ci===0&&mg.enemyHp<=45&&!mg.ball){const b=document.createElement("button");b.textContent="POKEBALL DE CONTRATO";b.addEventListener("click",()=>captureEnemy());acts.appendChild(b);}
- }else if(mg.phase==="won"){
-  const b=document.createElement("button");b.textContent="SIGUIENTE ENCUENTRO";b.addEventListener("click",nextEncounter);acts.appendChild(b);
- }else if(mg.phase==="finish"){
-  const b=document.createElement("button");b.textContent="CONTINUAR AL GRAN JEFE FINAL";b.addEventListener("click",()=>{ $("#modeGameOv").hidden=true; hideRaulUI(); startFinal(); });acts.appendChild(b);
- }else{
-  const b=document.createElement("button");b.textContent="SIGUIENTE ENCUENTRO";b.addEventListener("click",nextEncounter);acts.appendChild(b);
- }
+ const btn=(label,fn)=>{const b=document.createElement("button");b.type="button";b.textContent=label;b.addEventListener("click",fn);acts.appendChild(b);};
+ if(mg.phase==="fight"){
+  ARCADE_OPTS[mg.ci].forEach((a,i)=>btn(a,()=>customAttack(i,a)));
+  if(mg.ci===0&&mg.enemyHp<=45) btn("FIRMAR CONTRATO",captureEnemy);
+ }else if(mg.phase==="won") btn("SIGUIENTE ENCUENTRO",nextEncounter);
+ else if(mg.phase==="finish") btn("CONTINUAR AL GRAN JEFE FINAL",()=>{ $("#modeGameOv").hidden=true; hideRaulUI(); startFinal(); });
 }
 function customAttack(i,a){
- if(!mg||mg.phase!=="fight")return; if(mg.typ==="rpg"){rpgAttack(i,a);return;}
- const ci=mg.ci;
- if(mg.typ==="arcade"){
-  if(ci===0){mg.enemyHp=Math.max(0,mg.enemyHp-35);mg.message="¡PINBALL! La bola golpea al aspirante.";if(mg.enemyHp<=0){mg.message="¡RIDER CONTRATADO!";mg.phase="won";mg.team.push(true);}renderCustom();return;}
-  if(ci===2){if(a!=="MOTO"){mg.message="Ese rider no tiene moto. ¡Prueba otra vez!";renderCustom();return;}mg.enemyHp=0;mg.message="¡RIDER CON MOTO CAPTURADO!";mg.phase="won";mg.team.push(true);renderCustom();return;}
-  if(ci===3){const gear=a.replace("DISPARAR ","").toLowerCase();mg.gear[gear]=true;mg.message="¡EPI colocado: "+gear+"!";if(Object.keys(mg.gear).length>=4){mg.enemyHp=0;mg.phase="won";mg.team.push(true);mg.message="¡RIDER COMPLETO!";}renderCustom();return;}
-  if(ci===1){const valid=mg.round%2===0;if(a==="COMPROBAR FECHA"&&!valid){mg.message="La fecha no coincide: no pasa. Enviar a pedir cita.";mg.enemyHp=0;mg.phase="won";mg.team.push(true);}else if(a==="VALIDAR CITA"&&valid){mg.enemyHp=0;mg.phase="won";mg.team.push(true);mg.message="¡CITA VALIDADA! Pasa a formación.";}else{mg.message="QR o cita no válida. Escanea QR para pedir cita."; }renderCustom();return;}
- }
- let damage=ci===0?22:ci===2?(i===0?0:i===1||i===2?55:25):ci===3?30:([0,2].includes(i)?0:35);
- let msg="";
- if(ci===0){damage= i===0?20:i===1?20:i===2?25:i===3?30:35;msg="¡Ataque de contratación!";}
- if(ci===2){if(i===0){damage=0;msg="¡Documento caducado! El RTO lo esquiva.";}else if(i===1||i===2){damage=55;msg="¡DAÑO CRÍTICO!";}else{damage=25;msg="Permiso de trabajo validado.";}}
- if(ci===3){const need=["Casco","Chaqueta","Mochila","Guantes"];if(mg.gear[a]){msg="Ese EPI ya está entregado.";}else{mg.gear[a]=true;damage=30;msg="¡"+a+" equipado!";if(Object.keys(mg.gear).length===4){mg.enemyHp=0;msg="¡RIDER COMPLETO!";}}}
- if(ci===1){damage= i===0?0:i===1?30:i===2?35:0;msg=i===0?"QR no validado: escanea de nuevo.":i===1?"Código de cita comprobado.":i===2?"¡NIE validado!": "Sin cita válida: vuelve el día asignado.";if(i===1||i===2)mg.ball=true;}
- mg.enemyHp=Math.max(0,mg.enemyHp-damage);mg.message=msg;
- if(mg.enemyHp<=0){mg.message=ci===2?"¡RIDER APROBADO!":ci===3?"¡RIDER COMPLETO!":ci===1?(mg.ball?"¡TURNO PARA FORMACIÓN!":"¡ASPIRANTE RECHAZADO!"):"¡DESPEDIDO!";mg.phase="won";mg.team.push(true);}
+ if(!mg||mg.typ!=="arcade"||mg.phase!=="fight")return;
+ const ci=mg.ci, win=msg=>{mg.enemyHp=0;mg.phase="won";mg.team.push(true);mg.message=msg;};
+ if(ci===0){mg.enemyHp=Math.max(0,mg.enemyHp-35);mg.message="¡El contrato golpea al aspirante!";if(mg.enemyHp<=0)win("¡RIDER CONTRATADO!");}
+ else if(ci===2){if(a!=="MOTO")mg.message="Ese rider no tiene moto. ¡Prueba otra vez!";else win("¡RIDER CON MOTO CAPTURADO!");}
+ else if(ci===3){const gear=a.replace("DISPARAR ","").toLowerCase();mg.gear[gear]=true;mg.message="¡EPI colocado: "+gear+"!";if(Object.keys(mg.gear).length>=4)win("¡RIDER COMPLETO!");}
+ else if(ci===1){const valid=mg.round%2===0;if(a==="COMPROBAR FECHA"&&!valid)win("La fecha no coincide: no pasa. Enviar a pedir cita.");else if(a==="VALIDAR CITA"&&valid)win("¡CITA VALIDADA! Pasa a formación.");else mg.message="QR o cita no válida. Escanea QR para pedir cita.";}
  renderCustom();
 }
-function captureEnemy(){if(!mg)return;mg.ball=true;mg.enemyHp=0;mg.message="¡CONTRATO FIRMADO! RIDER CAPTURADO.";mg.phase="won";mg.team.push(true);renderCustom();}
-function nextEncounter(){if(!mg)return;mg.round++;if(mg.round>=4){mg.phase="finish";mg.message="¡Los cuatro encuentros superados! Los riders se unen al equipo.";mg.team=[1,2,3,4,5];}else{mg.phase=mg.typ==="rpg"?"map":"fight";mg.enemyHp=100;mg.ball=false;mg.gear={};mg.message=mg.typ==="rpg"?"Continúa explorando el mapa para encontrar otro aspirante.":"¡Nuevo encuentro!";}renderCustom();}
-$("#mgExit").addEventListener("click",()=>{ $("#modeGameOv").hidden=true; $("#modeGameOv").classList.remove("rpg-classic"); showSelect(); });
+function captureEnemy(){if(!mg)return;mg.enemyHp=0;mg.message="¡CONTRATO FIRMADO! RIDER CAPTURADO.";mg.phase="won";mg.team.push(true);renderCustom();}
+function nextEncounter(){if(!mg)return;mg.round++;if(mg.round>=4){mg.phase="finish";mg.message="¡Los cuatro encuentros superados! Los riders se unen al equipo.";mg.team=[1,2,3,4,5];}else{mg.phase="fight";mg.enemyHp=100;mg.gear={};mg.message="¡Nuevo encuentro!";}renderCustom();}
+function leaveModeGame(){ $("#modeGameOv").hidden=true; $("#modeGameOv").classList.remove("rpg-classic"); showSelect(); }
+$("#mgExit").addEventListener("click",leaveModeGame);
 
 
-/* ---------- RPG TOP-DOWN CLÁSICO ---------- */
+/* ---------- RPG · PORTÁTIL CLÁSICO (pantalla 160×144, 4 tonos) ----------
+   Todo se dibuja a resolución nativa en un canvas de 160×144 y se escala en píxeles.
+   Los sprites de la plantilla se pasan a 4 tonos por luminancia, así cada personaje
+   conserva su diseño. Textos y menús son HTML encima del canvas (nítidos y pulsables). */
+const GBW=160, GBH=144, MW=20, MH=18, RPG_SAVE="fliits-rpg-v1";
+const GB_PALS=[
+ {n:"VERDE", c:["#e0f8d0","#88c070","#346856","#081820"]},
+ {n:"GRIS",  c:["#f2f2ea","#aaa99e","#5b5a52","#151511"]},
+ {n:"FLiiTS",c:["#fff1e6","#f2a08a","#b3203a","#2a0a12"]}
+];
+let GP=GB_PALS[0].c;
+const DV={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]}, OPP={up:"down",down:"up",left:"right",right:"left"};
 const RPG_NPCS=[
- // 8 de cada 10 personajes del grupo de aspirantes son de origen pakistaní.
- // Son personajes variados y neutrales: el origen no determina su carácter ni sus habilidades.
- {name:"Aamir",origin:"Pakistaní",role:"Rider urbano · veterano",shirt:"#2f6b8f",hair:"#241a18",skin:"#b97950",hp:52,atk:["Ruta alternativa","Pedido duplicado","Batería al 20%"]},
- {name:"Bilal",origin:"Pakistaní",role:"Aspirante · ciclomotor",shirt:"#d57b35",hair:"#302018",skin:"#c98b63",hp:48,atk:["Cambio de dirección","Cliente impaciente","Lluvia sorpresa"]},
- {name:"Hamza",origin:"Pakistaní",role:"Rider de costa",shirt:"#347b63",hair:"#211915",skin:"#9f6748",hp:58,atk:["Viento de playa","Subida larga","Pedido doble"]},
- {name:"Imran",origin:"Pakistaní",role:"Repartidor nocturno",shirt:"#6654a0",hair:"#201a19",skin:"#bd8058",hp:62,atk:["Turno de noche","Portal sin número","Ascensor averiado"]},
- {name:"Farhan",origin:"Pakistaní",role:"Mecánico de motos",shirt:"#a34b43",hair:"#30221c",skin:"#ad714f",hp:55,atk:["Revisión de frenos","Batería baja","Pinchazo"]},
- {name:"Saira",origin:"Pakistaní",role:"Rider · especialista en rutas",shirt:"#c45a83",hair:"#30201d",skin:"#c48b69",hp:50,atk:["Atajo por el barrio","Pedido urgente","Dirección incorrecta"]},
- {name:"Ayesha",origin:"Pakistaní",role:"Aspirante · formación",shirt:"#4b82b8",hair:"#2b1d19",skin:"#d09a76",hp:46,atk:["Prueba de ruta","Código de acceso","Parada extra"]},
- {name:"Zain",origin:"Pakistaní",role:"Rider · zona comercial",shirt:"#8b763d",hair:"#211916",skin:"#a96d4b",hp:60,atk:["Centro peatonal","Pedido pesado","Cambio de turno"]},
- {name:"Nil",origin:"",role:"Rider local · zona centro",shirt:"#7b8b9b",hair:"#76513a",skin:"#efc49b",hp:49,atk:["Calle cortada","Pedido doble","Lluvia"]},
- {name:"Lucas",origin:"",role:"Aspirante · zona estación",shirt:"#547d58",hair:"#583a25",skin:"#d7a27b",hp:53,atk:["Tren con retraso","Portal cerrado","Ruta larga"]}
+ {name:"Aamir", role:"Rider urbano · veterano",     shirt:"#2f6b8f",hair:"#241a18",skin:"#b97950",hp:52,atk:["Ruta alternativa","Pedido duplicado","Batería al 20%"],say:"¡Llevo años repartiendo por el barrio! ¿Me convences?",after:"Vale, vale... me lo pensaré."},
+ {name:"Bilal", role:"Aspirante · ciclomotor",      shirt:"#d57b35",hair:"#302018",skin:"#c98b63",hp:48,atk:["Cambio de dirección","Cliente impaciente","Lluvia sorpresa"],say:"¡Tengo ciclomotor y muchas ganas! ¡Pruébame!",after:"Volveré con el carnet en regla."},
+ {name:"Hamza", role:"Rider de costa",              shirt:"#347b63",hair:"#211915",skin:"#9f6748",hp:58,atk:["Viento de playa","Subida larga","Pedido doble"],say:"El viento de la playa no me para. ¡A ver tú!",after:"Uf, qué brisa hace hoy..."},
+ {name:"Imran", role:"Repartidor nocturno",         shirt:"#6654a0",hair:"#201a19",skin:"#bd8058",hp:62,atk:["Turno de noche","Portal sin número","Ascensor averiado"],say:"El turno de noche es el mejor. ¿Aguantas?",after:"Me voy a dormir un rato."},
+ {name:"Farhan",role:"Mecánico de motos",           shirt:"#a34b43",hair:"#30221c",skin:"#ad714f",hp:55,atk:["Revisión de frenos","Batería baja","Pinchazo"],say:"Antes de repartir reviso los frenos. ¿Y tú?",after:"Frenos revisados. ¡Hasta otra!"},
+ {name:"Saira", role:"Rider · especialista en rutas",shirt:"#c45a83",hair:"#30201d",skin:"#c48b69",hp:50,atk:["Atajo por el barrio","Pedido urgente","Dirección incorrecta"],say:"¡Me sé todos los atajos del pueblo!",after:"Hay un atajo por allí... ¡shh!"},
+ {name:"Ayesha",role:"Aspirante · formación",       shirt:"#4b82b8",hair:"#2b1d19",skin:"#d09a76",hp:46,atk:["Prueba de ruta","Código de acceso","Parada extra"],say:"Estoy en formación. ¡Pon a prueba mi ruta!",after:"Seguiré practicando."},
+ {name:"Zain",  role:"Rider · zona comercial",      shirt:"#8b763d",hair:"#211916",skin:"#a96d4b",hp:60,atk:["Centro peatonal","Pedido pesado","Cambio de turno"],say:"Zona comercial y pedidos pesados. ¡Vamos!",after:"Necesito una mochila más grande."},
+ {name:"Nil",   role:"Rider local · zona centro",   shirt:"#7b8b9b",hair:"#76513a",skin:"#efc49b",hp:49,atk:["Calle cortada","Pedido doble","Lluvia"],say:"¡Calle cortada! Tendrás que pasar por mí.",after:"Ya puedes pasar."},
+ {name:"Lucas", role:"Aspirante · zona estación",   shirt:"#547d58",hair:"#583a25",skin:"#d7a27b",hp:53,atk:["Tren con retraso","Portal cerrado","Ruta larga"],say:"Mi tren llega tarde, pero yo no. ¡Te reto!",after:"¿Y ahora qué tren cojo?"}
 ];
-const RPG_OTHER_ORIGINS=["Catalán","Colombiano","Marroquí","Rumano","Argentino","Italiano","Senegalés","Peruano","Francés","Chileno"];
-const RPG_MAPS=[
- {name:"BARCELONA · BARRIO",kind:"city",sky:"#9ac9e8",ground:"#76a85a",road:"#d8c99a"},
- {name:"PUEBLO DEL INTERIOR",kind:"village",sky:"#a6d4ee",ground:"#6ca45b",road:"#d8c28b"},
- {name:"PUEBLO COSTERO",kind:"coast",sky:"#79c9df",ground:"#e3d59b",road:"#d6c18c"}
+// Zonas: mapa de 20×18 casillas. "." césped · "," hierba alta · "=" camino · "s" arena
+// "~" agua · "T" árbol · "f" valla · "F" flores · "S" cartel. Los edificios van aparte.
+const ZONES=[
+ {name:"BARCELONA · BARRIO", exitL:-1, exitR:1, start:[9,12,"up"],
+  paint(R,g){ R(1,8,19,2,"="); R(9,1,2,16,"="); R(4,5,1,3,"="); R(14,5,1,3,"="); R(1,15,18,1,"=");
+   R(2,10,5,1,"F"); R(13,10,3,1,"~"); R(16,5,2,2,"T"); R(6,11,2,1,"T"); g[7][7]="S"; },
+  bld:[{x:2,y:2,w:5,h:3,name:"FLiiTS HUB",hub:1},{x:12,y:2,w:5,h:3,name:"PISOS",msg:"PISOS. Aquí vive medio equipo de reparto."},
+       {x:2,y:12,w:5,h:3,name:"CAFÉ",msg:"CAFÉ. Un rider pide un cortado para llevar."},{x:12,y:12,w:6,h:3,name:"MERCAT",msg:"MERCAT. ¡Hoy hay muchísimos pedidos!"}],
+  signs:{"7,7":"BARCELONA · BARRIO\nESTE » PUEBLO DEL INTERIOR"},
+  npcs:[[0,6,9,"right",0],[1,12,6,"down",1],[8,17,8,"left",0]]},
+ {name:"PUEBLO DEL INTERIOR", exitL:0, exitR:2, start:[1,9,"right"],
+  paint(R,g){ R(0,8,20,2,"="); R(3,5,1,3,"="); R(10,6,1,2,"="); R(16,5,1,3,"="); R(8,10,1,5,"="); R(1,15,18,1,"=");
+   R(2,11,5,3,","); R(13,11,5,3,","); R(2,10,2,1,"f"); R(5,10,2,1,"f"); R(1,16,18,1,"F"); g[7][6]="S"; },
+  bld:[{x:2,y:2,w:3,h:3,name:"FORN",msg:"FORN. Huele a coca de recapte."},{x:8,y:2,w:5,h:4,name:"AJUNTAMENT",msg:"AJUNTAMENT. Hoy se tramitan permisos."},
+       {x:14,y:2,w:4,h:3,name:"CASA RURAL",msg:"CASA RURAL. No hay nadie en casa."},{x:9,y:12,w:4,h:3,name:"TAVERNA",msg:"TAVERNA. Se oye un partido del Barça."}],
+  signs:{"6,7":"PUEBLO DEL INTERIOR\n« BARCELONA · COSTA »"},
+  npcs:[[3,15,12,"left",0],[4,13,6,"down",1],[5,4,12,"right",0],[9,17,9,"left",0]]},
+ {name:"PUEBLO COSTERO", exitL:1, exitR:-1, start:[1,9,"right"],
+  paint(R,g){ R(0,0,MW,4,"~"); R(0,4,MW,2,"s"); R(0,4,1,2,"T"); R(19,4,1,2,"T"); R(10,1,2,4,"=");
+   R(0,8,18,2,"="); R(7,10,1,4,"="); R(1,14,18,1,"="); R(1,15,18,2,"s"); R(3,6,1,1,"T"); R(15,6,1,1,"T"); g[7][5]="S"; },
+  bld:[{x:2,y:11,w:4,h:3,name:"PESCADOR",msg:"PESCADOR. Cajas de pescado fresco."},{x:9,y:11,w:3,h:3,name:"GELATS",msg:"GELATS. ¡Un helado de turrón, por favor!"},
+       {x:13,y:11,w:5,h:3,name:"HOSTAL",msg:"HOSTAL. Recepción abierta las 24 horas."}],
+  signs:{"5,7":"PUEBLO COSTERO\n« PUEBLO DEL INTERIOR"},
+  npcs:[[2,11,2,"down",0],[6,3,9,"right",1],[7,16,15,"up",0]]}
 ];
-function setupRpgMap(){
- const used=mg.defeated||[];
- const xs=[150,225,410,475,145,500,340,80,565,300];
- const ys=[135,248,135,255,325,325,320,245,115,82];
- const randomOrigins=[...RPG_OTHER_ORIGINS].sort(()=>Math.random()-.5);
- const trafficTypes=["pie","patinete","bici","moto","pie","bici","patinete","moto","pie","bici"];
- mg.npcs=RPG_NPCS.map((n,i)=>({ ...n,id:i,traffic:trafficTypes[i%trafficTypes.length],origin:n.origin||randomOrigins[i-8]||"Catalán",x:xs[i],y:ys[i],tx:xs[i],ty:ys[i],walk:i%2===0,alive:!used.includes(i),step:i*13 })).filter(n=>n.alive);
- if(!mg.player)mg.player={x:320,y:245,dir:0,step:0};
- mg.player.x=Math.max(24,Math.min(616,mg.player.x));
- mg.player.y=Math.max(48,Math.min(350,mg.player.y));
-}
-function rpgBox(parent,cls,html){const d=document.createElement("div");d.className=cls;d.innerHTML=html;parent.appendChild(d);return d;}
-function rpgSprite(ctx,x,y,person,scale=1,back=false){
- const n=typeof person==="object"?person:{shirt:person,hair:"#302018",skin:"#efc49b"};
- const shirt=n.shirt||"#477dc0",hair=n.hair||"#302018",skin=n.skin||"#efc49b";
- ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.scale(scale,scale);
- const px=(a,b,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(a,b,w,h);};
- // Sombra y silueta con rasgos legibles incluso ampliados en la pantalla de combate.
- ctx.fillStyle="rgba(30,40,30,.28)";ctx.beginPath();ctx.ellipse(0,15,9,3,0,0,Math.PI*2);ctx.fill();
- px(-5,4,4,9,"#29394e");px(1,4,4,9,"#29394e");px(-6,11,5,2,"#33231d");px(1,11,5,2,"#33231d");
- px(-7,-5,14,11,shirt);px(-5,-12,10,8,skin);px(-6,-14,12,4,hair);
- px(-7,-9,2,5,hair);px(5,-9,2,5,hair);
- if(!back){px(-3,-9,2,2,"#171717");px(2,-9,2,2,"#171717");px(-1,-5,3,1,"#7f4436");}
- else{px(-5,-10,10,7,hair);px(-4,-4,8,5,shirt);}
- // Pequeño detalle variable para que los NPC no parezcan clones.
- if(n.detail){px(4,-2,2,5,n.detail);}
- ctx.restore();
-}
-function rpgDrawWorld(){
- const cv=$("#rpgCanvas");if(!cv)return;const c=cv.getContext("2d");c.imageSmoothingEnabled=false;
- const W=640,H=400,map=RPG_MAPS[mg.mapPos],S=820/640;
- c.clearRect(0,0,820,512);c.save();c.scale(S,S);
- c.fillStyle=map.ground;c.fillRect(0,0,W,H);
- // Grass tiles and paved sidewalks.
- for(let y=0;y<H;y+=32)for(let x=0;x<W;x+=32){c.fillStyle=((x/32+y/32)%2)?"rgba(255,255,255,.045)":"rgba(20,65,25,.055)";c.fillRect(x,y,32,32);}
- // Main roads form a small town grid, with sidewalks and crossings.
- c.fillStyle="#d7c9a1";c.fillRect(0,0,W,400);
- c.fillStyle=map.ground;c.fillRect(0,0,640,400);
- c.fillStyle=map.road;c.fillRect(260,0,112,400);c.fillRect(0,156,640,82);c.fillRect(0,320,640,52);
- c.fillStyle="#b3a17c";c.fillRect(255,0,5,400);c.fillRect(372,0,5,400);c.fillRect(0,151,640,5);c.fillRect(0,238,640,5);
- c.fillStyle="rgba(255,255,255,.52)";for(let y=10;y<400;y+=28)c.fillRect(315,y,3,13);for(let x=8;x<640;x+=34)c.fillRect(x,193,17,3);
- // Crosswalks near the central junction.
- for(let i=0;i<7;i++){c.fillStyle="#fff6df";c.fillRect(267+i*14,145,7,17);c.fillRect(267+i*14,238,7,17);}
- const house=(x,y,w,h,roof,label)=>{
-  // Bigger, more readable buildings while keeping their centres aligned to the original town plan.
-  const nw=Math.round(w*1.22),nh=Math.round(h*1.18);x-=Math.round((nw-w)/2);y-=Math.round((nh-h)/2);w=nw;h=nh;
-  c.fillStyle="#8c806b";c.fillRect(x-5,y-4,w+10,h+10);
-  c.fillStyle="#f0dfbc";c.fillRect(x,y,w,h);
-  c.fillStyle=roof;c.fillRect(x-10,y-17,w+20,36);c.fillStyle="rgba(0,0,0,.18)";c.fillRect(x-10,y+13,w+20,9);
-  c.fillStyle="#6d4a31";c.fillRect(x+w/2-12,y+h-37,24,37);
-  c.fillStyle="#7ebbd4";c.fillRect(x+15,y+31,29,25);c.fillRect(x+w-44,y+31,29,25);
-  c.fillStyle="#f6f0df";c.fillRect(x+19,y+34,21,3);c.fillRect(x+w-40,y+34,21,3);
-  c.fillStyle="#fff5df";c.font="bold 9px monospace";c.textAlign="center";c.fillText(label||"CASA",x+w/2,y+h-44);c.textAlign="left";
- };
- if(map.kind==="city"){
-  house(22,28,116,88,"#c86a52","FLiiTS SHOP");house(430,24,172,92,"#b8574e","FLiiTS HUB");
-  house(22,265,130,85,"#c7a56c","CAFÉ");house(430,260,175,88,"#b75b51","MERCAT");
-  house(160,26,82,76,"#d28b4c","PISOS");house(388,160,94,70,"#8b7bb2","TALLER");
-  // Plaza and small park on the left side of the road.
-  c.fillStyle="#6d9e55";c.fillRect(25,157,205,82);c.fillStyle="#b5d18b";c.fillRect(34,166,187,64);
-  c.fillStyle="#69a6bf";c.fillRect(101,181,52,31);c.fillStyle="#e1f3e8";c.fillRect(107,187,40,19);
-  c.fillStyle="#d9c99c";c.fillRect(165,172,47,49);c.fillStyle="#b8a477";c.fillRect(184,178,9,34);
- }else if(map.kind==="village"){
-  house(28,32,135,104,"#c86a52","FORN");house(430,28,164,104,"#d18a4c","CASA RURAL");
-  house(28,270,138,82,"#b86b4f","TAVERNA");house(438,265,154,86,"#c86a52","BOTIGA");
-  house(174,24,76,70,"#9679a6","AJUNTAMENT");
-  c.fillStyle="#8cb86c";c.fillRect(30,157,180,80);c.fillStyle="#b5d18b";c.fillRect(42,168,156,58);
- }else{
-  c.fillStyle="#46b5d0";c.fillRect(0,0,W,70);for(let x=0;x<W;x+=28){c.fillStyle="#b3e5e9";c.fillRect(x,13,17,3);c.fillRect(x+8,43,12,3);}c.fillStyle="#ead9a2";c.fillRect(0,70,W,24);
-  house(26,112,130,92,"#c96d4d","PESCADOR");house(435,108,164,94,"#d08a4b","HOSTAL");
-  house(28,270,136,83,"#d2a45d","GELATS");house(436,270,162,82,"#d2a45d","PORT");
-  c.fillStyle="#6eaa58";c.fillRect(192,270,205,80);c.fillStyle="#d5c18d";c.fillRect(206,282,176,56);
- }
- // Semáforos de la intersección: alternan rojo y verde en un ciclo visible.
- const lightGreen=((mg.worldTick||0)%360)>=180;
- const drawTrafficLight=(x,y)=>{c.fillStyle="#454545";c.fillRect(x+5,y+22,4,25);c.fillStyle="#252a29";c.fillRect(x,y,14,27);c.strokeStyle="#111";c.lineWidth=2;c.strokeRect(x,y,14,27);c.fillStyle=lightGreen?"#5b342f":"#f0443e";c.beginPath();c.arc(x+7,y+7,4,0,Math.PI*2);c.fill();c.fillStyle=lightGreen?"#3bd36a":"#405044";c.beginPath();c.arc(x+7,y+19,4,0,Math.PI*2);c.fill();};
- drawTrafficLight(382,143);drawTrafficLight(242,239);
- c.fillStyle="#fff8df";c.font="bold 8px monospace";c.fillText(lightGreen?"VERDE · PASA":"ROJO · STOP",400,151);
- // Street trees, planters, lamps and benches in a repeatable pixel-art pattern.
- const trees=map.kind==="city"?[[185,122],[215,128],[400,122],[610,150],[178,287],[395,290],[610,290],[20,235],[620,235],[240,345],[400,350]]:
-  [[190,125],[220,130],[400,124],[610,150],[185,285],[395,290],[610,290],[20,235],[620,235],[240,345],[400,350]];
- trees.forEach(([x,y],i)=>{c.fillStyle="#714b30";c.fillRect(x+9,y+13,7,17);c.fillStyle=i%2?"#1c7545":"#287f43";c.fillRect(x,y,25,23);c.fillStyle="#60b85c";c.fillRect(x+4,y+3,9,6);c.fillRect(x+14,y+10,7,6);});
- for(let i=0;i<8;i++){const x=30+i*80;c.fillStyle="#4a4a4a";c.fillRect(x,245,4,22);c.fillStyle="#ffe7a6";c.fillRect(x-3,242,10,6);}
- // Map title sign.
- c.fillStyle="#f8f0d9";c.fillRect(8,8,216,29);c.strokeStyle="#292929";c.lineWidth=3;c.strokeRect(8,8,216,29);c.fillStyle="#222";c.font="bold 13px monospace";c.fillText(map.name,16,27);
- // NPCs/enemigos: algunos van a pie y otros circulan en patinete, bici o moto.
- const drawRide=(type,x,y,n)=>{
-  if(type==="pie")return;
-  c.save();c.translate(Math.round(x),Math.round(y+7));
-  const wheel=(wx)=>{c.fillStyle="#20272a";c.beginPath();c.arc(wx,0,5,0,Math.PI*2);c.fill();c.fillStyle="#aab5ae";c.beginPath();c.arc(wx,0,2,0,Math.PI*2);c.fill();};
-  // Vehículo dibujado primero: el repartidor queda sentado/montado encima, no andando al lado.
-  if(type==="patinete"){
-   wheel(-10);wheel(10);c.strokeStyle="#354b55";c.lineWidth=3;c.beginPath();c.moveTo(-10,-1);c.lineTo(8,-1);c.lineTo(9,-18);c.lineTo(15,-18);c.stroke();c.fillStyle="#e7b64b";c.fillRect(-5,-5,12,3);
-  }else if(type==="bici"){
-   wheel(-13);wheel(13);c.strokeStyle="#345d72";c.lineWidth=3;c.beginPath();c.moveTo(-13,0);c.lineTo(-4,-12);c.lineTo(3,0);c.lineTo(-13,0);c.moveTo(3,0);c.lineTo(13,0);c.lineTo(4,-12);c.lineTo(-4,-12);c.moveTo(4,-12);c.lineTo(9,-17);c.stroke();
-  }else{
-   wheel(-13);wheel(13);c.fillStyle="#3f5964";c.fillRect(-13,-9,27,7);c.fillStyle="#d84c3e";c.fillRect(-5,-14,13,6);c.fillStyle="#252b2d";c.fillRect(8,-17,3,8);c.fillRect(-11,-12,5,3);
-  }
-  const shirt=n.shirt||"#477dc0",skin=n.skin||"#efc49b",hair=n.hair||"#302018";
-  // Cabeza, torso inclinado, brazos al manillar y piernas flexionadas.
-  c.fillStyle=hair;c.fillRect(-4,-29,9,4);c.fillStyle=skin;c.fillRect(-3,-26,7,7);
-  c.fillStyle=shirt;c.fillRect(-6,-19,12,10);c.fillStyle=skin;c.fillRect(-8,-17,4,5);c.fillRect(5,-18,5,4);
-  c.strokeStyle=shirt;c.lineWidth=3;c.beginPath();c.moveTo(-4,-11);c.lineTo(-9,-5);c.moveTo(4,-11);c.lineTo(9,-5);c.stroke();
-  c.fillStyle="#30343a";c.fillRect(-10,-6,7,3);c.fillRect(5,-6,7,3);
-  if(type==="moto"){c.fillStyle="#e63946";c.fillRect(-5,-30,10,3);c.fillStyle="#f5d36a";c.fillRect(5,-18,2,2);}
-  c.restore();
- };
- const lightRed=((mg.worldTick||0)%360)<180;
- mg.npcs.forEach(n=>{
-  if(n.walk&&mg.phase==="roam"&&mg.worldTick%45===0){n.tx=Math.max(55,Math.min(585,n.x+(Math.random()-.5)*116));n.ty=Math.max(92,Math.min(360,n.y+(Math.random()-.5)*96));}
-  const atCrossing=n.x>245&&n.x<390&&n.y>140&&n.y<255;
-  n.stopped=!!(atCrossing&&lightRed);
-  if(!n.stopped){const pace=n.traffic==="moto"?.042:n.traffic==="bici"?.034:n.traffic==="patinete"?.038:.025;n.x+=(n.tx-n.x)*pace;n.y+=(n.ty-n.y)*pace;}
-  if(n.traffic==="pie"){
-   // Los repartidores a pie caminan sin ningún vehículo ni rótulo.
-   rpgSprite(c,n.x,n.y,n,1.65,false);
-  }else{
-   // En bici, patinete o moto se representa una pose montada; no se dibuja el sprite andando.
-   drawRide(n.traffic,n.x,n.y,n);
-  }
-  // Solo el nombre y procedencia flotan sobre el personaje; nunca se escriben etiquetas del vehículo.
-  c.font="bold 9px monospace";c.textAlign="center";c.lineWidth=3;c.strokeStyle="#26482c";c.strokeText(n.name,n.x,n.y-31);c.fillStyle="#fff";c.fillText(n.name,n.x,n.y-31);c.font="8px monospace";c.strokeText(n.origin,n.x,n.y-21);c.fillStyle="#fff6d9";c.fillText(n.origin,n.x,n.y-21);c.textAlign="left";
- });
- // Selected hero and recruited team keep their exact selected appearance.
- c.save();c.translate(Math.round(mg.player.x-12),Math.round(mg.player.y-35));c.scale(1.5,1.5);drawSpr(c,CREW[mg.heroId??mg.ci].spr,0,0,false,(mg.player.step>>2)&1);c.restore();
- // Oreo, el gran danés de Iván, le acompaña por el mapa cuando Iván es el protagonista.
- if((mg.heroId??mg.ci)===0){const dogFrame=DOG[(mg.player.step>>3)&1];drawPalS(c,dogFrame,Math.round(mg.player.x-57),Math.round(mg.player.y-28),DOGPAL,true,1.65);}
- mg.team.forEach((r,i)=>{const off=i+1,tx=mg.player.x-(off%2?29:-29),ty=mg.player.y+28+Math.floor((off-1)/2)*22;rpgSprite(c,tx,ty,r,1.15,false);});
- c.fillStyle="rgba(20,30,20,.86)";c.fillRect(8,366,624,26);c.fillStyle="#fff";c.font="bold 12px monospace";c.fillText("FLECHAS / WASD: MOVERSE   ENTER: HABLAR   SEMÁFOROS: ROJO = PARAR · VERDE = PASAR",16,384);
- c.restore();
-}
-function renderRpg(){
- if(!mg)return;
- const scene=$("#mgScene");scene.innerHTML="";
- const heroName=nm(mg.heroId??mg.ci);
- $("#modeGameOv").classList.toggle("rpg-map-roam",mg.phase==="roam");
- $("#mgTitle").textContent=heroName+" · "+(mg.phase==="battle"?"¡UN REPARTIDOR TE DESAFÍA!":"AVENTURA POR CATALUNYA");
- $("#mgKick").textContent="RPG · "+RPG_MAPS[mg.mapPos].name;
- $("#mgProgress").textContent="CONTRATADOS "+mg.team.length+" · ENCUENTROS "+mg.encounterCount+"/4";
- const acts=$("#mgActions");acts.innerHTML="";acts.classList.remove("rpg-map-controls");
- $("#mgStatus").hidden=mg.phase!=="roam";
- acts.hidden=mg.phase==="battle";
- const makeButton=(parent,label,fn)=>{const b=document.createElement("button");b.textContent=label;b.type="button";b.disabled=!!mg.turnLocked;b.addEventListener("click",()=>{if(!mg.turnLocked)fn();});parent.appendChild(b);return b;};
- const drawBattlefield=()=>{
-  const n=mg.enemy;if(!n)return;
-  rpgBox(scene,"rpg-world rpg-battle-scene",'<canvas id="rpgCanvas" width="960" height="500"></canvas>');
-  const c=$("#rpgCanvas").getContext("2d");c.imageSmoothingEnabled=false;
-  const W=960,H=500,ci=mg.heroId??mg.ci,progress=Math.max(0,Math.min(1,mg.animProgress||0)),pulse=Math.sin(progress*Math.PI);
-  // Escenario isométrico: paisaje con profundidad, camino y plataformas en diagonal.
-  const sky=c.createLinearGradient(0,0,0,500);sky.addColorStop(0,"#8fb8d4");sky.addColorStop(.52,"#d5e4d2");sky.addColorStop(.53,"#91b875");sky.addColorStop(1,"#527e4b");c.fillStyle=sky;c.fillRect(0,0,840,500);
-  // Colinas y silueta de un pueblo catalán al fondo.
-  c.fillStyle="#7eaa78";c.beginPath();c.moveTo(0,190);c.lineTo(140,155);c.lineTo(280,190);c.lineTo(420,145);c.lineTo(600,190);c.lineTo(760,150);c.lineTo(840,175);c.lineTo(840,285);c.lineTo(0,285);c.closePath();c.fill();
-  c.fillStyle="#5d8d56";[[35,194,80,34],[132,184,62,43],[250,202,98,25],[390,186,78,41],[520,197,90,30],[700,184,90,42]].forEach(([x,y,w,h])=>c.fillRect(x,y,w,h));
-  // Camino de piedra en perspectiva diagonal y sus bordillos.
-  c.fillStyle="#9a8868";c.beginPath();c.moveTo(0,300);c.lineTo(840,205);c.lineTo(840,500);c.lineTo(0,500);c.closePath();c.fill();
-  c.fillStyle="#d4c29d";c.beginPath();c.moveTo(0,319);c.lineTo(840,224);c.lineTo(840,490);c.lineTo(0,490);c.closePath();c.fill();
-  c.strokeStyle="#b19e78";c.lineWidth=4;for(let i=0;i<13;i++){const y=340+i*14;c.beginPath();c.moveTo(0,y);c.lineTo(840,y-95);c.stroke();}
-  c.strokeStyle="rgba(255,255,255,.28)";c.lineWidth=3;c.beginPath();c.moveTo(0,395);c.lineTo(840,300);c.stroke();
-  // Jardines laterales y vegetación que refuerzan la perspectiva.
-  c.fillStyle="#477d48";c.beginPath();c.moveTo(0,285);c.lineTo(840,190);c.lineTo(840,225);c.lineTo(0,320);c.closePath();c.fill();
-  for(let i=0;i<22;i++){const x=(i*71+27)%830,y=190+(i*37)%105;c.fillStyle=i%2?"#2f7544":"#438c4d";c.fillRect(x,y,12,12);c.fillStyle="#b7d58c";c.fillRect(x+3,y+2,4,3);}
-  // Plataformas con perspectiva diagonal, una para cada repartidor.
-  function platform(x,y,w){c.fillStyle="#806a49";c.beginPath();c.moveTo(x-w/2,y+12);c.lineTo(x+w/2,y-20);c.lineTo(x+w/2,y-4);c.lineTo(x-w/2,y+28);c.closePath();c.fill();c.fillStyle="#d2b987";c.beginPath();c.moveTo(x-w/2,y+4);c.lineTo(x+w/2,y-28);c.lineTo(x+w/2,y-20);c.lineTo(x-w/2,y+12);c.closePath();c.fill();}
-  platform(205,340,270);platform(660,300,250);
-  for(let i=0;i<26;i++){const x=(i*71+27)%830,y=(i*43+13)%415;c.fillStyle=i%2?"#f4f0d3":"#79a96d";c.fillRect(x,y,3,3);}
+ZONES.forEach(z=>{ const g=Array.from({length:MH},()=>Array(MW).fill("."));
+ const R=(x,y,w,h,ch)=>{ for(let j=y;j<y+h;j++) for(let i=x;i<x+w;i++) if(j>=0&&j<MH&&i>=0&&i<MW) g[j][i]=ch; };
+ R(0,0,MW,1,"T"); R(0,MH-1,MW,1,"T"); R(0,0,1,MH,"T"); R(MW-1,0,1,MH,"T"); z.paint(R,g); z.grid=g; });
 
-  function heroBackSprite(index){
-   const src=CREW[index].spr;const count={};
-   for(let r=0;r<5;r++)for(const ch of src[r])if(ch!=="."&&ch!=="K")count[ch]=(count[ch]||0)+1;
-   const hair=Object.keys(count).sort((a,b)=>count[b]-count[a])[0]||"H";
-   const rows=src.map((row,r)=>r>=3&&r<=9?[...row].map(ch=>ch==="."?".":ch==="K"?"K":hair).join(""):row);
-   // A red FLiiTS thermal backpack makes the rear view unmistakable.
-   const arr=rows.map(r=>[...r]);
-   for(let y=12;y<=18;y++)for(let x=4;x<=11;x++)arr[y][x]=(y===12||y===18||x===4||x===11)?"K":((x===5||x===10)?"r":"R");
-   arr[14][7]="W";arr[15][7]="W";arr[16][7]="W";
-   return arr.map(r=>r.join(""));
-  }
-  function heroFigure(x,baseY,index,scale){
-   const spr=heroBackSprite(index);c.save();c.translate(Math.round(x-8*scale),Math.round(baseY-24*scale));c.scale(scale,scale);drawSpr(c,spr,0,0,false,0);c.restore();
-  }
-  function rivalFigure(x,baseY,p,scale,faceLeft){
-   c.save();c.translate(x,baseY);c.scale(faceLeft?-scale:scale,scale);
-   const px=(a,b,w,h,col)=>{c.fillStyle=col;c.fillRect(a,b,w,h);};
-   const skin=p.skin||"#c98b63",hair=p.hair||"#241a18",shirt=p.shirt||"#477dc0",pants=p.pants||"#34445a";
-   // Shoes and legs first, then a full rider silhouette from head to mid-calf.
-   px(-17,-4,13,29,pants);px(4,-4,13,29,pants);px(-19,22,17,7,"#282b31");px(3,22,18,7,"#282b31");
-   px(-24,-51,48,49,shirt);px(-31,-47,10,37,shirt);px(21,-47,10,37,shirt);
-   px(-33,-13,9,8,skin);px(24,-13,9,8,skin);
-   px(-19,-48,38,3,"#202b36");px(-3,-47,6,43,p.detail||"#f0d7a6");
-   px(-7,-62,14,13,skin);px(-20,-91,40,34,skin);
-   px(-22,-90,44,13,hair);px(-22,-81,6,20,hair);px(16,-81,6,20,hair);
-   px(-14,-72,6,3,"#161616");px(8,-72,6,3,"#161616");px(-3,-59,7,2,"#75423b");
-   // Jacket seams, badge and shoulder details.
-   px(-17,-37,5,3,"#f2e8d4");px(12,-37,5,3,"#f2e8d4");px(-20,-24,40,2,"rgba(0,0,0,.22)");
-   c.restore();
-  }
-  function burst(x,y,t,col){
-   const radius=7+Math.round(t*18);c.save();c.globalAlpha=1-t*.25;c.strokeStyle=col;c.lineWidth=5;c.beginPath();c.arc(x,y,radius,0,Math.PI*2);c.stroke();
-   c.fillStyle="#fff8d7";for(let i=0;i<8;i++){const a=i*Math.PI/4,rr=radius+5;c.fillRect(Math.round(x+Math.cos(a)*rr),Math.round(y+Math.sin(a)*rr),5,5);}c.restore();
-  }
-  function contractBall(x,y){c.save();c.translate(x,y);c.rotate(progress*16);c.fillStyle="#242424";c.beginPath();c.arc(0,0,13,0,Math.PI*2);c.fill();c.fillStyle="#df3a35";c.beginPath();c.arc(0,0,10,Math.PI,Math.PI*2);c.fill();c.fillStyle="#f7f4e8";c.beginPath();c.arc(0,0,10,0,Math.PI);c.fill();c.fillStyle="#222";c.fillRect(-12,-2,24,4);c.fillStyle="#fff";c.beginPath();c.arc(0,0,4,0,Math.PI*2);c.fill();c.strokeStyle="#222";c.lineWidth=2;c.stroke();c.restore();}
-
-  // Tarjeta del rival debajo de su figura, en el lado derecho de la arena.
-  const enemyMoves=n.moves||makeRpgEnemyMoves(n),enemyPp=enemyMoves.reduce((a,m)=>a+m.pp,0),enemyMax=enemyMoves.reduce((a,m)=>a+m.maxPp,0);
-  c.fillStyle="#fff9e9";c.fillRect(445,350,385,130);c.strokeStyle="#273b32";c.lineWidth=5;c.strokeRect(445,350,385,130);c.fillStyle="#e9e1c9";c.fillRect(456,361,363,108);
-  c.fillStyle="#182820";c.font="bold 21px monospace";c.fillText((n.name||"ASPIRANTE").toUpperCase(),472,390);
-  c.font="bold 12px monospace";c.fillText("NIV. "+(n.level||4)+" · "+(n.origin||"RIDER"),472,410);
-  c.font="bold 12px monospace";c.fillText("PS",472,438);c.fillStyle="#343c32";c.fillRect(508,425,292,14);c.fillStyle=n.hp/n.maxHp>.5?"#4d9c55":n.hp/n.maxHp>.2?"#d2a13e":"#c74b40";c.fillRect(511,428,286*Math.max(0,n.hp/n.maxHp),8);
-  c.fillStyle="#182820";c.font="bold 11px monospace";c.fillText("PP TOTAL "+enemyPp+" / "+enemyMax,472,461);
-
-  let ex=660,ey=300,hx=205,hy=340;
-  if(mg.anim==="heroAttack")hx+=Math.round(88*pulse);
-  if(mg.anim==="enemyDodge")ex+=Math.round(72*pulse);
-  if(mg.anim==="enemyAttack")ex-=Math.round(82*pulse);
-  if(mg.anim==="heroDodge")hx-=Math.round(72*pulse);
-  // Rival is full-body, larger, facing the selected protagonist.
-  rivalFigure(ex,ey,n,1.5,true);
-  if(mg.anim==="heroAttack"&&progress>.48)burst(ex-45,ey-106,Math.max(0,(progress-.48)/.52),"#e7b83d");
-  if(mg.anim==="enemyAttack"&&progress>.48)burst(hx+45,hy-105,Math.max(0,(progress-.48)/.52),"#e6b34a");
-  if(mg.anim==="capture"){c.save();c.globalAlpha=.45+.45*Math.sin(progress*Math.PI*5);c.fillStyle="#f8f4d8";c.beginPath();c.arc(ex,ey-105,70+progress*18,0,Math.PI*2);c.fill();c.restore();}
-  // Protagonist uses the selected character sprite from behind, looking towards the rival.
-  heroFigure(hx,hy,ci,7.5);
-  if(ci===0){
-   // Oreo stays close to Ivan's left side and faces the opponent without covering him.
-   drawPalS(c,DOG[(Math.floor((mg.worldTick||0)/8))&1],42,hy-82,DOGPAL,false,3.8);
-  }
-  // Tarjeta de Iván debajo de su figura, simétrica a la del rival.
-  const heroMoves=mg.moves||rpgMovesFor(ci),heroPp=heroMoves.reduce((a,m)=>a+m.pp,0),heroMax=heroMoves.reduce((a,m)=>a+m.maxPp,0);
-  c.fillStyle="#fff9e9";c.fillRect(24,350,385,130);c.strokeStyle="#273b32";c.lineWidth=5;c.strokeRect(24,350,385,130);c.fillStyle="#e9e1c9";c.fillRect(35,361,363,108);
-  c.fillStyle="#182820";c.font="bold 21px monospace";c.fillText(heroName.toUpperCase(),51,390);c.font="bold 12px monospace";c.fillText("FLiiTS · NIV. 01",51,410);c.fillText("PS",51,438);
-  c.fillStyle="#343c32";c.fillRect(87,425,292,14);c.fillStyle=mg.hp/mg.maxHp>.5?"#4d9c55":mg.hp/mg.maxHp>.2?"#d2a13e":"#c74b40";c.fillRect(90,428,286*Math.max(0,mg.hp/mg.maxHp),8);
-  c.fillStyle="#182820";c.font="bold 11px monospace";c.fillText("PP TOTAL "+heroPp+" / "+heroMax,51,461);
-
-  // Contract ball actually flies to the opponent and visibly collides before the result.
-  if(mg.anim==="ball"){
-   const t=progress,bx=250+(ex-250)*t,by=285+(ey-108-285)*t-Math.sin(t*Math.PI)*76;
-   contractBall(bx,by);
-   if(t>.78)burst(ex-8,ey-108,Math.min(1,(t-.78)/.22),"#e8d66b");
-  }
-  // Right-hand roster rail.
-  c.fillStyle="#355b43";c.fillRect(840,0,120,500);c.fillStyle="#e7e2ce";c.fillRect(848,0,104,500);c.strokeStyle="#263c2f";c.lineWidth=4;c.strokeRect(848,0,104,500);
-  const party=[{name:heroName,shirt:CREW[ci].shirt||"#d62839",active:true},...mg.team].slice(0,5);
-  for(let i=0;i<5;i++){
-   const y=9+i*94;c.fillStyle=i%2?"#fff8e8":"#dce9df";c.fillRect(856,y,88,82);c.strokeStyle="#627b63";c.lineWidth=2;c.strokeRect(856,y,88,82);
-   if(party[i]){
-    if(i===0){c.save();c.translate(884,y+5);c.scale(1.9,1.9);drawSpr(c,CREW[ci].spr,0,0,false,0);c.restore();}
-    else{c.fillStyle=party[i].shirt||"#b7a3bc";c.fillRect(887,y+10,26,27);c.fillStyle="#efc49b";c.fillRect(892,y+2,16,15);c.fillStyle="#241c2b";c.fillRect(891,y+1,18,5);}
-    c.fillStyle="#182820";c.font="bold 8px monospace";c.textAlign="center";c.fillText((party[i].name||"RIDER").slice(0,12),900,y+59);c.font="7px monospace";c.fillText(party[i].active?"EN CAMPO":"CONTRATADO",900,y+71);c.textAlign="left";
-   }
-   else{c.fillStyle="#778679";c.font="bold 22px monospace";c.textAlign="center";c.fillText("· · ·",900,y+43);c.textAlign="left";}
-  }
-  c.fillStyle="#263c2f";c.font="bold 10px monospace";c.textAlign="center";c.fillText("FLiiTS",900,487);c.textAlign="left";
- };
- window.__drawRpgBattlefield=drawBattlefield;
-
- if(mg.phase==="roam"){
-  const shell=rpgBox(scene,"rpg-map-shell","");
-  rpgBox(shell,"rpg-world rpg-map-world",'<canvas id="rpgCanvas" width="820" height="512"></canvas>');
-  const roster=rpgBox(shell,"rpg-party-side",'<div class="rpg-party-head">TU EQUIPO</div>');
-  const party=[{name:heroName,role:"PROTAGONISTA",active:true},...mg.team].slice(0,6);
-  party.forEach((r,i)=>{const card=document.createElement("div");card.className="rpg-party-card"+(i===0?" active":"");card.innerHTML=`<div class="avatar"></div><b>${esc(r.name||"RIDER")}</b><small>${i===0?"EN CAMPO":"CONTRATADO"}</small>`;roster.appendChild(card);});
-  while(roster.children.length<7){const card=document.createElement("div");card.className="rpg-party-card";card.innerHTML='<div class="avatar" style="opacity:.25"></div><b>LIBRE</b><small>—</small>';roster.appendChild(card);}
-  rpgDrawWorld();
-  rpgBox(scene,"rpg-hud rpg-map-hud",`<span>♥ ${heroName}: ${mg.hp}/${mg.maxHp} PS</span><span>🥫 Monster ×${mg.items.monster} · 🔴 Contrato ${mg.items.contract<0?"∞":"×"+mg.items.contract}</span><span>👥 Riders: ${mg.team.length}</span><span>📍 ${RPG_MAPS[mg.mapPos].name}</span>`);
-  $("#mgStatus").textContent="Explora la ciudad, habla con los personajes y cruza sus caminos para iniciar un combate.";
-  acts.classList.add("rpg-map-controls");
-  makeButton(acts,"CAMBIAR DE ZONA",()=>{mg.mapPos=(mg.mapPos+1)%RPG_MAPS.length;setupRpgMap();renderRpg();});
-  makeButton(acts,"MOCHILA",rpgBag);
-  makeButton(acts,"GUARDAR PROGRESO",()=>{$("#mgStatus").textContent="Progreso conservado durante esta partida.";});
- }else if(mg.phase==="battle"){
-  drawBattlefield();
-  const lower=rpgBox(scene,"rpg-battle-lower","");
-  rpgBox(lower,"rpg-dialog",mg.message||("¡"+mg.enemy.name+" quiere combatir! ¿Qué harás?"));
-  const menu=rpgBox(lower,"rpg-menu","");
-  if(mg.battleMenu==="root"){
-   ["LUCHAR","REPARTIDORES","MOCHILA","HUIR"].forEach((a,i)=>makeButton(menu,a,()=>{
-    if(i===0){mg.battleMenu="fight";renderRpg();}
-    else if(i===1){mg.battleMenu="party";renderRpg();}
-    else if(i===2){mg.battleMenu="bag";renderRpg();}
-    else{mg.phase="roam";mg.enemy=null;mg.turnLocked=false;mg.anim=null;mg.message="Has escapado del combate.";renderRpg();}
-   }));
-  }else if(mg.battleMenu==="fight"){
-   const moves=mg.moves||rpgMovesFor(mg.ci);
-   moves.forEach((a,i)=>{
-    const b=makeButton(menu,a.name+" · PP "+a.pp+"/"+a.maxPp,()=>rpgAttack(i,a.name));
-    b.disabled=!!mg.turnLocked||a.pp<=0;
-    b.innerHTML=a.name+'<span class="move-meta">'+a.tier+" · PP "+a.pp+"/"+a.maxPp+" · POT. "+a.power+"</span>";
-   });
-   makeButton(menu,"← VOLVER",()=>{mg.battleMenu="root";renderRpg();});
-  }else if(mg.battleMenu==="bag"){
-   makeButton(menu,"🥫 MONSTER · +35 PS (×"+mg.items.monster+")",()=>useMonster());
-   makeButton(menu,"🔴 BOLA CONTRATO ("+(mg.items.contract<0?"ILIMITADAS":"×"+mg.items.contract)+")",()=>throwContractBall());
-   makeButton(menu,"← VOLVER",()=>{mg.battleMenu="root";renderRpg();});
-  }else if(mg.battleMenu==="party"){
-   const names=mg.team.length?mg.team.map(x=>x.name+" · "+x.role).join(" | "):"Aún no has contratado a nadie.";
-   rpgBox(menu,"rpg-note","EQUIPO: "+heroName+" · "+names);
-   makeButton(menu,"← VOLVER",()=>{mg.battleMenu="root";renderRpg();});
-  }
- }else if(mg.phase==="result"){
-  drawBattlefield();rpgBox(scene,"rpg-dialog",mg.message);
-  makeButton(acts,"VOLVER AL MAPA",()=>{mg.phase="roam";mg.enemy=null;mg.turnLocked=false;mg.battleMenu="root";mg.message="Sigue explorando: hay más personajes por encontrar.";renderRpg();});
- }else if(mg.phase==="knockout"){
-  if(mg.enemy)drawBattlefield();
-  rpgBox(scene,"rpg-dialog","¡"+heroName+" se ha quedado sin PS! El rival gana este combate.");
-  makeButton(acts,"LEVANTARSE Y VOLVER AL MAPA",()=>{mg.hp=Math.max(45,Math.round(mg.maxHp*.5));mg.phase="roam";mg.enemy=null;mg.turnLocked=false;mg.battleMenu="root";mg.message="Has recuperado fuerzas. Vuelve a intentarlo.";renderRpg();});
- }else if(mg.phase==="finish"){
-  rpgBox(scene,"rpg-dialog","¡Equipo listo! Has reunido suficientes riders para avanzar.");
-  makeButton(acts,"CONTINUAR",()=>{mg.phase="roam";renderRpg();});
- }
- $("#mgTeam").textContent=mg.team.length?"RIDERS CONTRATADOS: "+mg.team.map(x=>x.name).join(" · "):"EQUIPO: "+heroName;
-}
-function rpgMovesFor(ci){
- const names=[
-  ["Oferta Glovo","Oferta Uber","Moto de empresa","Sueldo garantizado"],
-  ["Leer QR","Validar código de cita","Verificar NIE","Aprobar cita y formación"],
-  ["Revisar documentación","Validar permiso","Validar pasaporte + NIE","Aprobación RTO"],
-  ["Comprobar casco","Entregar chaqueta","Ajustar mochila térmica","Kit completo de seguridad"]
- ];
- const tiers=[
-  {tier:"FLOJO",pp:24,power:10},
-  {tier:"MEDIO",pp:16,power:18},
-  {tier:"MEDIO",pp:13,power:24},
-  {tier:"FUERTE",pp:6,power:36}
- ];
- return (names[ci]||names[0]).map((name,i)=>({name,...tiers[i],maxPp:tiers[i].pp}));
-}
+const RPG_MOVES=[["Oferta Glovo","Oferta Uber","Moto empresa","Sueldo fijo"],["Leer QR","Validar cita","Verificar NIE","Turno asignado"],
+                 ["Revisar papeles","Validar permiso","Pasaporte + NIE","Aprobación RTO"],["Casco","Chaqueta","Mochila térmica","Kit completo"]];
+const RPG_TIERS=[{tier:"FLOJO",pp:24,power:10},{tier:"MEDIO",pp:16,power:18},{tier:"MEDIO",pp:13,power:24},{tier:"FUERTE",pp:6,power:36}];
+function rpgMovesFor(ci){ return RPG_MOVES[ci].map((name,i)=>({name,...RPG_TIERS[i],maxPp:RPG_TIERS[i].pp})); }
 function makeRpgEnemyMoves(n){
- const names=(n.atk||[]).slice(0,3);
- while(names.length<3)names.push("Reacción de rider "+(names.length+1));
- names.push((n.role||"Rider").includes("mecánico")?"Revisión completa":"Contraataque de turno");
- const stats=[{tier:"FLOJO",pp:22,power:8},{tier:"MEDIO",pp:15,power:15},{tier:"MEDIO",pp:12,power:21},{tier:"FUERTE",pp:6,power:30}];
- return names.map((name,i)=>({name,...stats[i],maxPp:stats[i].pp}));
+ const names=(n.atk||[]).slice(0,3); while(names.length<3) names.push("Reacción "+(names.length+1));
+ names.push(n.role.includes("Mecánico")?"Revisión completa":"Contraataque");
+ const st=[{pp:22,power:8},{pp:15,power:15},{pp:12,power:21},{pp:6,power:30}];
+ return names.map((name,i)=>({name,...st[i],maxPp:st[i].pp}));
 }
 
-function finishRpgEncounter(captured){
- const n=mg.enemy;if(!n)return;mg.turnLocked=false;
- mg.defeated=mg.defeated||[];if(!mg.defeated.includes(n.id))mg.defeated.push(n.id);
- const idx=mg.npcs.findIndex(x=>x.id===n.id);if(idx>=0)mg.npcs.splice(idx,1);
- mg.encounterCount++;
- if(captured){mg.team.push({id:n.id,name:n.name,role:n.role,origin:n.origin,shirt:n.shirt,hair:n.hair,skin:n.skin});mg.message="¡"+n.name+" se une a tu equipo! ¡CONTRATO FIRMADO!";}
- else{mg.message="¡DESPEDIDO! Has superado a "+n.name+". El rival queda eliminado.";}
- mg.phase="result";mg.battleMenu="root";renderRpg();
+/* --- gráficos: paleta, sprites cuantizados y casillas --- */
+const hexRGB=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+const gbCache=new Map();
+function gbSprite(key,w,h,draw,P){
+ const k=key+"|"+P.join(); let c=gbCache.get(k); if(c) return c;
+ c=document.createElement("canvas"); c.width=w; c.height=h; const g=c.getContext("2d"); draw(g);
+ const d=g.getImageData(0,0,w,h), a=d.data, RGB=P.map(hexRGB);
+ for(let i=0;i<a.length;i+=4){ if(a[i+3]<128){ a[i+3]=0; continue; }
+  const l=(.299*a[i]+.587*a[i+1]+.114*a[i+2])/255, q=l>.72?0:l>.45?1:l>.2?2:3;
+  a[i]=RGB[q][0]; a[i+1]=RGB[q][1]; a[i+2]=RGB[q][2]; a[i+3]=255; }
+ g.putImageData(d,0,0); gbCache.set(k,c); return c;
+}
+function rowsPal(g,rows,pal,flip,stride){ const w=rows[0].length;
+ rows.forEach((row,r)=>{ for(let q=0;q<w;q++){ const col=pal[row[q]]; if(!col) continue; let x=flip?w-1-q:q;
+  if(stride&&r>=rows.length-5) x+=(q<w/2?-stride:stride); g.fillStyle=col; g.fillRect(x,r,1,1); } }); }
+// Vista de espaldas: la cara se cubre de pelo; los de la plantilla llevan la mochila FLiiTS.
+function backRows(src,pack){
+ const cnt={}; for(let r=0;r<5;r++) for(const ch of src[r]) if(ch!=="."&&ch!=="K") cnt[ch]=(cnt[ch]||0)+1;
+ const hair=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a])[0]||"H";
+ const arr=src.map((row,r)=>[...row].map(ch=>r>=3&&r<=9&&ch!=="."&&ch!=="K"?hair:ch));
+ if(pack){ for(let y=12;y<=18;y++) for(let x=4;x<=11;x++) arr[y][x]=(y===12||y===18||x===4||x===11)?"K":(x===5||x===10)?"r":"R"; arr[14][7]=arr[15][7]=arr[16][7]="W"; }
+ return arr.map(r=>r.join(""));
+}
+const CREW_BACK=CREW.map(c=>backRows(c.spr,true)), CAND_BACK=backRows(CAND_T,false);
+const shade=(h,f)=>"#"+hexRGB(h).map(v=>Math.round(v*f).toString(16).padStart(2,"0")).join("");
+function npcPal(d,beard){ return {K:"#1b1212",H:d.hair,S:d.skin,s:shade(d.skin,.8),B:d.hair,C:d.shirt,c:shade(d.shirt,.75),P:"#2d3a5c",G:"#3a2a1e",b:beard?d.hair:d.skin}; }
+function sprCrew(ci,view,stride,P){ return gbSprite(`c${ci}${view}${stride}`,16,24,g=>rowsPal(g,view==="up"?CREW_BACK[ci]:CREW[ci].spr,PAL,view==="left",stride),P); }
+function sprNpc(id,view,stride,P){ const d=RPG_NPCS[id]; return gbSprite(`n${id}${view}${stride}`,16,24,g=>rowsPal(g,view==="up"?CAND_BACK:CAND_T,npcPal(d,id%2),view==="left",stride),P); }
+function sprDog(f,flip,P){ return gbSprite(`dog${f}${flip}`,28,18,g=>rowsPal(g,DOG[f],DOGPAL,flip,0),P); }
+const CONTRACT=["KKKKKKKK","KWWWWWWK","KWKKKKWK","KWWWWWWK","KWKKKWWK","KWWWWRRK","KWWWWRRK","KKKKKKKK"];
+function sprContract(P){ return gbSprite("contract",8,8,g=>rowsPal(g,CONTRACT,{K:"#111",W:"#fff",R:"#d62839"},false,0),P); }
+
+const tileCache=new Map();
+function tileCv(ch,v,P){
+ const k=ch+v+P.join(); let c=tileCache.get(k); if(c) return c;
+ c=document.createElement("canvas"); c.width=c.height=16; const g=c.getContext("2d");
+ const f=(x,y,w,h,i)=>{ g.fillStyle=P[i]; g.fillRect(x,y,w,h); };
+ const tuft=(x,y,i)=>{ f(x,y,1,2,i); f(x+2,y,1,2,i); f(x+1,y+1,1,1,i); };
+ if(ch==="."){ f(0,0,16,16,1); [[[3,4],[10,11]],[[11,3],[4,12]],[[7,7]],[[2,10],[12,5]]][v].forEach(([x,y])=>tuft(x,y,2)); }
+ else if(ch===","){ f(0,0,16,16,2); for(let y=0;y<16;y+=4) for(let x=(y%8?2:0);x<16;x+=4){ f(x,y+1,1,3,3); f(x+2,y+1,1,3,3); f(x+1,y,1,2,1); } }
+ else if(ch==="="){ f(0,0,16,16,0); [[[3,3],[11,9]],[[12,2],[5,12]],[[8,6]],[[2,13],[13,6]]][v].forEach(([x,y])=>f(x,y,2,1,1)); }
+ else if(ch==="s"){ f(0,0,16,16,0); for(let y=1;y<16;y+=4) for(let x=(y%8===1?1:3);x<16;x+=4) f(x,y,1,1,1); }
+ else if(ch==="~"){ f(0,0,16,16,2); const o=v*2; f((2+o)%16,4,5,1,1); f((10+o)%16,4,4,1,1); f((6+o)%16,11,6,1,1); f((14+o)%16,11,2,1,1); f((7+o)%16,3,1,1,0); }
+ else if(ch==="F"){ f(0,0,16,16,1); [[3,4],[11,4],[6,11],[13,12]].forEach(([x,y],i)=>{ const d=(v+i)&1; f(x+d-1,y,3,1,0); f(x+d,y-1,1,3,0); f(x+d,y,1,1,3); f(x,y+2,1,2,2); }); }
+ else if(ch==="T"){ f(0,0,16,16,1); f(3,0,10,12,3); f(1,1,14,10,3); f(0,2,16,7,3); f(3,1,10,10,2); f(1,2,14,8,2); f(4,2,3,2,1); f(9,4,2,2,1); f(3,6,2,1,1); f(7,7,2,1,1); f(6,11,4,5,3); f(7,12,2,3,2); }
+ else if(ch==="f"){ f(0,0,16,16,1); f(0,4,16,3,3); f(0,5,16,1,0); f(0,10,16,3,3); f(0,11,16,1,0); f(2,2,3,13,3); f(3,3,1,11,0); f(11,2,3,13,3); f(12,3,1,11,0); }
+ else if(ch==="S"){ f(0,0,16,16,1); f(7,9,2,7,3); f(2,2,12,8,3); f(3,3,10,6,0); f(4,4,8,1,2); f(4,6,6,1,2); }
+ tileCache.set(k,c); return c;
+}
+function drawBuilding(c,b,ox,oy,P){
+ const f=(x,y,w,h,i)=>{ c.fillStyle=P[i]; c.fillRect(ox+x,oy+y,w,h); }, W=b.w*16, H=b.h*16, door=Math.floor(b.w/2);
+ f(0,14,W,H-14,3); f(1,14,W-2,H-15,0); f(1,H-3,W-2,2,1);
+ f(-2,-4,W+4,20,3); f(-1,-3,W+2,18,b.hub?3:2); for(let y=0;y<14;y+=4) f(-1,y,W+2,1,b.hub?2:3); f(-1,-3,W+2,1,b.hub?2:1);
+ for(let r=1;r<b.h;r++) for(let i=0;i<b.w;i++){ const tx=i*16, ty=r*16;
+  if(i===door&&r===b.h-1){ f(tx+3,ty+1,10,15,3); f(tx+4,ty+2,8,14,2); f(tx+10,ty+9,1,2,0); }
+  else { f(tx+3,ty+3,10,9,3); f(tx+4,ty+4,8,7,1); f(tx+7,ty+4,1,7,3); f(tx+4,ty+7,8,1,3); f(tx+5,ty+5,1,1,0); } }
+ if(b.hub){ let x=Math.round(W/2-10); for(const ch of "FLiiTS"){ const gl=FONT[ch]; gl.forEach((row,r)=>[...row].forEach((v,q)=>{ if(v==="1") f(x+q,3+r,1,1,0); })); x+=gl[0].length+1; } }
+}
+function pxEllipse(c,cx,cy,rx,ry,col){ c.fillStyle=col; for(let dy=-ry;dy<=ry;dy++){ const h=Math.round(rx*Math.sqrt(1-(dy*dy)/(ry*ry))); c.fillRect(cx-h,cy+dy,2*h,1); } }
+
+/* --- estado, cola de mensajes y menús --- */
+const HERO=()=>nm(mg.ci).toUpperCase(), ENAME=()=>mg.enemy?mg.enemy.name:"";
+const Q={
+ say(t){ rpgPages(t).forEach(p=>mg.q.push({k:"text",t:p,shown:0})); },
+ run(f){ mg.q.push({k:"fn",f}); }, anim(a,n){ mg.q.push({k:"anim",a,n}); }, drain(){ mg.q.push({k:"drain"}); }
+};
+function rpgPages(t){ const CH=17, lines=[];
+ String(t).split("\n").forEach(par=>{ let line=""; par.split(" ").forEach(w=>{
+  while(w.length>CH){ if(line){ lines.push(line); line=""; } lines.push(w.slice(0,CH)); w=w.slice(CH); }
+  if(!line) line=w; else if((line+" "+w).length<=CH) line+=" "+w; else { lines.push(line); line=w; } }); lines.push(line); });
+ const out=[]; for(let i=0;i<lines.length;i+=2) out.push(lines.slice(i,i+2).join("\n")); return out; }
+function rpgStart(ci){
+ const ov=$("#modeGameOv"); ov.classList.add("rpg-classic"); ov.hidden=false;
+ const pi=(+saved["rpg.pal"]||0)%GB_PALS.length; GP=GB_PALS[pi].c;
+ mg={typ:"rpg",ci,pal:pi,hp:100,maxHp:100,disp:100,items:{monster:2},team:[],gone:[],beaten:[],encounterCount:0,finished:false,
+     zone:0,grid:null,p:null,dog:null,npcs:[],q:[],menu:null,mcur:0,view:"map",anim:null,enemy:null,moves:rpgMovesFor(ci),banner:0,lock:false,t:0,ui:true,save:null};
+ const sc=$("#mgScene"); sc.innerHTML=`<div class="gb-bezel"><div class="gb-scr" id="gbScr"><canvas id="gbCv" width="${GBW}" height="${GBH}"></canvas><div class="gb-ov" id="gbOv"></div></div><div class="gb-brand">FLiiT&amp;Watch</div></div>
+  <div class="gb-help"><span class="kb">FLECHAS: MOVER · ENTER/Z: A · X: B · ESC: MENÚ</span><span class="tp">A: HABLAR · B: VOLVER · START: MENÚ</span></div>`;
+ $("#gbOv").addEventListener("click",e=>{ const it=e.target.closest(".gb-it"); if(it){ mg.mcur=+it.dataset.i; rpgPress("A"); } else if(e.target.closest(".gb-text")) rpgPress("A"); });
+ rpgEnterZone(0,...ZONES[0].start);
+ try{ mg.save=JSON.parse(localStorage.getItem(RPG_SAVE)||"null"); }catch(e){ mg.save=null; }
+ if(mg.save&&mg.save.ci===ci) rpgOpen("load"); else rpgWelcome();
+}
+function rpgWelcome(){ Q.say(`¡Hola, ${HERO()}! Recorre Catalunya y busca riders para FLiiTS.`); Q.say("Pulsa A para hablar. Si un rider te ve, ¡te retará!"); Q.say("Supera 4 encuentros y el equipo estará listo."); }
+function rpgEnterZone(z,x,y,dir){
+ const Z=ZONES[z]; mg.zone=z; mg.grid=Z.grid; mg.banner=120; mg.ui=true;
+ mg.p={x,y,fx:x,fy:y,t:16,moving:false,dir:dir||"down",step:0,turn:0,bump:0};
+ if(mg.ci===0){ const [dx,dy]=DV[OPP[mg.p.dir]], bx=x+dx, by=y+dy, ok=bx>=0&&bx<MW&&by>=0&&by<MH&&!"T~fS".includes(Z.grid[by][bx]);
+  mg.dog={x:ok?bx:x,y:ok?by:y,fx:ok?bx:x,fy:ok?by:y,t:16,moving:false,flip:dir==="left"}; } else mg.dog=null;
+ mg.npcs=Z.npcs.filter(([id])=>!mg.gone.includes(id)).map(([id,nx,ny,d,w])=>({id,d:RPG_NPCS[id],x:nx,y:ny,hx:nx,hy:ny,fx:nx,fy:ny,t:16,moving:false,dir:d,wander:!!w,state:"idle",beaten:mg.beaten.includes(id),cool:0,step:0}));
+}
+function rpgSave(){ const p=mg.p; try{ localStorage.setItem(RPG_SAVE,JSON.stringify({ci:mg.ci,zone:mg.zone,x:p.x,y:p.y,dir:p.dir,hp:mg.hp,items:mg.items,team:mg.team,gone:mg.gone,beaten:mg.beaten,enc:mg.encounterCount,fin:mg.finished})); return true; }catch(e){ return false; } }
+function rpgLoad(d){ Object.assign(mg,{hp:d.hp,disp:d.hp,items:d.items,team:d.team,gone:d.gone,beaten:d.beaten,encounterCount:d.enc,finished:d.fin}); rpgEnterZone(d.zone,d.x,d.y,d.dir); }
+function rpgOpen(id){ mg.menu=id; mg.mcur=0; mg.ui=true; }
+function rpgClose(){ mg.menu=null; mg.ui=true; }
+function rpgExit(toFinal){ mg=null; $("#modeGameOv").hidden=true; $("#modeGameOv").classList.remove("rpg-classic"); if(toFinal){ hideRaulUI(); startFinal(); } else showSelect(); }
+function rpgFree(){ return !mg.q.length&&!mg.menu&&!mg.lock&&mg.view==="map"; }
+function rpgMenuDef(){
+ const H=HERO(), E=mg.enemy, battle=mg.view==="battle", m=mg.menu;
+ if(m==="root") return {cls:"gb-root",grid:2,prompt:"¿Qué\nhará?",items:[
+   {t:"LUCHAR",f:()=>rpgOpen("fight")},{t:"EQUIPO",f:()=>rpgOpen("party")},{t:"MOCHILA",f:()=>rpgOpen("bag")},{t:"HUIR",f:rpgFlee}],back:null};
+ if(m==="fight"){ const mv=mg.moves[mg.mcur]||mg.moves[0];
+  return {cls:"gb-low",items:mg.moves.map((x,i)=>({t:x.name.toUpperCase(),dis:x.pp<=0,f:()=>rpgUseMove(i)})),back:()=>rpgOpen("root"),
+   info:`PP ${mv.pp}/${mv.maxPp}<br>${mv.tier} · ${mv.power}`}; }
+ if(m==="bag") return {cls:battle?"gb-low":"gb-side",items:[
+   {t:`MONSTER ×${mg.items.monster}`,f:rpgMonster},{t:"CONTRATO ×∞",f:()=>{ if(battle) rpgContract(); else { rpgClose(); Q.say("Úsalo en un combate cuando el rider esté convencido."); } }},
+   {t:battle?"VOLVER":"CERRAR",f:()=>battle?rpgOpen("root"):rpgOpen("start")}],back:()=>battle?rpgOpen("root"):rpgOpen("start")};
+ if(m==="party") return {cls:"gb-full",items:[{t:`${H} · PS ${mg.hp}/${mg.maxHp}`},...mg.team.map(r=>({t:`${r.name.toUpperCase()} · ${r.role}`})),
+   ...(mg.team.length?[]:[{t:"(aún sin riders)",dis:true}]),{t:"VOLVER",f:()=>battle?rpgOpen("root"):rpgOpen("start")}],back:()=>battle?rpgOpen("root"):rpgOpen("start")};
+ if(m==="start") return {cls:"gb-side",items:[
+   {t:"EQUIPO",f:()=>rpgOpen("party")},{t:"MOCHILA",f:()=>rpgOpen("bag")},
+   {t:"GUARDAR",f:()=>{ rpgClose(); const ok=rpgSave(); if(ok) sfx.coin(); Q.say(ok?`${H} ha guardado la partida.`:"No se ha podido guardar en este navegador."); }},
+   {t:"PALETA "+GB_PALS[mg.pal].n,f:()=>{ mg.pal=(mg.pal+1)%GB_PALS.length; GP=GB_PALS[mg.pal].c; saved["rpg.pal"]=String(mg.pal); persist(); mg.ui=true; }},
+   ...(mg.finished?[{t:"IR AL FINAL",f:()=>rpgExit(true)}]:[]),
+   {t:"SALIR",f:()=>rpgExit(false)},{t:"CERRAR",f:rpgClose}],back:rpgClose};
+ if(m==="finish") return {cls:"gb-side",prompt:"¿Vamos al gran\nfinal con Raül?",items:[{t:"IR AL FINAL",f:()=>rpgExit(true)},{t:"SEGUIR",f:()=>{ rpgClose(); Q.say("Cuando quieras, abre el MENÚ y elige IR AL FINAL."); }}],back:null};
+ if(m==="load") return {cls:"gb-side",prompt:"Hay una partida\nguardada.",items:[{t:"CONTINUAR",f:()=>{ rpgClose(); rpgLoad(mg.save); }},{t:"NUEVA",f:()=>{ rpgClose(); rpgWelcome(); }}],back:null};
+ return null;
+}
+function rpgPress(b){
+ if(!mg||mg.typ!=="rpg") return;
+ const s=mg.q[0];
+ if(s){ if(s.k==="text"&&(b==="A"||b==="B")){ if(s.shown<s.t.length) s.shown=s.t.length; else { mg.q.shift(); mg.ui=true; } } return; }
+ if(mg.lock) return;
+ if(mg.menu){ const M=rpgMenuDef(), n=M.items.length, prev=mg.mcur;
+  if(b==="UP") mg.mcur=M.grid===2?mg.mcur^2:(mg.mcur+n-1)%n;
+  else if(b==="DOWN") mg.mcur=M.grid===2?mg.mcur^2:(mg.mcur+1)%n;
+  else if((b==="LEFT"||b==="RIGHT")&&M.grid===2) mg.mcur^=1;
+  else if(b==="A"){ const it=M.items[mg.mcur]; if(it&&it.f&&!it.dis){ sfx.select(); it.f(); } else sfx.bump(); }
+  else if((b==="B"||b==="START")&&M.back){ sfx.back(); M.back(); }
+  if(mg&&prev!==mg.mcur) sfx.tick(); if(mg) mg.ui=true; return; }
+ if(mg.view!=="map") return;
+ if(b==="A") rpgInteract(); else if(b==="START"){ sfx.open(); rpgOpen("start"); }
 }
 
-function animateRpgBattle(kind,duration,after){
- if(!mg||mg.phase!=="battle")return;
- mg.turnLocked=true;mg.anim=kind;mg.animProgress=0;
- const started=performance.now();
- const tick=now=>{
-  if(!mg||mg.phase!=="battle")return;
-  const t=Math.min(1,(now-started)/duration);mg.animProgress=t;
-  if(window.__drawRpgBattlefield)window.__drawRpgBattlefield();
-  if(t<1)requestAnimationFrame(tick);
-  else{mg.anim=null;mg.animProgress=0;if(window.__drawRpgBattlefield)window.__drawRpgBattlefield();if(after)after();}
- };
- requestAnimationFrame(tick);
+/* --- mapa: movimiento por casillas, PNJ que te ven y te retan --- */
+function rpgSolid(x,y,who){
+ if(x<0||y<0||x>=MW||y>=MH) return true;
+ if("T~fS".includes(mg.grid[y][x])) return true;
+ if(ZONES[mg.zone].bld.some(b=>x>=b.x&&x<b.x+b.w&&y>=b.y&&y<b.y+b.h)) return true;
+ if(who!=="p"&&mg.p.x===x&&mg.p.y===y) return true;
+ return mg.npcs.some(n=>n!==who&&n.x===x&&n.y===y);
 }
-
-function enemyCounterattack(){
- if(!mg||mg.phase!=="battle"||!mg.enemy)return;
- const n=mg.enemy,moves=n.moves||makeRpgEnemyMoves(n),available=moves.filter(m=>m.pp>0);
- if(!available.length){mg.message+="\n"+n.name+" se ha quedado sin PP y no puede contraatacar.";mg.anim=null;mg.turnLocked=false;mg.battleMenu="root";renderRpg();return;}
- const move=available[Math.floor(Math.random()*available.length)];move.pp--;
- if(Math.random()<.12){
-  mg.message+="\n¡"+nm(mg.heroId??mg.ci)+" esquiva «"+move.name+"»!";renderRpg();
-  animateRpgBattle("heroDodge",520,()=>{mg.turnLocked=false;mg.battleMenu="root";renderRpg();});return;
- }
- const hit=Math.max(4,move.power+Math.floor(Math.random()*5));mg.hp=Math.max(0,mg.hp-hit);
- mg.message+="\n"+n.name+" usa «"+move.name+"» y te quita "+hit+" PS.";
- renderRpg();
- animateRpgBattle("enemyAttack",600,()=>{
-  if(mg.hp<=0){mg.phase="knockout";mg.turnLocked=false;mg.battleMenu="root";renderRpg();return;}
-  mg.turnLocked=false;mg.battleMenu="root";renderRpg();
- });
+function stepTo(o,x,y){ o.fx=o.x; o.fy=o.y; o.x=x; o.y=y; o.t=0; o.moving=true; o.step++; }
+function rpgMapUpdate(){
+ const p=mg.p, d=mg.dog;
+ [p,d,...mg.npcs].forEach(o=>{ if(o&&o.moving&&++o.t>=16) o.moving=false; });
+ if(mg.banner>0&&--mg.banner===0) mg.ui=true;
+ mg.npcs.forEach(n=>{ if(n.cool>0) n.cool--;
+  if(n.state==="alert"){ if(--n.alert<=0) n.state="approach"; return; }
+  if(n.state==="approach"&&!n.moving){ const dist=Math.abs(p.x-n.x)+Math.abs(p.y-n.y), [dx,dy]=DV[n.dir];
+   if(dist<=1||rpgSolid(n.x+dx,n.y+dy,n)){ n.state="idle"; n.cool=300; p.dir=OPP[n.dir]; mg.lock=false; rpgChallenge(n); } else stepTo(n,n.x+dx,n.y+dy); return; }
+  if(n.state==="idle"&&!n.moving&&rpgFree()&&(mg.t+n.id*37)%110===0){
+   const dirs=Object.keys(DV);
+   if(!n.wander||Math.random()<.5) n.dir=dirs[(Math.random()*4)|0];
+   else { const [dx,dy]=DV[n.dir], x=n.x+dx, y=n.y+dy; if(Math.abs(x-n.hx)+Math.abs(y-n.hy)<=2&&!rpgSolid(x,y,n)) stepTo(n,x,y); } } });
+ if(p.moving||!rpgFree()) return;
+ if(rpgSight()) return;
+ const want=(keys.ArrowUp||keys.w)?"up":(keys.ArrowDown||keys.s)?"down":(keys.ArrowLeft||keys.a)?"left":(keys.ArrowRight||keys.d)?"right":null;
+ if(!want){ p.turn=0; return; }
+ if(want!==p.dir&&p.turn===0){ p.dir=want; p.turn=5; return; }
+ if(p.turn>1){ p.turn--; return; }
+ p.dir=want; const [dx,dy]=DV[want], x=p.x+dx, y=p.y+dy, Z=ZONES[mg.zone];
+ if(x<0&&Z.exitL>=0) return rpgTravel(Z.exitL,MW-1,y,"left");
+ if(x>=MW&&Z.exitR>=0) return rpgTravel(Z.exitR,0,y,"right");
+ if(rpgSolid(x,y,"p")){ if(p.bump++%18===0) sfx.bump(); return; }
+ p.bump=0; if(d){ stepTo(d,p.x,p.y); d.flip=d.x<d.fx?true:d.x>d.fx?false:d.flip; }
+ stepTo(p,x,y);
 }
-function queueEnemyTurn(){
- if(!mg||mg.phase!=="battle"||!mg.enemy)return;
- mg.turnLocked=true;mg.battleMenu="root";
- animateRpgBattle("idle",260,()=>enemyCounterattack());
-}
-
-function rpgAttack(i,name){
- if(!mg||mg.phase!=="battle"||!mg.enemy||mg.turnLocked)return;
- const n=mg.enemy,moves=mg.moves||rpgMovesFor(mg.heroId??mg.ci),move=moves[i];if(!move)return;
- if(move.pp<=0){mg.message="No quedan PP para "+move.name+". Elige otro ataque.";mg.battleMenu="fight";renderRpg();return;}
- move.pp--;let dmg=move.power;let message="¡"+name+"!";
- const ci=mg.heroId??mg.ci;
- if(ci===0){dmg+=i===3?5:3;message="¡"+name+"! La oferta FLiiTS gana fuerza.";}
- else if(ci===2&&(i===2||i===3)){dmg=Math.round(move.power*1.35);message="¡CRÍTICO! Documentación y permiso validados.";}
- else if(ci===2&&i===0){dmg=Math.max(6,Math.round(move.power*.7));message="¡Revisión documental! El rival tiene que corregir sus papeles.";}
- else if(ci===3){mg.gear=mg.gear||{};mg.gear[name]=true;message="¡"+name+"! EPI comprobado y entregado.";}
- else if(ci===1){message="¡"+name+"! La cita queda más cerca de validarse.";}
- if(Math.random()<.10){
-  mg.message=message+" ¡"+n.name+" se mueve a un lado y esquiva el golpe! · PP "+move.pp+"/"+move.maxPp;
-  renderRpg();animateRpgBattle("enemyDodge",560,()=>enemyCounterattack());return;
- }
- n.hp=Math.max(0,n.hp-dmg);mg.message=message+" Impacto: -"+dmg+" PS · PP restantes: "+move.pp+"/"+move.maxPp;
- mg.turnLocked=true;mg.battleMenu="root";renderRpg();
- animateRpgBattle("heroAttack",620,()=>{if(n.hp<=0){finishRpgEncounter(false);return;}enemyCounterattack();});
-}
-
-function useMonster(){
- if(!mg||mg.phase!=="battle"||mg.turnLocked)return;
- if(mg.items.monster<=0){mg.message="No te quedan latas de Monster.";mg.battleMenu="root";renderRpg();return;}
- if(mg.hp>=mg.maxHp){mg.message="Ya tienes todos los PS. Guarda la Monster para después.";mg.battleMenu="root";renderRpg();return;}
- mg.items.monster--;const before=mg.hp;mg.hp=Math.min(mg.maxHp,mg.hp+35);mg.message="¡Te bebes una Monster! Recuperas "+(mg.hp-before)+" PS.";queueEnemyTurn();
-}
-function throwContractBall(){
- if(!mg||mg.phase!=="battle"||!mg.enemy||mg.turnLocked)return;
- if(mg.items.contract>=0&&mg.items.contract<=0){mg.message="No te quedan bolas de contrato.";mg.battleMenu="root";renderRpg();return;}
- if(mg.enemy.hp>Math.floor(mg.enemy.maxHp*.45)){mg.message="El aspirante aún tiene demasiados PS. Debilítalo por debajo del 45% para intentar contratarlo.";mg.battleMenu="root";renderRpg();return;}
- // La bola de contrato es ilimitada: no se consume al lanzarla ni al fallar.
- if(mg.items.contract>=0)mg.items.contract--;
- mg.turnLocked=true;mg.battleMenu="root";mg.message="¡"+nm(mg.heroId??mg.ci)+" lanza la bola de contrato!";renderRpg();
- animateRpgBattle("ball",900,()=>{
-  if(!mg||mg.phase!=="battle"||!mg.enemy)return;
-  const success=Math.random()<.82;
-  if(success){mg.message="¡La bola impacta! ¡El rival queda dentro y se cierra el contrato!";renderRpg();animateRpgBattle("capture",520,()=>finishRpgEncounter(true));}
-  else{mg.message="¡La bola golpea el suelo y "+mg.enemy.name+" salta a un lado! Se resiste al contrato.";renderRpg();animateRpgBattle("enemyDodge",500,()=>enemyCounterattack());}
- });
-}
-
-function rpgBag(){
- if(!mg)return;
- if(mg.phase==="battle"){mg.battleMenu="bag";renderRpg();return;}
- const acts=$("#mgActions");acts.innerHTML="";
- const b=document.createElement("button");b.textContent="🥫 Monster ×"+mg.items.monster+" · recuperar 35 PS";b.onclick=()=>{if(mg.items.monster>0){mg.items.monster--;mg.hp=Math.min(mg.maxHp,mg.hp+35);mg.message="¡Monster! Recuperas energía.";}renderRpg();};acts.appendChild(b);
- const back=document.createElement("button");back.textContent="VOLVER";back.onclick=renderRpg;acts.appendChild(back);
-}
-function startRpgEncounter(n,lead){
- if(!mg||!n)return;
- mg.turnLocked=false;mg.enemy={...n,maxHp:n.hp,hp:n.hp,moves:makeRpgEnemyMoves(n)};
- mg.phase="battle";mg.battleMenu="root";mg.anim=null;
- mg.moves=rpgMovesFor(mg.heroId??mg.ci).map(m=>({...m}));
- mg.message=lead||("¡"+n.name+" se cruza en tu camino!");renderRpg();
-}
+function rpgTravel(z,x,y,dir){ mg.lock=true; Q.anim("fadeOut",16); Q.run(()=>{ rpgEnterZone(z,x,y,dir); mg.lock=false; }); Q.anim("fadeIn",16); }
+function rpgSight(){ const p=mg.p;
+ for(const n of mg.npcs){ if(n.beaten||n.state!=="idle"||n.moving||n.cool>0) continue; const [dx,dy]=DV[n.dir];
+  for(let k=1;k<=4;k++){ const x=n.x+dx*k, y=n.y+dy*k; if(x===p.x&&y===p.y){ mg.lock=true; n.state="alert"; n.alert=40; tone(880,.06); tone(1320,.1,.07); return true; } if(rpgSolid(x,y,n)) break; } }
+ return false; }
+function rpgChallenge(n){ Q.say(`${n.d.name.toUpperCase()}: ${n.d.say}`); Q.run(()=>rpgBattle(n)); }
 function rpgInteract(){
- if(!mg||mg.phase!=="roam")return;
- const n=mg.npcs.find(n=>n.alive&&Math.hypot(n.x-mg.player.x,n.y-mg.player.y)<42);
- if(n)startRpgEncounter(n,n.name+" · "+n.role+" te desafía. ¿Qué harás?");
+ const p=mg.p, [dx,dy]=DV[p.dir], x=p.x+dx, y=p.y+dy, Z=ZONES[mg.zone];
+ const n=mg.npcs.find(n=>n.x===x&&n.y===y);
+ if(n){ n.dir=OPP[p.dir]; if(n.beaten) Q.say(`${n.d.name.toUpperCase()}: ${n.d.after}`); else rpgChallenge(n); return; }
+ if(Z.signs[x+","+y]){ Q.say(Z.signs[x+","+y]); return; }
+ const b=Z.bld.find(b=>x===b.x+Math.floor(b.w/2)&&y===b.y+b.h-1);
+ if(b){ if(b.hub){ Q.say("FLiiTS HUB. Te tomas un descanso..."); Q.run(()=>{ mg.hp=mg.maxHp; mg.disp=mg.hp; sfx.power(); }); Q.say("¡PS al máximo!"); } else Q.say(b.msg); return; }
+ if(y>=0&&y<MH&&x>=0&&x<MW&&mg.grid[y][x]==="~") Q.say("El Mediterráneo brilla al sol.");
 }
-function updateRpgWorld(){
- if(!mg||mg.typ!=="rpg"||mg.phase!=="roam")return;
- mg.worldTick++;const p=mg.player;let dx=0,dy=0;
- if(keys.ArrowLeft||keys.a)dx=-2.2;if(keys.ArrowRight||keys.d)dx=2.2;if(keys.ArrowUp||keys.w)dy=-2.2;if(keys.ArrowDown||keys.s)dy=2.2;
- if(dx||dy){p.x=Math.max(18,Math.min(622,p.x+dx));p.y=Math.max(48,Math.min(360,p.y+dy));p.dir=dx||p.dir;p.step++;const n=mg.npcs.find(n=>n.alive&&Math.hypot(n.x-p.x,n.y-p.y)<34);if(n){startRpgEncounter(n,"¡"+n.name+" se cruza en tu camino!");return;}}
- if(mg.worldTick%3===0)rpgDrawWorld();
+
+/* --- combate por turnos --- */
+function rpgBattle(n){
+ const d=n.d; mg.enemy={n,name:d.name.toUpperCase(),hp:d.hp,maxHp:d.hp,disp:d.hp,lv:d.hp>55?5:4,moves:makeRpgEnemyMoves(d),boxes:false,hidden:false,signed:false};
+ mg.moves=rpgMovesFor(mg.ci); mg.disp=mg.hp;
+ Q.run(()=>[523,494,523,494,523,659,784].forEach((f,i)=>tone(f,.07,i*.06)));
+ Q.anim("flash",28); Q.anim("wipe",24); Q.run(()=>{ mg.view="battle"; }); Q.anim("slide",36);
+ Q.run(()=>{ mg.enemy.boxes=true; }); Q.say(`¡${mg.enemy.name} quiere demostrar que vale!`); Q.run(()=>rpgOpen("root"));
 }
-function rpgMenuAction(index){
- if(!mg||mg.phase!=="battle")return;
- const buttons=[...$("#mgScene").querySelectorAll(".rpg-menu button")];if(buttons[index])buttons[index].click();
+function rpgUseMove(i){
+ const m=mg.moves[i]; if(!m||m.pp<=0) return; rpgClose(); m.pp--;
+ const e=mg.enemy, ci=mg.ci; let dmg=m.power, crit=false, note="";
+ if(ci===0&&i===3){ dmg+=5; note="¡La oferta FLiiTS convence!"; }
+ if(ci===2&&i>=2){ dmg=Math.round(m.power*1.35); crit=true; note="¡Documentación validada!"; }
+ if(ci===2&&i===0){ dmg=Math.max(6,Math.round(m.power*.7)); note="Tendrá que corregir sus papeles."; }
+ if(ci===3) note="¡EPI entregado!";
+ if(ci===1&&i>=1) note="La cita está más cerca.";
+ if(!crit&&Math.random()<.08){ crit=true; dmg=Math.round(dmg*1.5); }
+ dmg+=Math.floor(Math.random()*4);
+ Q.say(`¡${HERO()} usa ${m.name.toUpperCase()}!`); Q.anim("heroAtk",14);
+ if(Math.random()<.1){ Q.anim("enemyDodge",20); Q.say(`¡${e.name} lo esquiva!`); Q.run(rpgEnemyTurn); return; }
+ Q.run(()=>{ e.hp=Math.max(0,e.hp-dmg); sfx.hit(); }); Q.anim("enemyHit",24); Q.drain();
+ if(crit) Q.say("¡Golpe crítico!"); if(note) Q.say(note);
+ Q.run(()=>{ if(e.hp<=0) rpgEnemyDown(); else rpgEnemyTurn(); });
 }
+function rpgEnemyTurn(){
+ const e=mg.enemy, av=e.moves.filter(m=>m.pp>0);
+ if(!av.length){ Q.say(`¡${e.name} no tiene fuerzas para atacar!`); Q.run(()=>rpgOpen("root")); return; }
+ const m=av[(Math.random()*av.length)|0]; m.pp--;
+ Q.say(`¡${e.name} usa ${m.name.toUpperCase()}!`); Q.anim("enemyAtk",14);
+ if(Math.random()<.12){ Q.anim("heroDodge",20); Q.say(`¡${HERO()} lo esquiva!`); Q.run(()=>rpgOpen("root")); return; }
+ const dmg=Math.max(4,m.power+Math.floor(Math.random()*5));
+ Q.run(()=>{ mg.hp=Math.max(0,mg.hp-dmg); sfx.hit(); }); Q.anim("heroHit",24); Q.drain();
+ Q.run(()=>{ if(mg.hp<=0) rpgLose(); else rpgOpen("root"); });
+}
+function rpgEnemyDown(){ const e=mg.enemy;
+ Q.run(()=>slide(600,120,.4,.06)); Q.anim("faint",22); Q.run(()=>{ e.hidden=true; });
+ Q.say(`¡${e.name} no supera la selección!`); Q.say("Quizá vuelva con todo en regla."); Q.run(()=>rpgResolve(false)); }
+function rpgLose(){
+ Q.say(`¡${HERO()} está agotado!`); Q.say("Vuelves al FLiiTS HUB a descansar...");
+ Q.anim("fadeOut",16); Q.run(()=>{ mg.hp=mg.maxHp; mg.disp=mg.hp; mg.view="map"; mg.enemy=null; rpgEnterZone(0,4,5,"down"); }); Q.anim("fadeIn",16);
+ Q.say("¡PS recuperados! Inténtalo otra vez."); }
+function rpgFlee(){ rpgClose(); const n=mg.enemy.n;
+ Q.say("¡Escapas sin problemas!"); Q.anim("fadeOut",16); Q.run(()=>{ mg.view="map"; mg.enemy=null; n.cool=300; }); Q.anim("fadeIn",16); }
+function rpgMonster(){
+ const battle=mg.view==="battle", back=()=>rpgOpen("bag"); rpgClose();
+ if(mg.items.monster<=0){ Q.say("No te quedan latas de MONSTER."); Q.run(back); return; }
+ if(mg.hp>=mg.maxHp){ Q.say("Ya tienes los PS al máximo."); Q.run(back); return; }
+ mg.items.monster--; const heal=Math.min(35,mg.maxHp-mg.hp);
+ Q.say(`¡${HERO()} se bebe una MONSTER!`); Q.run(()=>{ mg.hp+=heal; sfx.power(); }); Q.drain(); Q.say(`Recupera ${heal} PS.`);
+ if(battle) Q.run(rpgEnemyTurn);
+}
+function rpgContract(){
+ rpgClose(); const e=mg.enemy;
+ if(e.hp>e.maxHp*.45){ Q.say(`${e.name} aún no está convencido.`); Q.say("Baja sus PS por debajo de la mitad."); Q.run(()=>rpgOpen("root")); return; }
+ Q.say(`¡${HERO()} ofrece un CONTRATO!`); Q.run(()=>slide(400,900,.3,.05)); Q.anim("throw",30); Q.anim("sign",46);
+ if(Math.random()<.82){ Q.run(()=>{ e.signed=true; tone(70,.3,0,"square",.14); }); Q.anim("stamp",24); Q.run(()=>{ e.hidden=true; sfx.win(); });
+  Q.say("¡CONTRATO FIRMADO!"); Q.say(`¡${e.name} se une a tu equipo!`); Q.run(()=>rpgResolve(true)); }
+ else { Q.anim("tear",30); Q.say(`¡${e.name} rompe el contrato!`); Q.run(rpgEnemyTurn); }
+}
+function rpgResolve(captured){
+ const e=mg.enemy, n=e.n;
+ if(captured){ mg.gone.push(n.id); mg.team.push({id:n.id,name:n.d.name,role:n.d.role}); mg.npcs=mg.npcs.filter(x=>x!==n); }
+ else { mg.beaten.push(n.id); n.beaten=true; }
+ mg.encounterCount++;
+ Q.anim("fadeOut",16); Q.run(()=>{ mg.view="map"; mg.enemy=null; }); Q.anim("fadeIn",16);
+ if(mg.encounterCount>=4&&!mg.finished){ Q.run(()=>{ mg.finished=true; sfx.clear(); });
+  Q.say("¡Has superado 4 encuentros!"); Q.say(`Riders contratados: ${mg.team.length}. ¡El equipo está listo!`); Q.run(()=>rpgOpen("finish")); }
+}
+
+/* --- bucle y dibujo --- */
+function rpgStepQueue(){
+ for(let guard=0;mg&&mg.q.length&&guard<60;guard++){
+  const s=mg.q[0];
+  if(s.k==="fn"){ mg.q.shift(); s.f(); if(mg) mg.ui=true; continue; }
+  if(s.k==="text"){ if(!s.on){ s.on=true; mg.ui=true; } else if(s.shown<s.t.length) s.shown++; return; }
+  if(s.k==="anim"){ if(!s.on){ s.on=true; mg.anim={a:s.a,t:0,n:s.n}; return; } if(++mg.anim.t>=s.n){ mg.anim=null; mg.q.shift(); continue; } return; }
+  if(s.k==="drain"){ const e=mg.enemy; let busy=false;
+   if(e&&e.disp!==e.hp){ e.disp+=Math.sign(e.hp-e.disp); busy=true; } if(mg.disp!==mg.hp){ mg.disp+=Math.sign(mg.hp-mg.disp); busy=true; }
+   if(busy) return; mg.q.shift(); continue; }
+ }
+}
+function rpgTick(){
+ if(!mg||mg.typ!=="rpg") return;
+ mg.t++; rpgStepQueue(); if(!mg) return;
+ if(mg.view==="map") rpgMapUpdate();
+ rpgDraw();
+ if(mg.ui){ mg.ui=false; rpgUI(); }
+ rpgLive();
+}
+function rpgPalNow(){
+ const A=mg.anim; if(!A) return GP; const k=A.t/A.n;
+ if(A.a==="flash") return ((A.t>>2)&1)?[...GP].reverse():GP;
+ const lv=A.a==="fadeOut"?Math.min(3,Math.floor(k*4)):A.a==="fadeIn"?Math.min(3,Math.floor((1-k)*4)):0;
+ return lv?GP.map((_,i)=>GP[Math.max(0,i-lv)]):GP;
+}
+const lerpPos=o=>{ const k=o.moving?o.t/16:1; return [Math.round((o.fx+(o.x-o.fx)*k)*16),Math.round((o.fy+(o.y-o.fy)*k)*16)]; };
+const strideOf=o=>o.moving&&o.t<8?((o.step&1)?1:-1):0;
+function rpgDraw(){
+ const cv=$("#gbCv"); if(!cv) return; const c=cv.getContext("2d"), P=rpgPalNow(), A=mg.anim;
+ c.imageSmoothingEnabled=false;
+ if(mg.view==="battle") rpgDrawBattle(c,P); else rpgDrawMap(c,P);
+ if(A&&A.a==="wipe"){ const h=Math.round(A.t/A.n*72); c.fillStyle=P[3]; c.fillRect(0,0,GBW,h); c.fillRect(0,GBH-h,GBW,h); }
+}
+function rpgDrawMap(c,P){
+ const [ppx,ppy]=lerpPos(mg.p), cx=Math.max(0,Math.min(MW*16-GBW,ppx+8-GBW/2)), cy=Math.max(0,Math.min(MH*16-GBH,ppy+8-GBH/2));
+ const tx0=Math.floor(cx/16), ty0=Math.floor(cy/16), wv=(frame>>4)&3;
+ for(let ty=ty0;ty<=ty0+9&&ty<MH;ty++) for(let tx=tx0;tx<=tx0+10&&tx<MW;tx++){ const ch=mg.grid[ty][tx];
+  c.drawImage(tileCv(ch,ch==="~"||ch==="F"?wv:(tx*7+ty*13)&3,P),tx*16-cx,ty*16-cy); }
+ ZONES[mg.zone].bld.forEach(b=>drawBuilding(c,b,b.x*16-cx,b.y*16-cy,P));
+ const ents=[];
+ mg.npcs.forEach(n=>{ const [x,y]=lerpPos(n); ents.push({y,draw:()=>c.drawImage(sprNpc(n.id,n.dir,strideOf(n),P),x-cx,y-8-cy),o:n,x}); });
+ ents.push({y:ppy,draw:()=>c.drawImage(sprCrew(mg.ci,mg.p.dir,strideOf(mg.p),P),ppx-cx,ppy-8-cy),o:mg.p,x:ppx});
+ if(mg.dog){ const [x,y]=lerpPos(mg.dog); ents.push({y:y-1,draw:()=>c.drawImage(sprDog((mg.dog.moving&&mg.dog.t<8)?1:0,mg.dog.flip,P),x-6-cx,y-2-cy),o:mg.dog,x}); }
+ ents.sort((a,b)=>a.y-b.y).forEach(e=>{ e.draw();
+  const o=e.o; if(mg.grid[o.y]&&mg.grid[o.y][o.x]===","&&!o.moving){ c.save(); c.beginPath(); c.rect(o.x*16-cx,o.y*16-cy+10,16,6); c.clip(); c.drawImage(tileCv(",",0,P),o.x*16-cx,o.y*16-cy); c.restore(); } });
+ mg.npcs.forEach(n=>{ if(n.state!=="alert") return; const [x,y]=lerpPos(n), bx=x-cx+3, by=y-cy-22;
+  c.fillStyle=P[3]; c.fillRect(bx,by,10,12); c.fillStyle=P[0]; c.fillRect(bx+1,by+1,8,10); c.fillStyle=P[3]; c.fillRect(bx+4,by+2,2,5); c.fillRect(bx+4,by+8,2,2); });
+}
+function drawContract(c,x,y,P,sig,stamp,stampR){
+ c.fillStyle=P[3]; c.fillRect(x,y,28,36); c.fillStyle=P[0]; c.fillRect(x+1,y+1,26,34);
+ let x0=x+4; for(const ch of "FLiiTS"){ const gl=FONT[ch]; c.fillStyle=P[3]; gl.forEach((row,r)=>[...row].forEach((v,q)=>{ if(v==="1") c.fillRect(x0+q,y+4+r,1,1); })); x0+=gl[0].length+1; }
+ c.fillStyle=P[2]; for(let r=0;r<4;r++) c.fillRect(x+4,y+12+r*4,r===3?12:20,1);
+ c.fillStyle=P[3]; const n=Math.round(sig*18); for(let i=0;i<n;i++) c.fillRect(x+5+i,y+29+Math.round(Math.sin(i/1.6)*2),1,1);
+ if(stamp){ pxEllipse(c,x+21,y+27,stampR,stampR,P[2]); c.fillStyle=P[0]; c.fillRect(x+20,y+24,1,6); c.fillRect(x+20,y+24,3,1); c.fillRect(x+20,y+27,2,1); }
+}
+function rpgDrawBattle(c,P){
+ const A=mg.anim, a=A&&A.a, k=A?A.t/A.n:1, E=mg.enemy; if(!E) return;
+ c.fillStyle=P[0]; c.fillRect(0,0,GBW,GBH);
+ let ex=108, ey=6, hx=8, hy=42;
+ if(a==="slide"){ ex-=Math.round((1-k)*130); hx+=Math.round((1-k)*130); }
+ if(a==="heroAtk") hx+=Math.round(Math.sin(k*Math.PI)*8);
+ if(a==="enemyAtk") ex-=Math.round(Math.sin(k*Math.PI)*8);
+ if(a==="enemyDodge") ex+=Math.round(Math.sin(k*Math.PI)*18);
+ if(a==="heroDodge") hx-=Math.round(Math.sin(k*Math.PI)*14);
+ if(a==="heroHit") hx+=(A.t>>1)&1?2:-2;
+ pxEllipse(c,ex+16,ey+48,28,5,P[1]); pxEllipse(c,hx+26,100,40,8,P[1]);
+ if(!E.hidden&&!(a==="enemyHit"&&(A.t>>2)&1)){
+  if(a==="faint"){ c.save(); c.beginPath(); c.rect(0,0,GBW,ey+50); c.clip(); c.drawImage(sprNpc(E.n.id,"down",0,P),ex,ey+Math.round(k*50),32,48); c.restore(); }
+  else c.drawImage(sprNpc(E.n.id,"down",0,P),ex,ey,32,48); }
+ if(!(a==="heroHit"&&(A.t>>2)&1)) c.drawImage(sprCrew(mg.ci,"up",0,P),hx,hy,48,72);
+ if(mg.ci===0) c.drawImage(sprDog(0,false,P),hx+46,78);
+ if(a==="throw"){ const x=hx+40+(ex+12-hx-40)*k, y=70+(ey+16-70)*k-Math.sin(k*Math.PI)*34; c.drawImage(sprContract(P),Math.round(x),Math.round(y),16,16); }
+ if(a==="sign") drawContract(c,ex+2,ey+4,P,k,false,0);
+ if(a==="stamp"||E.signed&&a!=="tear") drawContract(c,ex+2,ey+4,P,1,true,a==="stamp"?Math.max(5,Math.round(5+(1-k)*8)):5);
+ if(a==="tear"){ const off=Math.round(k*20), dy=Math.round(k*k*30); c.save(); c.beginPath(); c.rect(0,0,ex+16,GBH); c.clip(); drawContract(c,ex+2-off,ey+4+dy,P,1,false,0); c.restore();
+  c.save(); c.beginPath(); c.rect(ex+16,0,GBW,GBH); c.clip(); drawContract(c,ex+2+off,ey+4+dy,P,1,false,0); c.restore(); }
+}
+// Capa HTML: cuadros de texto, cajas de PS y menús.
+function rpgUI(){
+ const ov=$("#gbOv"); if(!ov) return; const scr=$("#gbScr"), E=mg.enemy;
+ GP.forEach((col,i)=>scr.style.setProperty("--g"+i,col));
+ let h="";
+ if(mg.view==="battle"&&E&&E.boxes){
+  h+=`<div class="gbx gb-ebox"><div class="gb-nm"><b>${esc(E.name)}</b><span>Nv${E.lv}</span></div><div class="gb-bar"><span>PS</span><div class="gbhp"><i id="gbEhp"></i></div></div></div>`;
+  h+=`<div class="gbx gb-hbox"><div class="gb-nm"><b>${esc(HERO())}</b><span>Nv1</span></div><div class="gb-bar"><span>PS</span><div class="gbhp"><i id="gbHhp"></i></div></div><div class="gb-hpn" id="gbHpn"></div></div>`; }
+ if(mg.view==="map"&&mg.banner>0&&!mg.anim&&!mg.menu) h+=`<div class="gbx gb-banner">${esc(ZONES[mg.zone].name)}</div>`;
+ const M=mg.menu&&rpgMenuDef(), s=mg.q[0], textNow=s&&s.k==="text";
+ if(textNow||(M&&M.prompt)||(mg.view==="battle"&&E&&E.boxes)) h+=`<div class="gbx gb-text" id="gbText"><span id="gbTxt"></span><i class="gb-more" id="gbMore" hidden></i></div>`;
+ if(M&&!textNow){
+  if(M.info) h+=`<div class="gbx gb-info">${M.info}</div>`;
+  h+=`<div class="gbx gb-menu ${M.cls}">`+M.items.map((it,i)=>`<div class="gb-it${i===mg.mcur?" on":""}${it.dis?" dis":""}" data-i="${i}">${esc(it.t)}</div>`).join("")+`</div>`; }
+ ov.innerHTML=h; mg.liveTxt=null;
+ $("#mgProgress").textContent=`${ZONES[mg.zone].name} · CONTRATADOS ${mg.team.length} · ENCUENTROS ${Math.min(4,mg.encounterCount)}/4`;
+}
+function rpgLive(){
+ const s=mg.q[0], el=$("#gbTxt");
+ if(el){ const M=mg.menu&&rpgMenuDef(); const txt=s&&s.k==="text"?s.t.slice(0,s.shown):(M&&M.prompt)||"";
+  if(txt!==mg.liveTxt){ el.textContent=txt; mg.liveTxt=txt; }
+  const more=$("#gbMore"); if(more) more.hidden=!(s&&s.k==="text"&&s.shown>=s.t.length); }
+ const E=mg.enemy, eb=$("#gbEhp"), hb=$("#gbHhp"), hn=$("#gbHpn");
+ if(eb&&E){ const r=E.disp/E.maxHp; eb.style.width=(r*100)+"%"; eb.classList.toggle("low",r<.25); }
+ if(hb){ const r=mg.disp/mg.maxHp; hb.style.width=(r*100)+"%"; hb.classList.toggle("low",r<.25); }
+ if(hn) hn.textContent=`${String(mg.disp).padStart(3," ")}/${mg.maxHp}`;
+}
+const RPG_KEYS={ArrowUp:"UP",w:"UP",ArrowDown:"DOWN",s:"DOWN",ArrowLeft:"LEFT",a:"LEFT",ArrowRight:"RIGHT",d:"RIGHT",Enter:"A"," ":"A",z:"A",x:"B",b:"B",Backspace:"B",Escape:"START"};
 
 /* ---------- SELECT SCREENS ---------- */
 const nm=i=>saved[`pl.${i}.n`]??CREW[i].name, rl=i=>CREW[i].role;
@@ -2498,7 +2306,7 @@ document.addEventListener("keydown",e=>{
   const k=e.key.length===1?e.key.toLowerCase():e.key;
   if(k==="e"){ setEdit(!editing); return; }
   if(k==="m"){ toggleMute(); return; }
-  if(k==="Escape" && !$("#titleOv").hidden===false){ if(gamePaused)setGamePaused(false);else setGamePaused(true); return; }
+  if(gamePaused){ if(k==="Escape"){ restorePauseLabels(); setGamePaused(false); } return; }
   if(k==="f"){ try{ document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{}); }catch(err){} return; }
   if(!$("#titleOv").hidden){ if(["Enter"," ","x","z","b"].includes(k)){ e.preventDefault(); start(); } return; }
   if(!$("#introOv").hidden){ if(["Enter"," ","x","z","b"].includes(k)){e.preventDefault();continueIntro();} return; }
@@ -2507,21 +2315,21 @@ document.addEventListener("keydown",e=>{
    if(["ArrowRight","ArrowDown","d","s"].includes(k)){modeCursor=(modeCursor+1)%cards.length;cards[modeCursor]?.focus();e.preventDefault();}
    else if(["ArrowLeft","ArrowUp","a","w"].includes(k)){modeCursor=(modeCursor+cards.length-1)%cards.length;cards[modeCursor]?.focus();e.preventDefault();}
    else if(["Enter"," ","x","z","b"].includes(k)){e.preventDefault();chooseMode(cards[modeCursor]?.dataset.mode||"platform");}
-   else if(k==="1"||k==="2"||k==="3")chooseMode(k==="1"?"platform":k==="2"?"rpg":"arcade"); return; }
-  if(!$("#modeGameOv").hidden){ if(k==="Escape"){ if(mg&&mg.typ==="rpg"&&mg.phase==="battle"){mg.phase="roam";mg.turnLocked=false;renderRpg();}else{$("#modeGameOv").hidden=true;showSelect();}} else if(mg&&mg.typ==="rpg"){
-    if(mg.phase==="roam"&&(k==="ArrowUp"||k==="ArrowDown"||k==="ArrowLeft"||k==="ArrowRight"||k==="w"||k==="a"||k==="s"||k==="d")){keys[k.length===1?k.toLowerCase():k]=true;e.preventDefault();}
-    else if(mg.phase==="roam"&&(k===" "||k==="Enter")){rpgInteract();e.preventDefault();}
-    else if(mg.phase==="battle"&&!mg.turnLocked&&["ArrowRight","ArrowDown","d","s"].includes(k)){rpgMenuCursor=(rpgMenuCursor+1)%4;const bs=document.querySelectorAll(".rpg-battle-lower .rpg-menu button");bs[rpgMenuCursor]?.focus();e.preventDefault();}
-    else if(mg.phase==="battle"&&!mg.turnLocked&&["ArrowLeft","ArrowUp","a","w"].includes(k)){rpgMenuCursor=(rpgMenuCursor+3)%4;const bs=document.querySelectorAll(".rpg-battle-lower .rpg-menu button");bs[rpgMenuCursor]?.focus();e.preventDefault();}
-    else if(mg.phase==="battle"&&!mg.turnLocked&&(k==="Enter"||k===" "||k==="x"||k==="z"||k==="b")){rpgMenuAction(rpgMenuCursor);e.preventDefault();}
-    else if(mg.phase==="battle"&&!mg.turnLocked&&["1","2","3","4"].includes(k)){rpgMenuCursor=Number(k)-1;rpgMenuAction(rpgMenuCursor);e.preventDefault();}
-  } return; }
+   else if(k==="1"||k==="2"||k==="3")chooseMode(k==="1"?"platform":k==="2"?"rpg":"arcade");
+   else if(k==="Escape"){ $("#modeOv").hidden=true; $("#titleOv").hidden=false; }
+   return; }
+  if(!$("#modeGameOv").hidden){
+    if(mg&&mg.typ==="rpg"){ const btn=RPG_KEYS[k]; if(!btn) return; e.preventDefault();
+      if(["UP","DOWN","LEFT","RIGHT"].includes(btn)) keys[k]=true;
+      if(!e.repeat||["UP","DOWN","LEFT","RIGHT"].includes(btn)) rpgPress(btn); return; }
+    if(k==="Escape") leaveModeGame(); return; }
   if(!$("#selOv").hidden){
     const p=SEL.indexOf(pick);
     if(k==="ArrowRight"||k==="ArrowDown"||k==="d"||k==="s"){ pick=SEL[(p+1)%4]; buildRoster(); sfx.select(); }
     else if(k==="ArrowLeft"||k==="ArrowUp"||k==="a"||k==="w"){ pick=SEL[(p+3)%4]; buildRoster(); sfx.select(); }
     else if(k==="r"){ pick=1; confirmPick(true); }
     else if(k==="Enter"||k===" "||k==="x"||k==="z"||k==="b"){ e.preventDefault(); confirmPick(); }
+    else if(k==="Escape"){ $("#selOv").hidden=true; $("#modeOv").hidden=false; sfx.back(); }
     return; }
   if(!$("#vehOv").hidden){
     if(k==="ArrowRight"||k==="ArrowDown"||k==="d"||k==="s"){ veh=(veh+1)%3; buildVeh(); sfx.select(); }
@@ -2530,6 +2338,7 @@ document.addEventListener("keydown",e=>{
     else if(k==="Enter"||k===" "||k==="x"||k==="z"||k==="b"){ e.preventDefault(); confirmVeh(); }
     return; }
   if(!$("#credOv").hidden){ if(k==="Escape"||k==="Enter"){ $("#credOv").hidden=true; showSelect(); } return; }
+  if(k==="Escape"){ if(open<0&&(mode==="play"||mode==="final"||mode==="raul")){ restorePauseLabels(); setGamePaused(true); } return; }
   if(k==="n"){ showNotes=!showNotes; document.querySelectorAll("#lvlBody .notes").forEach(n=>n.hidden=!showNotes); return; }
   if(open>=0){ if(k==="Enter"&&t.tagName!=="BUTTON"){ e.preventDefault(); closePanel(); } return; }
   if(k==="j"){ showSelect(); return; }
@@ -2594,7 +2403,7 @@ document.querySelectorAll("#mobilePad [data-system]").forEach(b=>b.addEventListe
 document.querySelectorAll("#mobilePad [data-key]").forEach(b=>{
  const key=b.dataset.key;
  const down=e=>{e.preventDefault();if(gamePaused)return;
-  const inMenu=!$("#titleOv").hidden||!$("#introOv").hidden||!$("#modeOv").hidden||!$("#selOv").hidden||!$("#vehOv").hidden||(!$("#modeGameOv").hidden&&mg&&mg.phase!=="roam");
+  const inMenu=!$("#titleOv").hidden||!$("#introOv").hidden||!$("#modeOv").hidden||!$("#selOv").hidden||!$("#vehOv").hidden||(!$("#modeGameOv").hidden&&mg);
   if(inMenu){document.dispatchEvent(new KeyboardEvent("keydown",{key,bubbles:true}));return;}
   keys[key]=true;auto=false;
  };
@@ -2609,23 +2418,14 @@ function controllerConfirm(which){
  if(!$("#selOv").hidden){confirmPick();return;}
  if(!$("#vehOv").hidden){confirmVeh();return;}
  if(!$("#modeGameOv").hidden&&mg){
-  if(mg.typ==="rpg"){
-   if(mg.phase==="roam")rpgInteract();
-   else if(mg.phase==="battle"&&!mg.turnLocked)rpgMenuAction(Math.max(0,rpgMenuCursor||0));
-   else if(mg.phase==="won")nextEncounter();
-   else { const first=$("#mgActions").querySelector("button:not(:disabled)"); if(first)first.click(); }
-  }else if(mg.phase==="won")nextEncounter();
-  else if(mg.phase==="fight"||mg.phase==="map"||mg.phase==="finish"){
-   const buttons=[...$("#mgActions").querySelectorAll("button:not(:disabled)")];
-   const target=mg.phase==="map"?buttons[buttons.length-1]:buttons[0];
-   if(target)target.click();
-  }
-  else if(which==="jump"&&mode==="play"&&pl.on){pl.vy=-5.6;pl.on=false;sfx.jump();}
+  if(mg.typ==="rpg"){ rpgPress(which==="jump"?"B":which==="start"?"START":"A"); return; }
+  if(mg.phase==="won") nextEncounter();
+  else { const target=$("#mgActions").querySelector("button:not(:disabled)"); if(target) target.click(); }
   return;
  }
  if(which==="jump"&&mode==="play"&&pl.on){pl.vy=-5.6;pl.on=false;sfx.jump();}
 }
-let modeCursor=0, rpgMenuCursor=0;
+let modeCursor=0;
 document.querySelectorAll("#mobilePad [data-action]").forEach(b=>{
  b.addEventListener("pointerdown",e=>{e.preventDefault();if(gamePaused)return;const action=b.dataset.action;
   if(action==="jump"&&($("#titleOv").hidden&&$("#introOv").hidden&&$("#modeOv").hidden&&$("#selOv").hidden&&$("#vehOv").hidden)){
