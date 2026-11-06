@@ -1374,10 +1374,11 @@ const BOSS=[
 
 /* ---------- WORLD ---------- */
 const MOBILE_PORTRAIT = matchMedia("(max-width:700px) and (orientation:portrait)").matches;
-// En la consola del móvil el lienzo toma la forma de la pantalla para llenarla (sin franjas negras a los lados).
-const VW = (()=>{ if(!MOBILE_PORTRAIT) return 256; const st=$("#stage"); if(!document.documentElement.classList.contains("frame-gb")||!st) return 192;
-  const r=st.getBoundingClientRect(); if(r.width<50||r.height<50) return 192; return Math.max(192,Math.min(256,Math.round(256*(r.width-8)/(r.height-8)/2)*2)); })();
-const VH = MOBILE_PORTRAIT ? 256 : 144;
+// En vertical el lienzo mide 256 de ancho (las escenas de Raül y el final están dibujadas a ese ancho: con menos,
+// las gradas y las mochilas quedaban fuera). En la consola, el alto se adapta a la pantalla para llenarla.
+const VW = 256;
+const VH = (()=>{ if(!MOBILE_PORTRAIT) return 144; const st=$("#stage"); if(!document.documentElement.classList.contains("frame-gb")||!st) return 256;
+  const r=st.getBoundingClientRect(); if(r.width<50||r.height<50) return 256; return Math.max(256,Math.min(360,Math.round(256*(r.height-8)/(r.width-8)/2)*2)); })();
 const GY = VH - 24;
 const cv=$("#cv"); cv.width=VW; cv.height=VH;
 const ctx=cv.getContext("2d"); ctx.imageSmoothingEnabled=false;
@@ -2084,7 +2085,9 @@ function draw(){
   bubbles=bubbles.filter(b=>{ if(frame>b.until){ b.el.remove(); return false; }
     const x=typeof b.wx==="function"?b.wx():b.wx, y=typeof b.wy==="function"?b.wy():b.wy;
     const minTop=map.clientHeight?(b.el.offsetHeight+10)/map.clientHeight*100:0;
-    b.el.style.left=((x-cam)/VW*100)+"%"; b.el.style.top=Math.max(y/VH*100,minTop)+"%"; return true; });
+    // Que el bocadillo no se salga por los lados de la pantalla
+    const mw=map.clientWidth, hw=mw?(b.el.offsetWidth/2+3)/mw*100:0, lx=(x-cam)/VW*100, sx=(x-cam)>-20&&(x-cam)<VW+20;
+    b.el.style.left=(sx&&hw<50?Math.min(100-hw,Math.max(hw,lx)):lx)+"%"; b.el.style.top=Math.max(y/VH*100,minTop)+"%"; return true; });
 }
 function loop(){
   if(!gamePaused) frame++;
