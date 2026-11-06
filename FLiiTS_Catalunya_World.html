@@ -632,6 +632,32 @@ body.editing [data-k]:focus{outline:2px solid var(--gold);background:rgba(0,0,0,
 .modegame.arc .foot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-family:var(--f-display);font-size:clamp(7px,1.3cqw,10px)}
 @media(max-width:700px){.arc-wrap{width:min(100%,calc((100cqh - 170px)*var(--ar)))}}
 </style>
+<style id="superada">
+/* Tarjeta de pantalla superada, resultados opacos y check en el selector */
+.win-ov{background:radial-gradient(ellipse at 50% 40%,#c11431,#120b0c);z-index:45;text-align:center}
+.win-ov .wbox{display:grid;justify-items:center;gap:clamp(8px,2cqh,16px);padding:16px}
+.win-ov .wk{font-family:var(--f-display);font-size:clamp(7px,1.3cqw,11px);color:var(--sky);letter-spacing:.08em}
+.win-ov h2{font-family:var(--f-display);font-weight:400;font-size:clamp(20px,5cqw,48px);line-height:1.3;color:var(--gold);text-shadow:4px 4px 0 var(--red),7px 7px 0 var(--edge);margin:0;animation:pop .35s steps(4)}
+.win-ov .wspr canvas{height:clamp(72px,18cqh,150px);width:auto;image-rendering:pixelated;animation:float .5s steps(2) infinite alternate}
+.win-ov .wcoins{display:flex;gap:14px}
+.win-ov .wcoins i{width:clamp(20px,4cqw,34px);aspect-ratio:1;border-radius:50%;border:3px solid var(--edge);background:rgba(0,0,0,.35);box-shadow:inset 0 0 0 2px rgba(255,255,255,.15)}
+.win-ov .wcoins i.on{background:radial-gradient(circle at 35% 30%,#fff3b0,#ffd23f 45%,#c9971a);box-shadow:0 0 12px #ffd23f}
+.win-ov .wcoins i.new{animation:coinIn .7s .3s steps(6) both}
+@keyframes coinIn{0%{transform:translateY(-60px) scale(.3);opacity:0}70%{transform:translateY(4px) scale(1.15);opacity:1}100%{transform:none}}
+.win-ov p{font-size:clamp(18px,2.4cqw,26px);margin:0;color:var(--ink)}
+.win-ov .press{margin-top:6px}
+.lvl-ov.solid{background:radial-gradient(ellipse at 50% 30%,#2a1d1f,#120b0c 75%)}
+.pick .ck{position:absolute;top:6px;right:6px;width:clamp(24px,4cqw,36px);aspect-ratio:1;border-radius:50%;background:var(--green);border:3px solid var(--edge);box-shadow:0 0 0 2px var(--ink)}
+.pick .ck::after{content:"";position:absolute;left:28%;top:16%;width:28%;height:48%;border:solid var(--edge);border-width:0 4px 4px 0;transform:rotate(40deg)}
+.pick.done{border-color:var(--green)}
+body.theme-gb .win-ov{background:var(--g0)}
+body.theme-gb .win-ov h2{color:var(--g3);text-shadow:3px 3px 0 var(--g1)}
+body.theme-gb .win-ov .wcoins i{border-color:var(--g3);background:var(--g0);box-shadow:none}
+body.theme-gb .win-ov .wcoins i.on{background:var(--g2);box-shadow:inset 0 0 0 3px var(--g1)}
+body.theme-gb .pick .ck{background:var(--g3);border-color:var(--g0);box-shadow:0 0 0 2px var(--g3)}
+body.theme-gb .pick .ck::after{border-color:var(--g0)}
+body.theme-gb .pick.done{border-color:var(--g3)}
+</style>
 <style id="tema-gameboy">
 /* Tema Game Boy: al elegir RPG, selector, resultados, pausa y créditos pasan a los 4 tonos
    de la paleta del juego (--g0 claro … --g3 oscuro). Se redefinen las variables de color
@@ -844,6 +870,18 @@ body.theme-gb .hud,body.theme-gb .hint{color:var(--g3)}
       <button class="btn" id="clearBtn" type="button">ENTER · NIVEL COMPLETADO</button>
     </div>
   </section>
+</div>
+
+<!-- Pantalla superada -->
+<div class="ov win-ov" id="winOv" hidden>
+  <div class="wbox">
+    <div class="wk" id="winKick"></div>
+    <h2>¡PANTALLA<br>SUPERADA!</h2>
+    <div class="wspr" id="winSpr"></div>
+    <div class="wcoins" id="winCoins"></div>
+    <p id="winMsg"></p>
+    <button class="press" id="winGo" type="button">A / ENTER · CONTINUAR</button>
+  </div>
 </div>
 
 <!-- Credits -->
@@ -2830,11 +2868,11 @@ const SEL=[0,2,3,1];
 function buildRoster(){
   const r=$("#roster"); r.innerHTML="";
   SEL.forEach(i=>{ const fin_=i===1, sIdx=SCREEN_OF[i], b=document.createElement("div"), locked=fin_&&!raulOpen();
-    b.className="pick"+(i===pick?" on":"")+(fin_?" final":"")+(locked?" locked":"")+(fin_&&justUnlocked?" unlock":""); b.tabIndex=0; b.setAttribute("role","button");
+    b.className="pick"+(i===pick?" on":"")+(fin_?" final":"")+(locked?" locked":"")+(fin_&&justUnlocked?" unlock":"")+(!fin_&&DONE()[sIdx]?" done":""); b.tabIndex=0; b.setAttribute("role","button");
     if(locked){ const cv=document.createElement("canvas"); cv.width=16; cv.height=24; const g=cv.getContext("2d"); CREW[1].spr.forEach((row,rr)=>[...row].forEach((ch,q)=>{ if(ch!=="."){ g.fillStyle="#120b0c"; g.fillRect(q,rr,1,1); } })); b.appendChild(themed(cv));
       b.insertAdjacentHTML("beforeend",`<div class="ped"></div><div class="pn">???</div><div class="pr">Personaje secreto</div><div class="coinbadge">${gold()}/3 MONEDAS DE ORO</div>`); }
     else { b.appendChild(themed(standCanvas(i)));
-    const badge = fin_ ? `<div class="coinbadge">¡DESBLOQUEADO!</div>` : (DONE()[sIdx]?`<div class="coinbadge">MONEDA ✓</div>`:"");
+    const badge = fin_ ? `<div class="coinbadge">¡DESBLOQUEADO!</div>` : (DONE()[sIdx]?`<div class="coinbadge">SUPERADO</div><span class="ck" aria-label="Superado"></span>`:"");
     b.insertAdjacentHTML("beforeend",`<div class="ped"></div><div class="pn" data-k="pl.${i}.n">${esc(nm(i))}</div><div class="pr">${esc(rl(i))}</div>${badge}`); }
     b.addEventListener("click",()=>{ if(editing) return; pick=i; confirmPick(); });
     r.appendChild(b); });
@@ -2877,7 +2915,7 @@ function openPanel(kick,title,html,btn,onDone,after){
   open=1; keys={}; $("#lvlKick").textContent=kick; $("#lvlTitle").textContent=title;
   const body=$("#lvlBody"); body.innerHTML=html; applySaved(body);
   body.querySelectorAll(".notes").forEach(n=>n.hidden=!showNotes);
-  $("#clearBtn").textContent=btn; panelDone=onDone; $("#lvlOv").hidden=false; sfx.open();
+  $("#clearBtn").textContent=btn; panelDone=onDone; $("#lvlOv").classList.toggle("solid",activeGameMode!=="platform"); $("#lvlOv").hidden=false; sfx.open();
   if(after) after(body); $("#clearBtn").focus({preventScroll:true});
 }
 function closePanel(){ if(open<0) return; open=-1; $("#lvlOv").hidden=true; const f=panelDone; panelDone=null; if(f) f(); }
@@ -2896,9 +2934,24 @@ function openCityPanel(){
     <div class="ccards${many?" many":""}">${cards}</div><div class="ctot" id="ctot"></div><div class="src">Riders contratados y tipo de vehículo según contrato · Rider forecast, 04/11/2026</div>${notes(`d.${i}.notes`,S.note)}`;
   openPanel(`MUNDO ${i+1} · ${nm(S.who)}`,"¡PANTALLA SUPERADA!",html,"ENTER · GUARDAR MONEDA DE ORO",()=>finishScreen(i),b=>updTotals(b));
 }
+// Al acabar una pantalla: tarjeta de "¡PANTALLA SUPERADA!" (tapa el juego) y vuelta al selector.
+let winNext=null, winTimer=0;
 function finishScreen(i){
-  DONE()[i]=true; updHud(); sfx.clear(); toast("¡MONEDA DE ORO!"); setTimeout(()=>{ if(gold()===3&&!FORCED[activeGameMode]){ pick=1; justUnlocked=true; showSelect(); toast("¡NUEVO PERSONAJE DESBLOQUEADO!"); sfx.power(); setTimeout(()=>sfx.win(),400); } else showSelect(); },1300);
+  DONE()[i]=true; updHud(); sfx.clear();
+  const who=SCREENS[i].who, unlock=gold()===3&&!FORCED[activeGameMode];
+  showWin(who,i,()=>{ if(unlock){ pick=1; justUnlocked=true; showSelect(); toast("¡NUEVO PERSONAJE DESBLOQUEADO!"); sfx.power(); setTimeout(()=>sfx.win(),400); } else showSelect(); });
 }
+function showWin(who,i,next){
+  mode="win"; keys={}; clearBubbles(); hideRaulUI();
+  $("#winKick").textContent=`${{platform:"PLATAFORMAS",rpg:"RPG",arcade:"ARCADE"}[activeGameMode]} · MUNDO ${i+1} · ${nm(who)}`;
+  const sp=$("#winSpr"); sp.innerHTML=""; sp.appendChild(themed(standCanvas(who)));
+  $("#winCoins").innerHTML=[0,1,2].map(k=>`<i class="${DONE()[k]?"on":""}${k===i?" new":""}"></i>`).join("");
+  $("#winMsg").textContent=gold()===3?"¡3 monedas! Se desbloquea el personaje secreto.":`Moneda de oro conseguida · llevas ${gold()}/3`;
+  winNext=next; $("#winOv").hidden=false; setTimeout(()=>sfx.coin(),500);
+  clearTimeout(winTimer); winTimer=setTimeout(closeWin,5000);
+}
+function closeWin(){ if($("#winOv").hidden) return; clearTimeout(winTimer); $("#winOv").hidden=true; const f=winNext; winNext=null; if(f) f(); }
+$("#winGo").addEventListener("click",closeWin);
 let motoURL=null;
 function openMotoPanel(i){
   { const c=document.createElement("canvas"); c.width=16; c.height=13; drawSpr(c.getContext("2d"),MOTO,0,0); motoURL=themed(c).toDataURL(); }
@@ -3016,6 +3069,7 @@ document.addEventListener("keydown",e=>{
     else if(k==="Escape"){ if(vehResume){ $("#vehOv").hidden=true; mode="play"; vehResume=false; } else showSelect(); }
     else if(k==="Enter"||k===" "||k==="x"||k==="z"||k==="b"){ e.preventDefault(); confirmVeh(); }
     return; }
+  if(!$("#winOv").hidden){ if(["Enter"," ","x","z","b","Escape"].includes(k)){ e.preventDefault(); closeWin(); } return; }
   if(!$("#credOv").hidden){ if(k==="Escape"||k==="Enter"){ $("#credOv").hidden=true; showSelect(); } return; }
   if(k==="Escape"){ if(open<0&&(mode==="play"||mode==="final"||mode==="raul")){ restorePauseLabels(); setGamePaused(true); } return; }
   if(k==="n"){ showNotes=!showNotes; document.querySelectorAll("#lvlBody .notes").forEach(n=>n.hidden=!showNotes); return; }
@@ -3093,6 +3147,7 @@ document.querySelectorAll("#mobilePad [data-key]").forEach(b=>{
 });
 function controllerConfirm(which){
  const isStart=which==="start";
+ if(!$("#winOv").hidden){closeWin();return;}
  if(!$("#titleOv").hidden){start();return;}
  if(!$("#introOv").hidden){continueIntro();return;}
  if(!$("#modeOv").hidden){const cards=[...document.querySelectorAll(".mode-card")];const ix=Math.max(0,modeCursor||0);chooseMode(cards[ix]?.dataset.mode||"platform");return;}
