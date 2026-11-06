@@ -683,6 +683,15 @@ html.frame-gb #selectBack,html.frame-gb #vehBack,html.frame-gb #ridBack{font-siz
 .mode-ov .mode-grid .demo-card{grid-column:1/-1;min-height:0!important;padding:10px!important;background:#120b0c;border-color:#ffd23f}
 .mode-ov .mode-grid .demo-card b{font-size:clamp(10px,1.5cqw,16px)!important;color:#ffd23f}
 </style>
+<style id="bocadillos-consola">
+/* Consola: bocadillos pequeños y translúcidos para que no tapen el juego */
+html.frame-gb .bubble{font-size:11px!important;line-height:1!important;padding:2px 4px!important;border-width:2px!important;max-width:44%!important;opacity:.9}
+html.frame-gb .bubble::after{bottom:-6px;border-left-width:4px;border-right-width:4px;border-top-width:5px}
+html.frame-gb .bubble.ok,html.frame-gb .bubble.no,html.frame-gb .bubble.bad,html.frame-gb .bubble.plane,html.frame-gb .bubble.mail{font-size:6px!important;line-height:1.4!important;padding:3px 4px!important}
+html.frame-gb .place{font-size:9px!important}
+html.frame-gb .lbl{font-size:6px!important}
+html.frame-gb .toast{font-size:13px!important;text-shadow:2px 2px 0 var(--red),4px 4px 0 var(--edge)}
+</style>
 <style id="tema-gameboy">
 /* Tema Game Boy: al elegir RPG, selector, resultados, pausa y créditos pasan a los 4 tonos
    de la paleta del juego (--g0 claro … --g3 oscuro). Se redefinen las variables de color
@@ -1471,7 +1480,7 @@ const bossLbl=document.createElement("div"); bossLbl.className="lbl"; map.append
 const stampEl=document.createElement("div"); stampEl.className="stamp"; stampEl.textContent="ALL APPROVED"; stampEl.hidden=true; map.appendChild(stampEl);
 const scrEl=document.createElement("div"); scrEl.className="projtext"; scrEl.innerHTML=`<span data-k="epi.t1">CATALUNYA</span><b data-k="epi.t2">EPIs 100% ENTREGADOS</b><i></i>`; scrEl.hidden=true; map.appendChild(scrEl);
 
-function say(text,wx,wy,frames,cls=""){ const el=document.createElement("div"); el.className="bubble "+cls; el.textContent=text; map.appendChild(el); bubbles.push({el,wx,wy,until:frame+frames}); }
+function say(text,wx,wy,frames,cls=""){ if(document.documentElement.classList.contains("frame-gb")) while(bubbles.length>=3){ bubbles.shift().el.remove(); } const el=document.createElement("div"); el.className="bubble "+cls; el.textContent=text; map.appendChild(el); bubbles.push({el,wx,wy,until:frame+frames}); }
 function clearBubbles(){ bubbles.forEach(b=>b.el.remove()); bubbles=[]; }
 const plane={sx:150,sy:26};
 function planeSay(text,cls,frames=80){ say(text,()=>cam+plane.sx+4,()=>plane.sy-14,frames,"plane "+cls); }
