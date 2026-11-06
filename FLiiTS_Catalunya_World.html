@@ -2527,7 +2527,7 @@ ARC_GAMES[4]={
   // objetos de la calle (de lejos a cerca)
   const proj=(s,x)=>{ const z=s-G.s; if(z<.35) return null; const sc=FOC/z; return {z,sc,x:W/2+(x-cam)*sc+shift(z),y:HZ+CH*sc}; };
   const objs=[], s0=Math.floor(G.s/6)*6;
-  for(let s=s0;s<G.s+110;s+=6){ if((G.inter||[]).some(I=>s>=I.s-3&&s<I.s+11)) continue; objs.push({s,k:"bld",x:-3.7,i:s/6}); objs.push({s,k:"bld",x:3.7,i:s/6+7}); if((s/6)%2===0){ objs.push({s:s+3,k:"tree",x:-2.45}); objs.push({s:s+3,k:"tree",x:2.45}); } }
+  for(let s=s0;s<G.s+110;s+=6){ if((G.inter||[]).some(I=>s>=I.s-3&&s<I.s+11)) continue; objs.push({s,k:"bld",x:-4.95,i:s/6}); objs.push({s,k:"bld",x:4.95,i:s/6+7}); if((s/6)%2===0){ objs.push({s:s+3,k:"tree",x:-2.45}); objs.push({s:s+3,k:"tree",x:2.45}); } }
   (G.inter||[]).forEach(I=>{ objs.push({s:I.s-.6,k:"light",x:2.35,I}); objs.push({s:I.s-.6,k:"light",x:-2.35,I,small:1}); });
   if(G.phase!=="order") objs.push({s:G.dest,k:"house",x:3.2});
   (G.traffic||[]).forEach(c=>objs.push({s:c.s,k:"car",x:c.x,c})); (G.cross||[]).forEach(c=>objs.push({s:c.s,k:"cross",x:c.x,c}));
