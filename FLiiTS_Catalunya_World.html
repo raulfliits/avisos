@@ -572,6 +572,49 @@ body.editing [data-k]:focus{outline:2px solid var(--gold);background:rgba(0,0,0,
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
+<style id="tema-gameboy">
+/* Tema Game Boy: al elegir RPG, selector, resultados, pausa y créditos pasan a los 4 tonos
+   de la paleta del juego (--g0 claro … --g3 oscuro). Se redefinen las variables de color
+   de la página y se ajustan los fondos translúcidos para que no quede ningún rojo. */
+body.theme-gb{--panel:var(--g0);--panel2:var(--g0);--ink:var(--g3);--dim:var(--g2);--mute:var(--g1);--gold:var(--g3);--red:var(--g1);--green:var(--g1);--sky:var(--g2);--edge:var(--g0);--night:var(--g0);--night2:var(--g1);background:var(--g0);color:var(--g3)}
+body.theme-gb .sel-ov{background:var(--g0)}
+body.theme-gb .sel-ov h2{color:var(--g3);text-shadow:2px 2px 0 var(--g1)}
+body.theme-gb .pick{background:var(--g0);border:4px double var(--g3)}
+body.theme-gb .pick.on{background:var(--g1);border-color:var(--g3)}
+body.theme-gb .pick.on::before{border-top-color:var(--g3)}
+body.theme-gb .pick .pn,body.theme-gb .pick.locked .pn{color:var(--g3)}
+body.theme-gb .pick .pr{color:var(--g2)}
+body.theme-gb .pick .ped{background:var(--g2);box-shadow:0 4px 0 var(--g3)}
+body.theme-gb #selectBack,body.theme-gb #vehBack{background:var(--g0);color:var(--g3);border:3px double var(--g3);box-shadow:none}
+body.theme-gb .lvl-ov{background:var(--g2)}
+body.theme-gb .win{background:var(--g0);border:6px double var(--g3);box-shadow:0 0 0 4px var(--g0),0 0 0 7px var(--g3);border-radius:0}
+body.theme-gb .win h2{color:var(--g3);text-shadow:2px 2px 0 var(--g1)}
+body.theme-gb .win .foot{border-top-color:var(--g2)}
+body.theme-gb .ccard,body.theme-gb .mbig,body.theme-gb .mrow,body.theme-gb .qs,body.theme-gb .city-t,body.theme-gb .card,body.theme-gb .ver{background:var(--g0);border-color:var(--g3)}
+body.theme-gb .ccard .cn,body.theme-gb .mrow.hl b,body.theme-gb .ctot,body.theme-gb .mtl b{color:var(--g3)}
+body.theme-gb .mrow.hl{background:var(--g1)}
+body.theme-gb .mrow.nx b,body.theme-gb .vno{color:var(--g2)}
+body.theme-gb .vok{background:var(--g3);color:var(--g0)}
+body.theme-gb .qs.on,body.theme-gb .city-t.on{background:var(--g1);box-shadow:none}
+body.theme-gb .notes{background:var(--g1);color:var(--g3);border-left-color:var(--g3)}
+body.theme-gb .delta.good{background:var(--g1);color:var(--g3)} body.theme-gb .delta.bad{background:var(--g3);color:var(--g0)}
+body.theme-gb .btn{background:var(--g3);color:var(--g0);box-shadow:0 4px 0 var(--g2)}
+body.theme-gb .btn.ghost{background:transparent;color:var(--g3);box-shadow:inset 0 0 0 2px var(--g3)}
+body.theme-gb .coinbadge{background:var(--g3);color:var(--g0)}
+body.theme-gb .cred{background:var(--g0)}
+body.theme-gb .roll .big{color:var(--g3);text-shadow:4px 4px 0 var(--g1)}
+body.theme-gb .roll .h{color:var(--g2)}
+body.theme-gb .pause-screen{background:color-mix(in srgb,var(--g3) 85%,transparent)}
+body.theme-gb .pause-card{background:var(--g0);color:var(--g3);border:6px double var(--g3);box-shadow:0 0 0 4px var(--g0)}
+body.theme-gb .pause-card h2{color:var(--g3)}
+body.theme-gb .pause-card button{background:var(--g0);color:var(--g3);border:3px solid var(--g3)}
+body.theme-gb .pause-card button:hover{background:var(--g1)}
+body.theme-gb .toast{color:var(--g3);text-shadow:3px 3px 0 var(--g0),5px 5px 0 var(--g1)}
+body.theme-gb .mfleet img.fut{filter:none;opacity:.35}
+body.theme-gb .pick.unlock{animation:unlgb .9s steps(2) 3}
+@keyframes unlgb{50%{background:var(--g3);box-shadow:0 0 0 8px var(--g1)}}
+body.theme-gb .hud,body.theme-gb .hint{color:var(--g3)}
+</style>
 <style id="rpg-portatil">
 /* RPG · consola portátil de 4 tonos. Las medidas del interior van en cqw (ancho de la pantalla)
    para que el texto mantenga la rejilla de 160 px a cualquier tamaño. */
@@ -1234,14 +1277,17 @@ const SCREENS=[
    npcs:[["casco"],["chaqueta","guantes"],["mochila"],["casco","guantes"],["chaqueta"],["mochila","casco"],["guantes","chaqueta","mochila"]] }
 ];
 const SCREEN_OF={0:0,2:1,3:2};
-let scr=SCREENS[0], mode="title", done=[false,false,false];
+let scr=SCREENS[0], mode="title";
+// Monedas de oro por juego: plataforma, RPG y arcade son partidas independientes.
+const PROG={platform:[false,false,false],rpg:[false,false,false],arcade:[false,false,false]}, FORCED={};
+const DONE=()=>PROG[activeGameMode]||PROG.platform;
 let pick=0, veh=0, score=0, coins=0, c1=0, c2=0, docs=0, hireN=0;
 const pl={x:40,y:GY,vx:0,vy:0,on:true,flip:false,step:0};
 const dog={x:0,flip:false,step:0};
 let cam=0, keys={}, auto=false, plats=[], coinsArr=[], TOPS=[], npcs=[], proj=[], fx=[], bubbles=[], placeEls=[], bossS={on:false,t:0}, lastShot=0;
 const RH=()=>composeRider(pick,veh,0).h;
 const headY=()=>pl.y-RH()-2;
-const gold=()=>done.filter(Boolean).length;
+const gold=()=>DONE().filter(Boolean).length;
 
 const bossLbl=document.createElement("div"); bossLbl.className="lbl"; map.appendChild(bossLbl);
 const stampEl=document.createElement("div"); stampEl.className="stamp"; stampEl.textContent="ALL APPROVED"; stampEl.hidden=true; map.appendChild(stampEl);
@@ -1457,7 +1503,7 @@ const FINAL_SCR={type:"final",len:VW,land:[["pyrenees",128]]};
 function startFinal(){
   hideRaulUI(); mode="final"; scr=FINAL_SCR; cam=0; clearBubbles(); fx=[]; placeEls.forEach(e=>e.el.remove()); placeEls=[]; stampEl.hidden=true; scrEl.hidden=true;
   BAGS.forEach(b=>b.st=[]);
-  fin={t:0,rx:92,armor:false,coins:[0,2,3].map((w,i)=>({w,on:done[i],x:20+i*18,y:GY-46})),done:null};
+  fin={t:0,rx:92,armor:false,coins:[0,2,3].map((w,i)=>({w,on:DONE()[i],x:20+i*18,y:GY-46})),done:null};
   $("#pname").textContent=nm(1); $("#pveh").textContent="AVIONETA"; $("#world").textContent="FINAL";
   document.querySelectorAll(".hud .ctr").forEach(e=>e.hidden=true);
   if(!t0) t0=Date.now(); setTimeout(fit,0);
@@ -1621,7 +1667,7 @@ function openRaulPanel(){
    ${F.map((f,i)=>`<div class="vf">${K(`r.f${i}.t`,f[0],"b")}${K(`r.f${i}.d`,f[1],"span")}</div><div class="vno">✗ ${K(`r.f${i}.c`,f[2],"span")}</div><div class="vok">✓</div>`).join("")}</div>
    ${notes("r.notes","~2 min. Cuenta el antes: colas y gente colándose en la formación. Después las tres mejoras frente a Calendly: una cita por persona, validación en oficina y autorrelleno de cancelaciones.")}`;
   const go=gold()>=3||forceFinal;
-  openPanel("OFICINA · "+nm(1),"CITAS: MEJOR QUE CALENDLY",html,go?"ENTER · AL JEFE FINAL":"ENTER · VOLVER",()=>{ hideRaulUI(); if(go) startFinal(); else showSelect(); },b=>{
+  openPanel("OFICINA · "+nm(1),"CITAS: MEJOR QUE CALENDLY",html,go?"ENTER · AL JEFE FINAL":"ENTER · VOLVER",()=>{ hideRaulUI(); if(!go) showSelect(); else if(activeGameMode==="rpg") rpgStartFinal(); else startFinal(); },b=>{
     [...b.querySelector("#quest").children].forEach((q,k)=>setTimeout(()=>{ if(open>0){ q.classList.add("on"); sfx.tick(); } },400+k*450));
     b.querySelectorAll(".vok").forEach((v,k)=>setTimeout(()=>{ if(open>0){ v.classList.add("on"); sfx.coin(); } },2300+k*500)); });
 }
@@ -1727,10 +1773,10 @@ function paintIntroSprites(){
 }
 function showIntro(){ $("#introOv").hidden=false; $("#titleOv").hidden=true; paintIntroSprites(); }
 function continueIntro(){ const sc=$("#introScene"); sc.classList.add("disperse"); $("#introLine").textContent="¡REUNIÓN TERMINADA! CADA UNO A SU MISIÓN."; setTimeout(()=>{sc.classList.remove("disperse");$("#introOv").hidden=true;$("#modeOv").hidden=false;sfx.open();},650); }
-function chooseMode(m){ activeGameMode=m; $("#modeOv").hidden=true; showSelect(); }
+function chooseMode(m){ activeGameMode=m; if(m==="rpg") GP=GB_PALS[(+saved["rpg.pal"]||0)%GB_PALS.length].c; $("#modeOv").hidden=true; showSelect(); }
 document.querySelectorAll(".mode-card").forEach(b=>b.addEventListener("click",()=>chooseMode(b.dataset.mode)));
 $("#modeBack").addEventListener("click",()=>{ $("#modeOv").hidden=true; $("#titleOv").hidden=false; });
-$("#selectBack").addEventListener("click",()=>{ $("#selOv").hidden=true; $("#modeOv").hidden=false; });
+$("#selectBack").addEventListener("click",()=>{ $("#selOv").hidden=true; setTheme(false); $("#modeOv").hidden=false; });
 $("#vehBack").addEventListener("click",()=>{ $("#vehOv").hidden=true; showSelect(); });
 $("#introContinue").addEventListener("click",continueIntro);
 
@@ -1796,85 +1842,112 @@ $("#mgExit").addEventListener("click",leaveModeGame);
 
 
 /* ---------- RPG · PORTÁTIL CLÁSICO (pantalla 160×144, 4 tonos) ----------
-   Todo se dibuja a resolución nativa en un canvas de 160×144 y se escala en píxeles.
-   Los sprites de la plantilla se pasan a 4 tonos por luminancia, así cada personaje
-   conserva su diseño. Textos y menús son HTML encima del canvas (nítidos y pulsables). */
-const GBW=160, GBH=144, MW=20, MH=18, RPG_SAVE="fliits-rpg-v1";
+   Mismo recorrido que el modo plataforma, adaptado: cada personaje tiene su misión
+   (con su dinámica y su jefe), al acabarla sale la página de resultados y se guarda
+   la moneda de oro; con las 3 monedas se desbloquea Raül, su oficina y el jefe final.
+   Todo se dibuja a 160×144 y los sprites de la plantilla se pasan a 4 tonos. */
+const GBW=160, GBH=144, MW=20, MH=18, SOLID="T~fSWDP";
 const GB_PALS=[
  {n:"VERDE", c:["#e0f8d0","#88c070","#346856","#081820"]},
  {n:"GRIS",  c:["#f2f2ea","#aaa99e","#5b5a52","#151511"]},
  {n:"FLiiTS",c:["#fff1e6","#f2a08a","#b3203a","#2a0a12"]}
 ];
-let GP=GB_PALS[0].c;
+let GP=GB_PALS[(+saved["rpg.pal"]||0)%GB_PALS.length].c;
 const DV={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]}, OPP={up:"down",down:"up",left:"right",right:"left"};
 const RPG_NPCS=[
- {name:"Aamir", role:"Rider urbano · veterano",     shirt:"#2f6b8f",hair:"#241a18",skin:"#b97950",hp:52,atk:["Ruta alternativa","Pedido duplicado","Batería al 20%"],say:"¡Llevo años repartiendo por el barrio! ¿Me convences?",after:"Vale, vale... me lo pensaré."},
- {name:"Bilal", role:"Aspirante · ciclomotor",      shirt:"#d57b35",hair:"#302018",skin:"#c98b63",hp:48,atk:["Cambio de dirección","Cliente impaciente","Lluvia sorpresa"],say:"¡Tengo ciclomotor y muchas ganas! ¡Pruébame!",after:"Volveré con el carnet en regla."},
- {name:"Hamza", role:"Rider de costa",              shirt:"#347b63",hair:"#211915",skin:"#9f6748",hp:58,atk:["Viento de playa","Subida larga","Pedido doble"],say:"El viento de la playa no me para. ¡A ver tú!",after:"Uf, qué brisa hace hoy..."},
- {name:"Imran", role:"Repartidor nocturno",         shirt:"#6654a0",hair:"#201a19",skin:"#bd8058",hp:62,atk:["Turno de noche","Portal sin número","Ascensor averiado"],say:"El turno de noche es el mejor. ¿Aguantas?",after:"Me voy a dormir un rato."},
- {name:"Farhan",role:"Mecánico de motos",           shirt:"#a34b43",hair:"#30221c",skin:"#ad714f",hp:55,atk:["Revisión de frenos","Batería baja","Pinchazo"],say:"Antes de repartir reviso los frenos. ¿Y tú?",after:"Frenos revisados. ¡Hasta otra!"},
- {name:"Saira", role:"Rider · especialista en rutas",shirt:"#c45a83",hair:"#30201d",skin:"#c48b69",hp:50,atk:["Atajo por el barrio","Pedido urgente","Dirección incorrecta"],say:"¡Me sé todos los atajos del pueblo!",after:"Hay un atajo por allí... ¡shh!"},
- {name:"Ayesha",role:"Aspirante · formación",       shirt:"#4b82b8",hair:"#2b1d19",skin:"#d09a76",hp:46,atk:["Prueba de ruta","Código de acceso","Parada extra"],say:"Estoy en formación. ¡Pon a prueba mi ruta!",after:"Seguiré practicando."},
- {name:"Zain",  role:"Rider · zona comercial",      shirt:"#8b763d",hair:"#211916",skin:"#a96d4b",hp:60,atk:["Centro peatonal","Pedido pesado","Cambio de turno"],say:"Zona comercial y pedidos pesados. ¡Vamos!",after:"Necesito una mochila más grande."},
- {name:"Nil",   role:"Rider local · zona centro",   shirt:"#7b8b9b",hair:"#76513a",skin:"#efc49b",hp:49,atk:["Calle cortada","Pedido doble","Lluvia"],say:"¡Calle cortada! Tendrás que pasar por mí.",after:"Ya puedes pasar."},
- {name:"Lucas", role:"Aspirante · zona estación",   shirt:"#547d58",hair:"#583a25",skin:"#d7a27b",hp:53,atk:["Tren con retraso","Portal cerrado","Ruta larga"],say:"Mi tren llega tarde, pero yo no. ¡Te reto!",after:"¿Y ahora qué tren cojo?"}
+ {name:"Aamir", role:"Rider urbano",          shirt:"#2f6b8f",hair:"#241a18",skin:"#b97950",hp:52,atk:["Ruta alternativa","Pedido duplicado","Batería al 20%"]},
+ {name:"Bilal", role:"Aspirante · ciclomotor",shirt:"#d57b35",hair:"#302018",skin:"#c98b63",hp:48,atk:["Cambio de dirección","Cliente impaciente","Lluvia sorpresa"]},
+ {name:"Hamza", role:"Rider de costa",        shirt:"#347b63",hair:"#211915",skin:"#9f6748",hp:58,atk:["Viento de playa","Subida larga","Pedido doble"]},
+ {name:"Imran", role:"Repartidor nocturno",   shirt:"#6654a0",hair:"#201a19",skin:"#bd8058",hp:62,atk:["Turno de noche","Portal sin número","Ascensor averiado"]},
+ {name:"Farhan",role:"Mecánico de motos",     shirt:"#a34b43",hair:"#30221c",skin:"#ad714f",hp:55,atk:["Revisión de frenos","Batería baja","Pinchazo"]},
+ {name:"Saira", role:"Especialista en rutas", shirt:"#c45a83",hair:"#30201d",skin:"#c48b69",hp:50,atk:["Atajo por el barrio","Pedido urgente","Dirección incorrecta"]},
+ {name:"Ayesha",role:"Aspirante · formación", shirt:"#4b82b8",hair:"#2b1d19",skin:"#d09a76",hp:46,atk:["Prueba de ruta","Código de acceso","Parada extra"]},
+ {name:"Zain",  role:"Rider · zona comercial",shirt:"#8b763d",hair:"#211916",skin:"#a96d4b",hp:60,atk:["Centro peatonal","Pedido pesado","Cambio de turno"]},
+ {name:"Nil",   role:"Rider local",           shirt:"#7b8b9b",hair:"#76513a",skin:"#efc49b",hp:49,atk:["Calle cortada","Pedido doble","Lluvia"]},
+ {name:"Lucas", role:"Aspirante · estación",  shirt:"#547d58",hair:"#583a25",skin:"#d7a27b",hp:53,atk:["Tren con retraso","Portal cerrado","Ruta larga"]}
 ];
-// Zonas: mapa de 20×18 casillas. "." césped · "," hierba alta · "=" camino · "s" arena
-// "~" agua · "T" árbol · "f" valla · "F" flores · "S" cartel. Los edificios van aparte.
-const ZONES=[
- {name:"BARCELONA · BARRIO", exitL:-1, exitR:1, start:[9,12,"up"],
-  paint(R,g){ R(1,8,19,2,"="); R(9,1,2,16,"="); R(4,5,1,3,"="); R(14,5,1,3,"="); R(1,15,18,1,"=");
-   R(2,10,5,1,"F"); R(13,10,3,1,"~"); R(16,5,2,2,"T"); R(6,11,2,1,"T"); g[7][7]="S"; },
-  bld:[{x:2,y:2,w:5,h:3,name:"FLiiTS HUB",hub:1},{x:12,y:2,w:5,h:3,name:"PISOS",msg:"PISOS. Aquí vive medio equipo de reparto."},
-       {x:2,y:12,w:5,h:3,name:"CAFÉ",msg:"CAFÉ. Un rider pide un cortado para llevar."},{x:12,y:12,w:6,h:3,name:"MERCAT",msg:"MERCAT. ¡Hoy hay muchísimos pedidos!"}],
-  signs:{"7,7":"BARCELONA · BARRIO\nESTE » PUEBLO DEL INTERIOR"},
-  npcs:[[0,6,9,"right",0],[1,12,6,"down",1],[8,17,8,"left",0]]},
- {name:"PUEBLO DEL INTERIOR", exitL:0, exitR:2, start:[1,9,"right"],
-  paint(R,g){ R(0,8,20,2,"="); R(3,5,1,3,"="); R(10,6,1,2,"="); R(16,5,1,3,"="); R(8,10,1,5,"="); R(1,15,18,1,"=");
+// Plantillas de mapa (20×18 casillas). "." césped · "," hierba alta · "=" camino · "s" arena · "~" agua
+// "T" árbol · "f" valla · "F" flores · "S" cartel · "_" suelo · "W" pared · "D" mesa · "P" planta.
+const TPL=[
+ {paint(R,g){ R(0,8,20,2,"="); R(9,1,2,16,"="); R(4,5,1,3,"="); R(14,5,1,3,"="); R(1,15,18,1,"="); R(2,10,5,1,"F"); R(13,10,3,1,"~"); R(16,5,2,2,"T"); R(6,11,2,1,"T"); g[7][7]="S"; },
+  bld:[{x:2,y:2,w:5,h:3,name:"FLiiTS HUB",hub:1},{x:12,y:2,w:5,h:3,msg:"PISOS. Aquí vive medio equipo de reparto."},
+       {x:2,y:12,w:5,h:3,msg:"CAFÉ. Un rider pide un cortado para llevar."},{x:12,y:12,w:6,h:3,msg:"MERCAT. ¡Hoy hay muchísimos pedidos!"}],
+  start:[9,12,"up"], slots:[[6,9,"right"],[12,6,"down"],[16,11,"left"],[3,16,"right"],[14,8,"left"]], boss:[17,9,"left"]},
+ {paint(R,g){ R(0,8,20,2,"="); R(3,5,1,3,"="); R(10,6,1,2,"="); R(16,5,1,3,"="); R(8,10,1,5,"="); R(1,15,18,1,"=");
    R(2,11,5,3,","); R(13,11,5,3,","); R(2,10,2,1,"f"); R(5,10,2,1,"f"); R(1,16,18,1,"F"); g[7][6]="S"; },
-  bld:[{x:2,y:2,w:3,h:3,name:"FORN",msg:"FORN. Huele a coca de recapte."},{x:8,y:2,w:5,h:4,name:"AJUNTAMENT",msg:"AJUNTAMENT. Hoy se tramitan permisos."},
-       {x:14,y:2,w:4,h:3,name:"CASA RURAL",msg:"CASA RURAL. No hay nadie en casa."},{x:9,y:12,w:4,h:3,name:"TAVERNA",msg:"TAVERNA. Se oye un partido del Barça."}],
-  signs:{"6,7":"PUEBLO DEL INTERIOR\n« BARCELONA · COSTA »"},
-  npcs:[[3,15,12,"left",0],[4,13,6,"down",1],[5,4,12,"right",0],[9,17,9,"left",0]]},
- {name:"PUEBLO COSTERO", exitL:1, exitR:-1, start:[1,9,"right"],
-  paint(R,g){ R(0,0,MW,4,"~"); R(0,4,MW,2,"s"); R(0,4,1,2,"T"); R(19,4,1,2,"T"); R(10,1,2,4,"=");
-   R(0,8,18,2,"="); R(7,10,1,4,"="); R(1,14,18,1,"="); R(1,15,18,2,"s"); R(3,6,1,1,"T"); R(15,6,1,1,"T"); g[7][5]="S"; },
-  bld:[{x:2,y:11,w:4,h:3,name:"PESCADOR",msg:"PESCADOR. Cajas de pescado fresco."},{x:9,y:11,w:3,h:3,name:"GELATS",msg:"GELATS. ¡Un helado de turrón, por favor!"},
-       {x:13,y:11,w:5,h:3,name:"HOSTAL",msg:"HOSTAL. Recepción abierta las 24 horas."}],
-  signs:{"5,7":"PUEBLO COSTERO\n« PUEBLO DEL INTERIOR"},
-  npcs:[[2,11,2,"down",0],[6,3,9,"right",1],[7,16,15,"up",0]]}
+  bld:[{x:2,y:2,w:3,h:3,msg:"FORN. Huele a coca de recapte."},{x:8,y:2,w:5,h:4,msg:"AJUNTAMENT. Hoy se tramitan permisos."},
+       {x:14,y:2,w:4,h:3,msg:"CASA RURAL. No hay nadie en casa."},{x:9,y:12,w:4,h:3,msg:"TAVERNA. Se oye un partido del Barça."}],
+  start:[1,9,"right"], slots:[[15,12,"left"],[13,6,"down"],[4,12,"right"],[11,8,"left"],[16,16,"up"]], boss:[17,9,"left"]},
+ {paint(R,g){ R(0,0,MW,4,"~"); R(0,4,MW,2,"s"); R(0,4,1,2,"T"); R(19,4,1,2,"T"); R(10,1,2,4,"=");
+   R(0,8,20,2,"="); R(7,10,1,4,"="); R(1,14,18,1,"="); R(1,15,18,2,"s"); R(3,6,1,1,"T"); R(15,6,1,1,"T"); g[7][5]="S"; },
+  bld:[{x:2,y:11,w:4,h:3,msg:"PESCADOR. Cajas de pescado fresco."},{x:9,y:11,w:3,h:3,msg:"GELATS. ¡Un helado de turrón, por favor!"},
+       {x:13,y:11,w:5,h:3,msg:"HOSTAL. Recepción abierta las 24 horas."}],
+  start:[1,9,"right"], slots:[[11,2,"down"],[3,9,"right"],[16,15,"up"],[13,6,"left"],[6,16,"right"]], boss:[17,8,"left"]},
+ {paint(R,g){ R(0,0,MW,MH,"_"); R(0,0,MW,3,"W"); R(0,0,1,MH,"W"); R(MW-1,0,1,MH,"W"); R(0,MH-1,MW,1,"W");
+   R(7,5,6,1,"D"); R(14,13,4,1,"D"); R(14,15,4,1,"D"); [[1,3],[18,3],[1,16],[18,16]].forEach(([x,y])=>g[y][x]="P"); g[3][4]="S"; },
+  bld:[], start:[9,7,"down"], slots:[[4,10,"up"],[7,10,"up"],[10,10,"up"],[13,10,"up"],[16,10,"up"],[9,13,"up"]]}
 ];
-ZONES.forEach(z=>{ const g=Array.from({length:MH},()=>Array(MW).fill("."));
+TPL.forEach(z=>{ const g=Array.from({length:MH},()=>Array(MW).fill("."));
  const R=(x,y,w,h,ch)=>{ for(let j=y;j<y+h;j++) for(let i=x;i<x+w;i++) if(j>=0&&j<MH&&i>=0&&i<MW) g[j][i]=ch; };
- R(0,0,MW,1,"T"); R(0,MH-1,MW,1,"T"); R(0,0,1,MH,"T"); R(MW-1,0,1,MH,"T"); z.paint(R,g); z.grid=g; });
+ R(0,0,MW,1,"T"); R(0,MH-1,MW,1,"T"); R(0,0,1,MH,"T"); R(MW-1,0,1,MH,"T"); z.paint(R,g); z.grid=g;
+ z.sign=(()=>{ for(let y=0;y<MH;y++) for(let x=0;x<MW;x++) if(g[y][x]==="S") return x+","+y; })(); });
 
-const RPG_MOVES=[["Oferta Glovo","Oferta Uber","Moto empresa","Sueldo fijo"],["Leer QR","Validar cita","Verificar NIE","Turno asignado"],
+// Misiones (clave = personaje). screen = pantalla del modo plataforma cuyos resultados se muestran.
+const RAUL_CASES=[
+ {c:"cita",code:"7KQ2",say:"¡Hola! Tengo cita. Mi código es 7KQ2."},
+ {c:"otra",say:"Ya tengo cita... ¿puedo coger otra para mañana?"},
+ {c:"sin",say:"¡Vengo sin cita! ¿Me dejas pasar?"},
+ {c:"cita",code:"M4TR",say:"Buenos días. Código de cita: M4TR."},
+ {c:"cancela",say:"No puedo venir el martes. Cancelo mi cita de las 12h."},
+ {c:"cita",code:"X9PL",say:"Me llegó el mail con el código X9PL."}
+];
+const MISSIONS={
+ 0:{screen:0,kind:"hire",title:"CONTRATA A QUIEN HAGA GLOVO + UBER",zones:[{tpl:0,name:"BARCELONA"},{tpl:1,name:"SABADELL"}],
+    rules:["Habla con cada rider. Si hace GLOVO + UBER, bájale los PS y ofrécele un CONTRATO.","Si solo hace Glovo, recházalo en combate. Y al que falla... ¡despídelo!"],
+    data:()=>SCREENS[0].npcs.map(([t,say,act])=>({red:t==="r",act,say:say==="Solo Glovo"?"Solo hago Glovo.":say==="¡Glovo y Uber!"?"¡Hago Glovo y Uber!":say})),
+    boss:{name:"MARTÍ",spr:"marti",hp:95,intro:["MARTÍ: ¡¡TU FORECAST NO CUADRA!!"],outro:["MARTÍ: ¿Y estas contrataciones...?","MARTÍ: ¡¡FORECAST PERFECTO!!"],atk:["Forecast negativo","Hoja de cálculo","Reunión urgente","Recorte de plantilla"]}},
+ 2:{screen:1,kind:"docs",title:"PIDE LOS PAPELES A TODOS",zones:[{tpl:0,name:"BARCELONA"},{tpl:2,name:"GAVÀ · MATARÓ"}],
+    rules:["Cada aspirante te enseña un documento.","APRUEBA los que están en regla y RECHAZA los que no. Los aprobados van a tu mochila."],
+    data:()=>SCREENS[1].npcs.map(([doc,ok,ans])=>({doc,ok:!!ok,ans})),
+    boss:{name:"VALIDACIÓN",spr:"office",hp:100,intro:["VALIDACIÓN: ¡¡RECHAZADO!! ¡¡RECHAZADO!!","Usa tus documentos: ¡SUPER ENVÍO!"],outro:["¡¡ALL APPROVED!!","VALIDACIÓN: ¡Gracias!"],atk:["¡Rechazado!","Falta una firma","Vuelva mañana","Sello caducado"]}},
+ 3:{screen:2,kind:"epis",title:"¡NADIE SE VA SIN SU EQUIPO!",zones:[{tpl:1,name:"LLEIDA · MARTORELL"},{tpl:0,name:"SANT CUGAT · PARETS"}],
+    rules:["Cada rider necesita casco, chaqueta, guantes y mochila.","Dale el EPI que le falta. ¡Si te equivocas, pierdes PS!"],
+    data:()=>SCREENS[2].npcs.map(need=>({need:[...need]})),
+    boss:{name:"ALMACÉN",spr:"almacen",hp:110,intro:["MARTÍ Y FRANCO: ¡¡AQUÍ NO SE ENTREGA NADA!!"],outro:["FRANCO: ¡Bienvenido al almacén!","¡EPIs 100% entregados en Catalunya!"],atk:["Inventario cerrado","Escáner sin batería","Caja equivocada","Pedido bloqueado"]}},
+ 1:{kind:"raul",title:"ORDENA LA OFICINA",zones:[{tpl:3,name:"OFICINA FLiiTS"}],
+    rules:["La oficina es un caos: sin citas y sin turnos.","Atiende a cada persona: VALIDA su cita, UNA cita por persona, SIN cita no se entra y RELLENA los huecos."],
+    data:()=>RAUL_CASES.map(c=>({...c}))}
+};
+const LABELS={hire:["Contratados","Despedidos"],docs:["Aprobados","Rechazados"],epis:["EPIs","Completos"],raul:["Citas","Turnos"]};
+
+const RPG_MOVES=[["Oferta Glovo","Oferta Uber","Moto empresa","Sueldo fijo"],["Pegatina FLiiTS","Ruta optimizada","Turno asignado","PODER FLiiTS"],
                  ["Revisar papeles","Validar permiso","Pasaporte + NIE","Aprobación RTO"],["Casco","Chaqueta","Mochila térmica","Kit completo"]];
 const RPG_TIERS=[{tier:"FLOJO",pp:24,power:10},{tier:"MEDIO",pp:16,power:18},{tier:"MEDIO",pp:13,power:24},{tier:"FUERTE",pp:6,power:36}];
 function rpgMovesFor(ci){ return RPG_MOVES[ci].map((name,i)=>({name,...RPG_TIERS[i],maxPp:RPG_TIERS[i].pp})); }
-function makeRpgEnemyMoves(n){
- const names=(n.atk||[]).slice(0,3); while(names.length<3) names.push("Reacción "+(names.length+1));
- names.push(n.role.includes("Mecánico")?"Revisión completa":"Contraataque");
- const st=[{pp:22,power:8},{pp:15,power:15},{pp:12,power:21},{pp:6,power:30}];
- return names.map((name,i)=>({name,...st[i],maxPp:st[i].pp}));
-}
+function enemyMoves(names){ const st=[{pp:22,power:8},{pp:15,power:15},{pp:12,power:21},{pp:6,power:30}]; return names.slice(0,4).map((name,i)=>({name,...st[i],maxPp:st[i].pp})); }
 
-/* --- gráficos: paleta, sprites cuantizados y casillas --- */
+/* --- tema Game Boy para todo el modo RPG (selector, resultados, pausa, créditos) --- */
+function gbQuantize(c,P){
+ const g=c.getContext("2d"), d=g.getImageData(0,0,c.width,c.height), a=d.data, RGB=P.map(hexRGB);
+ for(let i=0;i<a.length;i+=4){ if(a[i+3]<128){ a[i+3]=0; continue; }
+  const l=(.299*a[i]+.587*a[i+1]+.114*a[i+2])/255, q=l>.72?0:l>.45?1:l>.2?2:3;
+  a[i]=RGB[q][0]; a[i+1]=RGB[q][1]; a[i+2]=RGB[q][2]; a[i+3]=255; }
+ g.putImageData(d,0,0); return c;
+}
+const isGB=()=>document.body.classList.contains("theme-gb");
+function setTheme(on){ document.body.classList.toggle("theme-gb",!!on); if(on) GP.forEach((c,i)=>document.documentElement.style.setProperty("--g"+i,c)); }
+function themed(cv){ if(!isGB()) return cv; const c=document.createElement("canvas"); c.width=cv.width; c.height=cv.height; c.getContext("2d").drawImage(cv,0,0); return gbQuantize(c,GP); }
+
+/* --- gráficos: sprites cuantizados y casillas --- */
 const hexRGB=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
 const gbCache=new Map();
 function gbSprite(key,w,h,draw,P){
  const k=key+"|"+P.join(); let c=gbCache.get(k); if(c) return c;
- c=document.createElement("canvas"); c.width=w; c.height=h; const g=c.getContext("2d"); draw(g);
- const d=g.getImageData(0,0,w,h), a=d.data, RGB=P.map(hexRGB);
- for(let i=0;i<a.length;i+=4){ if(a[i+3]<128){ a[i+3]=0; continue; }
-  const l=(.299*a[i]+.587*a[i+1]+.114*a[i+2])/255, q=l>.72?0:l>.45?1:l>.2?2:3;
-  a[i]=RGB[q][0]; a[i+1]=RGB[q][1]; a[i+2]=RGB[q][2]; a[i+3]=255; }
- g.putImageData(d,0,0); gbCache.set(k,c); return c;
+ c=document.createElement("canvas"); c.width=w; c.height=h; draw(c.getContext("2d")); gbQuantize(c,P); gbCache.set(k,c); return c;
 }
-function rowsPal(g,rows,pal,flip,stride){ const w=rows[0].length;
+function rowsPal(g,rows,pal,flip,stride,ox=0,oy=0){ const w=rows[0].length;
  rows.forEach((row,r)=>{ for(let q=0;q<w;q++){ const col=pal[row[q]]; if(!col) continue; let x=flip?w-1-q:q;
-  if(stride&&r>=rows.length-5) x+=(q<w/2?-stride:stride); g.fillStyle=col; g.fillRect(x,r,1,1); } }); }
-// Vista de espaldas: la cara se cubre de pelo; los de la plantilla llevan la mochila FLiiTS.
+  if(stride&&r>=rows.length-5) x+=(q<w/2?-stride:stride); g.fillStyle=col; g.fillRect(ox+x,oy+r,1,1); } }); }
 function backRows(src,pack){
  const cnt={}; for(let r=0;r<5;r++) for(const ch of src[r]) if(ch!=="."&&ch!=="K") cnt[ch]=(cnt[ch]||0)+1;
  const hair=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a])[0]||"H";
@@ -1884,10 +1957,28 @@ function backRows(src,pack){
 }
 const CREW_BACK=CREW.map(c=>backRows(c.spr,true)), CAND_BACK=backRows(CAND_T,false);
 const shade=(h,f)=>"#"+hexRGB(h).map(v=>Math.round(v*f).toString(16).padStart(2,"0")).join("");
-function npcPal(d,beard){ return {K:"#1b1212",H:d.hair,S:d.skin,s:shade(d.skin,.8),B:d.hair,C:d.shirt,c:shade(d.shirt,.75),P:"#2d3a5c",G:"#3a2a1e",b:beard?d.hair:d.skin}; }
+function npcPal(d,beard,red){ const C=red?"#d62839":d.shirt; return {K:"#1b1212",H:d.hair,S:d.skin,s:shade(d.skin,.8),B:d.hair,C,c:shade(C,.75),P:"#2d3a5c",G:"#3a2a1e",b:beard?d.hair:d.skin}; }
+const lookOf=(id,red)=>{ const d=RPG_NPCS[id]; const C=red?"#d62839":d.shirt; return {H:d.hair,S:d.skin,s:shade(d.skin,.8),beard:id%2,C,c:shade(C,.75),P:"#2d3a5c"}; };
 function sprCrew(ci,view,stride,P){ return gbSprite(`c${ci}${view}${stride}`,16,24,g=>rowsPal(g,view==="up"?CREW_BACK[ci]:CREW[ci].spr,PAL,view==="left",stride),P); }
-function sprNpc(id,view,stride,P){ const d=RPG_NPCS[id]; return gbSprite(`n${id}${view}${stride}`,16,24,g=>rowsPal(g,view==="up"?CAND_BACK:CAND_T,npcPal(d,id%2),view==="left",stride),P); }
+function sprArmor(P){ return gbSprite("armor",16,24,g=>rowsPal(g,CREW_BACK[1],ARMOR,false,0),P); }
+function sprNpc(id,view,stride,P,red){ return gbSprite(`n${id}${view}${stride}${red?1:0}`,16,24,g=>rowsPal(g,view==="up"?CAND_BACK:CAND_T,npcPal(RPG_NPCS[id],id%2,red),view==="left",stride),P); }
+function sprPerson(id,gear,P){ const key=Object.keys(gear).sort().join(""); return gbSprite(`p${id}${key}`,40,28,g=>drawPerson(g,lookOf(id),20,3,false,0,gear),P); }
 function sprDog(f,flip,P){ return gbSprite(`dog${f}${flip}`,28,18,g=>rowsPal(g,DOG[f],DOGPAL,flip,0),P); }
+const EVIL_W={K:"#1b1212",H:"#120c0a",S:"#c79a86",s:"#a87c6a",B:"#120c0a",C:"#3b1f4f",c:"#2a1538",P:"#241a2e",G:"#120b0c",b:"#c79a86"};
+const GOOD_W={K:"#1b1212",H:"#2b1b14",S:"#e0ac69",s:"#c08a50",B:"#2b1b14",C:"#2f4f8f",c:"#243d70",P:"#56657e",G:"#3a2a1e",b:"#2b1b14"};
+function sprBoss(kind,good,P){
+ const w=kind==="almacen"?36:18;
+ return gbSprite(`boss${kind}${good?1:0}`,w,28,g=>{
+  if(kind==="marti") rowsPal(g,MARTI,good?MPAL_I:{...MPAL_I,...EVIL},true,0);
+  else if(kind==="office") rowsPal(g,CAND_T,good?GOOD_W:EVIL_W,false,0,1,4);
+  else { rowsPal(g,MARTI_B,good?MPAL_A:{...MPAL_A,...EVIL},true,0); rowsPal(g,FRANCO,good?FPAL:{...FPAL,...EVIL},true,0,20,4); } },P);
+}
+function sprBags(dizzy,stk,P){ return gbSprite(`bags${dizzy?1:0}${stk}`,76,34,g=>{
+ [[0,"#ffc244","#d99a1c"],[40,"#2bb673","#1d8a55"]].forEach(([x,col,dk],i)=>{ const f=(a,b,w,h,c)=>{ g.fillStyle=c; g.fillRect(x+a,b,w,h); }, K="#1b1212";
+  f(0,0,36,28,K); f(1,1,34,26,col); f(1,21,34,5,dk); f(5,27,7,6,K); f(24,27,7,6,K);
+  if(!dizzy){ f(7,8,7,7,"#fff"); f(22,8,7,7,"#fff"); f(10,10,3,3,K); f(24,10,3,3,K); f(5,5,9,2,K); f(22,5,9,2,K); f(8,18,20,4,K); f(10,19,1,2,"#fff"); f(14,19,1,2,"#fff"); f(18,19,1,2,"#fff"); f(22,19,1,2,"#fff"); }
+  else { for(let k=0;k<6;k++){ f(7+k,8+k,1,1,K); f(12-k,8+k,1,1,K); f(22+k,8+k,1,1,K); f(27-k,8+k,1,1,K); } f(10,20,16,1,K); }
+  for(let s=0;s<stk;s++){ const sx=2+((s*7+i*3)%27), sy=2+((s*5+i*2)%17); f(sx,sy,6,5,K); f(sx+1,sy+1,4,3,"#d62839"); f(sx+2,sy+1,1,3,"#fff"); } }); },P); }
 const CONTRACT=["KKKKKKKK","KWWWWWWK","KWKKKKWK","KWWWWWWK","KWKKKWWK","KWWWWRRK","KWWWWRRK","KKKKKKKK"];
 function sprContract(P){ return gbSprite("contract",8,8,g=>rowsPal(g,CONTRACT,{K:"#111",W:"#fff",R:"#d62839"},false,0),P); }
 
@@ -1906,6 +1997,10 @@ function tileCv(ch,v,P){
  else if(ch==="T"){ f(0,0,16,16,1); f(3,0,10,12,3); f(1,1,14,10,3); f(0,2,16,7,3); f(3,1,10,10,2); f(1,2,14,8,2); f(4,2,3,2,1); f(9,4,2,2,1); f(3,6,2,1,1); f(7,7,2,1,1); f(6,11,4,5,3); f(7,12,2,3,2); }
  else if(ch==="f"){ f(0,0,16,16,1); f(0,4,16,3,3); f(0,5,16,1,0); f(0,10,16,3,3); f(0,11,16,1,0); f(2,2,3,13,3); f(3,3,1,11,0); f(11,2,3,13,3); f(12,3,1,11,0); }
  else if(ch==="S"){ f(0,0,16,16,1); f(7,9,2,7,3); f(2,2,12,8,3); f(3,3,10,6,0); f(4,4,8,1,2); f(4,6,6,1,2); }
+ else if(ch==="_"){ f(0,0,16,16,0); f(0,15,16,1,1); f(15,0,1,16,1); if(v===2) f(6,6,2,2,1); }
+ else if(ch==="W"){ f(0,0,16,16,1); f(0,13,16,3,2); f(0,15,16,1,3); if(v&1){ f(3,2,10,8,3); f(4,3,8,6,0); f(7,3,1,6,3); f(4,6,8,1,3); } }
+ else if(ch==="D"){ f(0,0,16,16,0); f(0,2,16,9,3); f(1,3,14,6,1); f(1,9,14,2,2); f(1,11,2,5,3); f(13,11,2,5,3); }
+ else if(ch==="P"){ f(0,0,16,16,0); f(4,10,8,6,3); f(5,11,6,4,2); f(3,1,10,10,3); f(4,2,8,8,2); f(5,3,2,2,1); f(9,5,2,2,1); }
  tileCache.set(k,c); return c;
 }
 function drawBuilding(c,b,ox,oy,P){
@@ -1918,9 +2013,10 @@ function drawBuilding(c,b,ox,oy,P){
  if(b.hub){ let x=Math.round(W/2-10); for(const ch of "FLiiTS"){ const gl=FONT[ch]; gl.forEach((row,r)=>[...row].forEach((v,q)=>{ if(v==="1") f(x+q,3+r,1,1,0); })); x+=gl[0].length+1; } }
 }
 function pxEllipse(c,cx,cy,rx,ry,col){ c.fillStyle=col; for(let dy=-ry;dy<=ry;dy++){ const h=Math.round(rx*Math.sqrt(1-(dy*dy)/(ry*ry))); c.fillRect(cx-h,cy+dy,2*h,1); } }
+function drawCoin(c,x,y,P,t){ const w=Math.max(1,Math.round(Math.abs(Math.cos(t/6))*7)); pxEllipse(c,x,y,w+1,8,P[3]); if(w>1){ pxEllipse(c,x,y,w,7,P[1]); c.fillStyle=P[0]; c.fillRect(x-1,y-4,1,6); } }
 
 /* --- estado, cola de mensajes y menús --- */
-const HERO=()=>nm(mg.ci).toUpperCase(), ENAME=()=>mg.enemy?mg.enemy.name:"";
+const HERO=()=>nm(mg.ci).toUpperCase(), NPCNAME=n=>n.boss?mg.M.boss.name:RPG_NPCS[n.look].name.toUpperCase();
 const Q={
  say(t){ rpgPages(t).forEach(p=>mg.q.push({k:"text",t:p,shown:0})); },
  run(f){ mg.q.push({k:"fn",f}); }, anim(a,n){ mg.q.push({k:"anim",a,n}); }, drain(){ mg.q.push({k:"drain"}); }
@@ -1930,52 +2026,60 @@ function rpgPages(t){ const CH=17, lines=[];
   while(w.length>CH){ if(line){ lines.push(line); line=""; } lines.push(w.slice(0,CH)); w=w.slice(CH); }
   if(!line) line=w; else if((line+" "+w).length<=CH) line+=" "+w; else { lines.push(line); line=w; } }); lines.push(line); });
  const out=[]; for(let i=0;i<lines.length;i+=2) out.push(lines.slice(i,i+2).join("\n")); return out; }
-function rpgStart(ci){
+function rpgOverlay(){
  const ov=$("#modeGameOv"); ov.classList.add("rpg-classic"); ov.hidden=false;
- const pi=(+saved["rpg.pal"]||0)%GB_PALS.length; GP=GB_PALS[pi].c;
- mg={typ:"rpg",ci,pal:pi,hp:100,maxHp:100,disp:100,items:{monster:2},team:[],gone:[],beaten:[],encounterCount:0,finished:false,
-     zone:0,grid:null,p:null,dog:null,npcs:[],q:[],menu:null,mcur:0,view:"map",anim:null,enemy:null,moves:rpgMovesFor(ci),banner:0,lock:false,t:0,ui:true,save:null};
  const sc=$("#mgScene"); sc.innerHTML=`<div class="gb-bezel"><div class="gb-scr" id="gbScr"><canvas id="gbCv" width="${GBW}" height="${GBH}"></canvas><div class="gb-ov" id="gbOv"></div></div><div class="gb-brand">FLiiT&amp;Watch</div></div>
   <div class="gb-help"><span class="kb">FLECHAS: MOVER · ENTER/Z: A · X: B · ESC: MENÚ</span><span class="tp">A: HABLAR · B: VOLVER · START: MENÚ</span></div>`;
  $("#gbOv").addEventListener("click",e=>{ const it=e.target.closest(".gb-it"); if(it){ mg.mcur=+it.dataset.i; rpgPress("A"); } else if(e.target.closest(".gb-text")) rpgPress("A"); });
- rpgEnterZone(0,...ZONES[0].start);
- try{ mg.save=JSON.parse(localStorage.getItem(RPG_SAVE)||"null"); }catch(e){ mg.save=null; }
- if(mg.save&&mg.save.ci===ci) rpgOpen("load"); else rpgWelcome();
 }
-function rpgWelcome(){ Q.say(`¡Hola, ${HERO()}! Recorre Catalunya y busca riders para FLiiTS.`); Q.say("Pulsa A para hablar. Si un rider te ve, ¡te retará!"); Q.say("Supera 4 encuentros y el equipo estará listo."); }
-function rpgEnterZone(z,x,y,dir){
- const Z=ZONES[z]; mg.zone=z; mg.grid=Z.grid; mg.banner=120; mg.ui=true;
+function rpgNewState(ci,M){ return {typ:"rpg",ci,M,pal:(+saved["rpg.pal"]||0)%GB_PALS.length,hp:100,maxHp:100,disp:100,items:{monster:2},team:[],c1:0,c2:0,docs:0,hires:0,
+  zones:[],zi:0,grid:null,p:null,dog:null,npcs:[],q:[],menu:null,mcur:0,view:"map",anim:null,enemy:null,moves:rpgMovesFor(ci),banner:0,lock:false,t:0,ui:true}; }
+function rpgStart(ci){
+ const M=MISSIONS[ci]; rpgOverlay(); mg=rpgNewState(ci,M); GP=GB_PALS[mg.pal].c;
+ mg.zones=M.zones.map(z=>({...z,npcs:[]}));
+ const data=M.data(), nz=mg.zones.length, per=Math.ceil(data.length/nz);
+ data.forEach((d,k)=>{ const zi=Math.min(nz-1,Math.floor(k/per)), Z=mg.zones[zi], [x,y,dir]=TPL[Z.tpl].slots[Z.npcs.length%TPL[Z.tpl].slots.length];
+  Z.npcs.push({uid:k,look:(k*3+ci*2)%RPG_NPCS.length,data:d,hx:x,hy:y,hdir:dir,done:false}); });
+ if(M.boss){ const Z=mg.zones[nz-1], [x,y,dir]=TPL[Z.tpl].boss; Z.npcs.push({uid:"boss",boss:true,hx:x,hy:y,hdir:dir,done:false}); }
+ rpgEnterZone(0,...TPL[mg.zones[0].tpl].start);
+ Q.say(`¡${HERO()}! MISIÓN: ${M.title}`); M.rules.forEach(r=>Q.say(r));
+}
+function rpgEnterZone(zi,x,y,dir){
+ const Z=mg.zones[zi], T=TPL[Z.tpl]; mg.zi=zi; mg.grid=T.grid; mg.banner=120; mg.ui=true;
  mg.p={x,y,fx:x,fy:y,t:16,moving:false,dir:dir||"down",step:0,turn:0,bump:0};
- if(mg.ci===0){ const [dx,dy]=DV[OPP[mg.p.dir]], bx=x+dx, by=y+dy, ok=bx>=0&&bx<MW&&by>=0&&by<MH&&!"T~fS".includes(Z.grid[by][bx]);
+ if(mg.ci===0){ const [dx,dy]=DV[OPP[mg.p.dir]], bx=x+dx, by=y+dy, ok=bx>=0&&bx<MW&&by>=0&&by<MH&&!SOLID.includes(T.grid[by][bx]);
   mg.dog={x:ok?bx:x,y:ok?by:y,fx:ok?bx:x,fy:ok?by:y,t:16,moving:false,flip:dir==="left"}; } else mg.dog=null;
- mg.npcs=Z.npcs.filter(([id])=>!mg.gone.includes(id)).map(([id,nx,ny,d,w])=>({id,d:RPG_NPCS[id],x:nx,y:ny,hx:nx,hy:ny,fx:nx,fy:ny,t:16,moving:false,dir:d,wander:!!w,state:"idle",beaten:mg.beaten.includes(id),cool:0,step:0}));
+ mg.npcs=Z.npcs.filter(n=>!n.done); mg.npcs.forEach(n=>Object.assign(n,{x:n.hx,y:n.hy,fx:n.hx,fy:n.hy,dir:n.hdir,t:16,moving:false,state:"idle",cool:60,step:0}));
 }
-function rpgSave(){ const p=mg.p; try{ localStorage.setItem(RPG_SAVE,JSON.stringify({ci:mg.ci,zone:mg.zone,x:p.x,y:p.y,dir:p.dir,hp:mg.hp,items:mg.items,team:mg.team,gone:mg.gone,beaten:mg.beaten,enc:mg.encounterCount,fin:mg.finished})); return true; }catch(e){ return false; } }
-function rpgLoad(d){ Object.assign(mg,{hp:d.hp,disp:d.hp,items:d.items,team:d.team,gone:d.gone,beaten:d.beaten,encounterCount:d.enc,finished:d.fin}); rpgEnterZone(d.zone,d.x,d.y,d.dir); }
+const rpgRemaining=()=>mg.zones.reduce((a,z)=>a+z.npcs.filter(n=>!n.boss&&!n.done).length,0);
 function rpgOpen(id){ mg.menu=id; mg.mcur=0; mg.ui=true; }
 function rpgClose(){ mg.menu=null; mg.ui=true; }
-function rpgExit(toFinal){ mg=null; $("#modeGameOv").hidden=true; $("#modeGameOv").classList.remove("rpg-classic"); if(toFinal){ hideRaulUI(); startFinal(); } else showSelect(); }
+function rpgQuit(){ mg=null; $("#modeGameOv").hidden=true; $("#modeGameOv").classList.remove("rpg-classic"); }
 function rpgFree(){ return !mg.q.length&&!mg.menu&&!mg.lock&&mg.view==="map"; }
+const EPI_ITEMS=["casco","chaqueta","guantes","mochila"];
 function rpgMenuDef(){
- const H=HERO(), E=mg.enemy, battle=mg.view==="battle", m=mg.menu;
+ const H=HERO(), battle=mg.view==="battle", m=mg.menu, E=mg.enemy, kind=mg.M.kind;
+ const back=()=>battle?rpgOpen(E&&E.check?"check":"root"):rpgOpen("start");
  if(m==="root") return {cls:"gb-root",grid:2,prompt:"¿Qué\nhará?",items:[
    {t:"LUCHAR",f:()=>rpgOpen("fight")},{t:"EQUIPO",f:()=>rpgOpen("party")},{t:"MOCHILA",f:()=>rpgOpen("bag")},{t:"HUIR",f:rpgFlee}],back:null};
  if(m==="fight"){ const mv=mg.moves[mg.mcur]||mg.moves[0];
   return {cls:"gb-low",items:mg.moves.map((x,i)=>({t:x.name.toUpperCase(),dis:x.pp<=0,f:()=>rpgUseMove(i)})),back:()=>rpgOpen("root"),
    info:`PP ${mv.pp}/${mv.maxPp}<br>${mv.tier} · ${mv.power}`}; }
+ if(m==="check"){
+  if(kind==="docs") return {cls:"gb-low",items:[{t:"APROBAR",f:()=>rpgDecide(0)},{t:"RECHAZAR",f:()=>rpgDecide(1)},{t:"MOCHILA",f:()=>rpgOpen("bag")}],back:null};
+  if(kind==="epis") return {cls:"gb-low",items:EPI_ITEMS.map((it,i)=>({t:"DAR "+it.toUpperCase(),f:()=>rpgDecide(i)})),back:null};
+  return {cls:"gb-low",items:["VALIDAR CITA","UNA POR PERSONA","SIN CITA, FUERA","RELLENAR HUECO"].map((t,i)=>({t,f:()=>rpgDecide(i)})),back:null}; }
  if(m==="bag") return {cls:battle?"gb-low":"gb-side",items:[
-   {t:`MONSTER ×${mg.items.monster}`,f:rpgMonster},{t:"CONTRATO ×∞",f:()=>{ if(battle) rpgContract(); else { rpgClose(); Q.say("Úsalo en un combate cuando el rider esté convencido."); } }},
-   {t:battle?"VOLVER":"CERRAR",f:()=>battle?rpgOpen("root"):rpgOpen("start")}],back:()=>battle?rpgOpen("root"):rpgOpen("start")};
+   {t:`MONSTER ×${mg.items.monster}`,f:rpgMonster},
+   ...(kind==="hire"?[{t:"CONTRATO ×∞",f:()=>{ if(battle&&!(E&&E.check)) rpgContract(); else { rpgClose(); Q.say("Úsalo en un combate cuando el rider esté convencido."); Q.run(()=>rpgOpen(battle?"check":"bag")); } }}]:[]),
+   {t:battle?"VOLVER":"CERRAR",f:back}],back};
  if(m==="party") return {cls:"gb-full",items:[{t:`${H} · PS ${mg.hp}/${mg.maxHp}`},...mg.team.map(r=>({t:`${r.name.toUpperCase()} · ${r.role}`})),
-   ...(mg.team.length?[]:[{t:"(aún sin riders)",dis:true}]),{t:"VOLVER",f:()=>battle?rpgOpen("root"):rpgOpen("start")}],back:()=>battle?rpgOpen("root"):rpgOpen("start")};
+   ...(mg.team.length?[]:[{t:"(aún sin riders)",dis:true}]),{t:"VOLVER",f:back}],back};
  if(m==="start") return {cls:"gb-side",items:[
+   {t:"MISIÓN",f:()=>{ rpgClose(); const [l1,l2]=LABELS[kind]; Q.say(mg.M.title); mg.M.rules.forEach(r=>Q.say(r)); Q.say(`${l1}: ${mg.c1} · ${l2}: ${mg.c2}\nQuedan: ${rpgRemaining()}`); }},
    {t:"EQUIPO",f:()=>rpgOpen("party")},{t:"MOCHILA",f:()=>rpgOpen("bag")},
-   {t:"GUARDAR",f:()=>{ rpgClose(); const ok=rpgSave(); if(ok) sfx.coin(); Q.say(ok?`${H} ha guardado la partida.`:"No se ha podido guardar en este navegador."); }},
-   {t:"PALETA "+GB_PALS[mg.pal].n,f:()=>{ mg.pal=(mg.pal+1)%GB_PALS.length; GP=GB_PALS[mg.pal].c; saved["rpg.pal"]=String(mg.pal); persist(); mg.ui=true; }},
-   ...(mg.finished?[{t:"IR AL FINAL",f:()=>rpgExit(true)}]:[]),
-   {t:"SALIR",f:()=>rpgExit(false)},{t:"CERRAR",f:rpgClose}],back:rpgClose};
- if(m==="finish") return {cls:"gb-side",prompt:"¿Vamos al gran\nfinal con Raül?",items:[{t:"IR AL FINAL",f:()=>rpgExit(true)},{t:"SEGUIR",f:()=>{ rpgClose(); Q.say("Cuando quieras, abre el MENÚ y elige IR AL FINAL."); }}],back:null};
- if(m==="load") return {cls:"gb-side",prompt:"Hay una partida\nguardada.",items:[{t:"CONTINUAR",f:()=>{ rpgClose(); rpgLoad(mg.save); }},{t:"NUEVA",f:()=>{ rpgClose(); rpgWelcome(); }}],back:null};
+   {t:"PALETA "+GB_PALS[mg.pal].n,f:()=>{ mg.pal=(mg.pal+1)%GB_PALS.length; GP=GB_PALS[mg.pal].c; saved["rpg.pal"]=String(mg.pal); persist(); setTheme(true); mg.ui=true; }},
+   {t:"SALIR",f:()=>{ rpgQuit(); showSelect(); }},{t:"CERRAR",f:rpgClose}],back:rpgClose};
  return null;
 }
 function rpgPress(b){
@@ -1994,11 +2098,11 @@ function rpgPress(b){
  if(b==="A") rpgInteract(); else if(b==="START"){ sfx.open(); rpgOpen("start"); }
 }
 
-/* --- mapa: movimiento por casillas, PNJ que te ven y te retan --- */
+/* --- mapa: movimiento por casillas; los PNJ te ven y vienen a hablar contigo --- */
 function rpgSolid(x,y,who){
  if(x<0||y<0||x>=MW||y>=MH) return true;
- if("T~fS".includes(mg.grid[y][x])) return true;
- if(ZONES[mg.zone].bld.some(b=>x>=b.x&&x<b.x+b.w&&y>=b.y&&y<b.y+b.h)) return true;
+ if(SOLID.includes(mg.grid[y][x])) return true;
+ if(TPL[mg.zones[mg.zi].tpl].bld.some(b=>x>=b.x&&x<b.x+b.w&&y>=b.y&&y<b.y+b.h)) return true;
  if(who!=="p"&&mg.p.x===x&&mg.p.y===y) return true;
  return mg.npcs.some(n=>n!==who&&n.x===x&&n.y===y);
 }
@@ -2011,59 +2115,105 @@ function rpgMapUpdate(){
   if(n.state==="alert"){ if(--n.alert<=0) n.state="approach"; return; }
   if(n.state==="approach"&&!n.moving){ const dist=Math.abs(p.x-n.x)+Math.abs(p.y-n.y), [dx,dy]=DV[n.dir];
    if(dist<=1||rpgSolid(n.x+dx,n.y+dy,n)){ n.state="idle"; n.cool=300; p.dir=OPP[n.dir]; mg.lock=false; rpgChallenge(n); } else stepTo(n,n.x+dx,n.y+dy); return; }
-  if(n.state==="idle"&&!n.moving&&rpgFree()&&(mg.t+n.id*37)%110===0){
-   const dirs=Object.keys(DV);
-   if(!n.wander||Math.random()<.5) n.dir=dirs[(Math.random()*4)|0];
-   else { const [dx,dy]=DV[n.dir], x=n.x+dx, y=n.y+dy; if(Math.abs(x-n.hx)+Math.abs(y-n.hy)<=2&&!rpgSolid(x,y,n)) stepTo(n,x,y); } } });
+  if(!n.boss&&mg.M.kind!=="raul"&&n.state==="idle"&&!n.moving&&rpgFree()&&(mg.t+n.uid*37)%110===0) n.dir=Object.keys(DV)[(Math.random()*4)|0]; });
  if(p.moving||!rpgFree()) return;
  if(rpgSight()) return;
  const want=(keys.ArrowUp||keys.w)?"up":(keys.ArrowDown||keys.s)?"down":(keys.ArrowLeft||keys.a)?"left":(keys.ArrowRight||keys.d)?"right":null;
  if(!want){ p.turn=0; return; }
  if(want!==p.dir&&p.turn===0){ p.dir=want; p.turn=5; return; }
  if(p.turn>1){ p.turn--; return; }
- p.dir=want; const [dx,dy]=DV[want], x=p.x+dx, y=p.y+dy, Z=ZONES[mg.zone];
- if(x<0&&Z.exitL>=0) return rpgTravel(Z.exitL,MW-1,y,"left");
- if(x>=MW&&Z.exitR>=0) return rpgTravel(Z.exitR,0,y,"right");
+ p.dir=want; const [dx,dy]=DV[want], x=p.x+dx, y=p.y+dy;
+ if(x<0||x>=MW){ const to=mg.zi+(x<0?-1:1);
+  if(to>=0&&to<mg.zones.length) return rpgTravel(to,x<0?MW-1:0,y,want);
+  if(p.bump++%40===0){ sfx.bump(); Q.say(x<0?"Tu misión sigue en la otra dirección.":"¡Aún no! Termina la misión antes de irte."); } return; }
  if(rpgSolid(x,y,"p")){ if(p.bump++%18===0) sfx.bump(); return; }
  p.bump=0; if(d){ stepTo(d,p.x,p.y); d.flip=d.x<d.fx?true:d.x>d.fx?false:d.flip; }
  stepTo(p,x,y);
 }
 function rpgTravel(z,x,y,dir){ mg.lock=true; Q.anim("fadeOut",16); Q.run(()=>{ rpgEnterZone(z,x,y,dir); mg.lock=false; }); Q.anim("fadeIn",16); }
 function rpgSight(){ const p=mg.p;
- for(const n of mg.npcs){ if(n.beaten||n.state!=="idle"||n.moving||n.cool>0) continue; const [dx,dy]=DV[n.dir];
+ if(mg.M.kind==="raul") return false;
+ for(const n of mg.npcs){ if(n.boss||n.state!=="idle"||n.moving||n.cool>0) continue; const [dx,dy]=DV[n.dir];
   for(let k=1;k<=4;k++){ const x=n.x+dx*k, y=n.y+dy*k; if(x===p.x&&y===p.y){ mg.lock=true; n.state="alert"; n.alert=40; tone(880,.06); tone(1320,.1,.07); return true; } if(rpgSolid(x,y,n)) break; } }
  return false; }
-function rpgChallenge(n){ Q.say(`${n.d.name.toUpperCase()}: ${n.d.say}`); Q.run(()=>rpgBattle(n)); }
+function rpgChallenge(n){
+ const M=mg.M, who=NPCNAME(n), d=n.data;
+ if(n.boss){ const rem=rpgRemaining(); if(rem>0){ Q.say(`${who}: ¡Aún te quedan ${rem} por atender! Vuelve cuando acabes.`); return; }
+  M.boss.intro.forEach(t=>Q.say(t)); Q.run(()=>rpgBattle(n)); return; }
+ if(M.kind==="hire"){ Q.say(`${who}: ${d.red?"Ya reparto con FLiiTS, pero...":"Busco trabajo de rider."} ${d.say}`); Q.run(()=>rpgBattle(n)); }
+ else if(M.kind==="docs"){ Q.say(`${HERO()}: ¿Me enseñas tu ${d.doc}?`); Q.say(`${who}: ${d.ans}`); Q.run(()=>rpgCheck(n)); }
+ else if(M.kind==="epis"){ Q.say(`${who}: ¡Me falta ${INAME[d.need[0]]}!`); Q.run(()=>rpgCheck(n)); }
+ else { Q.say(`${who}: ${d.say}`); Q.run(()=>rpgCheck(n)); }
+}
 function rpgInteract(){
- const p=mg.p, [dx,dy]=DV[p.dir], x=p.x+dx, y=p.y+dy, Z=ZONES[mg.zone];
+ const p=mg.p, [dx,dy]=DV[p.dir], x=p.x+dx, y=p.y+dy, T=TPL[mg.zones[mg.zi].tpl];
  const n=mg.npcs.find(n=>n.x===x&&n.y===y);
- if(n){ n.dir=OPP[p.dir]; if(n.beaten) Q.say(`${n.d.name.toUpperCase()}: ${n.d.after}`); else rpgChallenge(n); return; }
- if(Z.signs[x+","+y]){ Q.say(Z.signs[x+","+y]); return; }
- const b=Z.bld.find(b=>x===b.x+Math.floor(b.w/2)&&y===b.y+b.h-1);
+ if(n){ if(!n.boss) n.dir=OPP[p.dir]; rpgChallenge(n); return; }
+ if(T.sign===x+","+y){ const Z=mg.zones; Q.say(mg.M.kind==="raul"?"OFICINA FLiiTS\nCitas · formación · turnos":`${Z[mg.zi].name}`+(Z[mg.zi-1]?`\n« ${Z[mg.zi-1].name}`:"")+(Z[mg.zi+1]?`\n${Z[mg.zi+1].name} »`:"")); return; }
+ const b=T.bld.find(b=>x===b.x+Math.floor(b.w/2)&&y===b.y+b.h-1);
  if(b){ if(b.hub){ Q.say("FLiiTS HUB. Te tomas un descanso..."); Q.run(()=>{ mg.hp=mg.maxHp; mg.disp=mg.hp; sfx.power(); }); Q.say("¡PS al máximo!"); } else Q.say(b.msg); return; }
  if(y>=0&&y<MH&&x>=0&&x<MW&&mg.grid[y][x]==="~") Q.say("El Mediterráneo brilla al sol.");
 }
 
-/* --- combate por turnos --- */
+/* --- encuentros: combate (Ivan y jefes) o decisión (Gerard, Azlan, Raül) --- */
+function rpgIntroBattle(){ Q.run(()=>[523,494,523,494,523,659,784].forEach((f,i)=>tone(f,.07,i*.06))); Q.anim("flash",28); Q.anim("wipe",24); Q.run(()=>{ mg.view="battle"; }); Q.anim("slide",36); Q.run(()=>{ mg.enemy.boxes=true; }); }
 function rpgBattle(n){
- const d=n.d; mg.enemy={n,name:d.name.toUpperCase(),hp:d.hp,maxHp:d.hp,disp:d.hp,lv:d.hp>55?5:4,moves:makeRpgEnemyMoves(d),boxes:false,hidden:false,signed:false};
+ const B=mg.M.boss, d=n.boss?null:RPG_NPCS[n.look];
+ mg.enemy={n,boss:!!n.boss,name:NPCNAME(n),hp:n.boss?B.hp:d.hp,maxHp:n.boss?B.hp:d.hp,disp:n.boss?B.hp:d.hp,lv:n.boss?9:d.hp>55?5:4,
+  moves:enemyMoves(n.boss?B.atk:[...d.atk,"Contraataque"]),spr:n.boss?B.spr:"npc",boxes:false,hidden:false};
  mg.moves=rpgMovesFor(mg.ci); mg.disp=mg.hp;
- Q.run(()=>[523,494,523,494,523,659,784].forEach((f,i)=>tone(f,.07,i*.06)));
- Q.anim("flash",28); Q.anim("wipe",24); Q.run(()=>{ mg.view="battle"; }); Q.anim("slide",36);
- Q.run(()=>{ mg.enemy.boxes=true; }); Q.say(`¡${mg.enemy.name} quiere demostrar que vale!`); Q.run(()=>rpgOpen("root"));
+ if(n.boss&&mg.M.kind==="docs"&&mg.docs) mg.moves[3]={name:`SUPER ENVÍO ×${mg.docs}`,tier:"ESPECIAL",pp:2,maxPp:2,power:14+6*mg.docs};
+ rpgIntroBattle();
+ Q.say(n.boss?`¡${mg.enemy.name} te desafía!`:n.data.red?`¡${mg.enemy.name} no se quiere ir!`:`¡${mg.enemy.name} quiere demostrar que vale!`); Q.run(()=>rpgOpen("root"));
+}
+function rpgCheck(n){
+ mg.enemy={n,check:true,name:NPCNAME(n),hp:1,maxHp:1,disp:1,spr:mg.M.kind==="epis"?"person":"npc",boxes:false,hidden:false};
+ mg.disp=mg.hp; Q.anim("flash",12); Q.anim("wipe",18); Q.run(()=>{ mg.view="battle"; }); Q.anim("slide",30); Q.run(()=>{ mg.enemy.boxes=true; }); Q.run(()=>rpgOpen("check"));
+}
+function rpgPenalty(dmg,why){ rpgClose(); sfx.back(); Q.say(why); Q.run(()=>{ mg.hp=Math.max(0,mg.hp-dmg); sfx.hit(); }); Q.anim("heroHit",20); Q.drain(); Q.run(()=>{ if(mg.hp<=0) rpgLose(); else rpgOpen("check"); }); }
+function rpgDecide(i){
+ const e=mg.enemy, n=e.n, d=n.data, who=e.name, kind=mg.M.kind;
+ if(kind==="docs"){
+  if((i===0)!==d.ok) return rpgPenalty(15,d.ok?`¡Ojo! El ${d.doc} de ${who} estaba en regla.`:`¡Ojo! Ese ${d.doc} no es válido.`);
+  rpgClose();
+  if(d.ok){ mg.c1++; mg.docs++; Q.run(()=>sfx.power()); Q.say("¡APROBADO!"); Q.say(`El ${d.doc} va a la mochila. Llevas ${mg.docs}.`); }
+  else { mg.c2++; Q.run(()=>sfx.hit()); Q.say("¡RECHAZADO!"); Q.say(`${who}: Volveré con los papeles en regla.`); }
+  Q.run(()=>rpgResolveNpc(n)); return; }
+ if(kind==="epis"){ const it=EPI_ITEMS[i];
+  if(!d.need.includes(it)) return rpgPenalty(10,`¡${who} ya tiene ${INAME[it]}!`);
+  rpgClose(); d.need=d.need.filter(x=>x!==it); n.gear=n.gear||{}; mg.c1++;
+  Q.run(()=>{ sfx.coin(); }); Q.say(`¡${it.toUpperCase()} entregado!`);
+  if(d.need.length){ Q.say(`${who}: ¡Gracias! Pero me falta ${INAME[d.need[0]]}.`); Q.run(()=>rpgOpen("check")); }
+  else { mg.c2++; Q.run(()=>sfx.power()); Q.say(`${who}: ¡Completo! ¡Gracias!`); Q.run(()=>rpgResolveNpc(n)); }
+  return; }
+ const ok={cita:0,otra:1,sin:2,cancela:3}[d.c];
+ if(i!==ok) return rpgPenalty(10,"Así no... ¡piensa en el nuevo sistema de citas!");
+ rpgClose(); Q.run(()=>sfx.coin());
+ if(d.c==="cita"){ mg.c1++; mg.c2++; Q.say(`✓ Código ${d.code} validado.`); Q.say(`Turno: ${SHIFTS[(mg.c1*3)%SHIFTS.length]}. ¡Pasa a formación!`); }
+ else if(d.c==="otra") Q.say("✓ Solo una cita por persona. ¡Nadie acapara huecos!");
+ else if(d.c==="sin") Q.say("✓ Sin cita no se entra. Pide tu cita con el QR.");
+ else { mg.c2++; Q.say("✓ Hueco rellenado: adelantamos a quien tenía la cita lejos."); }
+ Q.run(()=>rpgResolveNpc(n));
+}
+function rpgBackToMap(after){ Q.anim("fadeOut",16); Q.run(()=>{ mg.view="map"; mg.enemy=null; mg.menu=null; if(after) after(); }); Q.anim("fadeIn",16); }
+function rpgResolveNpc(n){
+ rpgBackToMap(()=>{ n.done=true; mg.npcs=mg.npcs.filter(x=>x!==n); });
+ Q.run(()=>{ const rem=rpgRemaining(); if(rem>0) return;
+  if(mg.M.boss){ Q.say(`¡Todos atendidos! Ahora, a por ${mg.M.boss.name}.`); }
+  else { Q.run(()=>sfx.clear()); Q.say("¡Oficina en orden ✓!"); Q.say("Todos tienen su cita y su turno."); Q.anim("fadeOut",20); Q.run(rpgMissionDone); } });
 }
 function rpgUseMove(i){
  const m=mg.moves[i]; if(!m||m.pp<=0) return; rpgClose(); m.pp--;
  const e=mg.enemy, ci=mg.ci; let dmg=m.power, crit=false, note="";
- if(ci===0&&i===3){ dmg+=5; note="¡La oferta FLiiTS convence!"; }
- if(ci===2&&i>=2){ dmg=Math.round(m.power*1.35); crit=true; note="¡Documentación validada!"; }
- if(ci===2&&i===0){ dmg=Math.max(6,Math.round(m.power*.7)); note="Tendrá que corregir sus papeles."; }
- if(ci===3) note="¡EPI entregado!";
- if(ci===1&&i>=1) note="La cita está más cerca.";
+ if(m.name.startsWith("SUPER ENVÍO")){ crit=true; note=`¡¡${mg.docs} DOCUMENTOS EN REGLA!!`; }
+ else if(ci===0&&i===3){ dmg+=5; note="¡La oferta FLiiTS convence!"; }
+ else if(ci===2&&i>=2){ dmg=Math.round(m.power*1.35); crit=true; note="¡Documentación validada!"; }
+ else if(ci===2&&i===0){ dmg=Math.max(6,Math.round(m.power*.7)); note="Tendrá que corregir sus papeles."; }
+ else if(ci===3) note="¡EPI entregado!";
  if(!crit&&Math.random()<.08){ crit=true; dmg=Math.round(dmg*1.5); }
  dmg+=Math.floor(Math.random()*4);
  Q.say(`¡${HERO()} usa ${m.name.toUpperCase()}!`); Q.anim("heroAtk",14);
- if(Math.random()<.1){ Q.anim("enemyDodge",20); Q.say(`¡${e.name} lo esquiva!`); Q.run(rpgEnemyTurn); return; }
+ if(!e.boss&&Math.random()<.1){ Q.anim("enemyDodge",20); Q.say(`¡${e.name} lo esquiva!`); Q.run(rpgEnemyTurn); return; }
  Q.run(()=>{ e.hp=Math.max(0,e.hp-dmg); sfx.hit(); }); Q.anim("enemyHit",24); Q.drain();
  if(crit) Q.say("¡Golpe crítico!"); if(note) Q.say(note);
  Q.run(()=>{ if(e.hp<=0) rpgEnemyDown(); else rpgEnemyTurn(); });
@@ -2078,39 +2228,73 @@ function rpgEnemyTurn(){
  Q.run(()=>{ mg.hp=Math.max(0,mg.hp-dmg); sfx.hit(); }); Q.anim("heroHit",24); Q.drain();
  Q.run(()=>{ if(mg.hp<=0) rpgLose(); else rpgOpen("root"); });
 }
-function rpgEnemyDown(){ const e=mg.enemy;
+function rpgEnemyDown(){
+ const e=mg.enemy;
+ if(mg.final) return rpgFinalWin();
+ if(e.boss) return rpgBossWin();
  Q.run(()=>slide(600,120,.4,.06)); Q.anim("faint",22); Q.run(()=>{ e.hidden=true; });
- Q.say(`¡${e.name} no supera la selección!`); Q.say("Quizá vuelva con todo en regla."); Q.run(()=>rpgResolve(false)); }
+ const act=e.n.data.act;
+ if(act==="hire"){ Q.say(`${e.name} se va a pensarlo...`); Q.say("¡Era buen candidato! Vuelve a hablarle y ofrécele un CONTRATO."); rpgBackToMap(()=>{ e.n.cool=360; }); }
+ else if(act==="reject"){ Q.say(`¡${e.name} RECHAZADO!`); Q.say("Solo Glovo no puede ser."); Q.run(()=>rpgResolveNpc(e.n)); }
+ else { Q.run(()=>{ mg.c2++; }); Q.say(`¡${e.name} DESPEDIDO!`); Q.run(()=>rpgResolveNpc(e.n)); }
+}
+function rpgBossWin(){
+ const e=mg.enemy, B=mg.M.boss;
+ Q.run(()=>sfx.power()); Q.anim("flash",24); Q.run(()=>{ e.good=true; if(mg.M.kind==="docs") e.signed=true; });
+ B.outro.forEach(t=>Q.say(t));
+ Q.run(()=>{ e.coin=true; }); Q.anim("coin",70); Q.run(()=>{ e.coin=false; sfx.coin(); sfx.win(); }); Q.say("¡MONEDA DE ORO!");
+ Q.anim("fadeOut",20); Q.run(rpgMissionDone);
+}
 function rpgLose(){
- Q.say(`¡${HERO()} está agotado!`); Q.say("Vuelves al FLiiTS HUB a descansar...");
- Q.anim("fadeOut",16); Q.run(()=>{ mg.hp=mg.maxHp; mg.disp=mg.hp; mg.view="map"; mg.enemy=null; rpgEnterZone(0,4,5,"down"); }); Q.anim("fadeIn",16);
- Q.say("¡PS recuperados! Inténtalo otra vez."); }
-function rpgFlee(){ rpgClose(); const n=mg.enemy.n;
- Q.say("¡Escapas sin problemas!"); Q.anim("fadeOut",16); Q.run(()=>{ mg.view="map"; mg.enemy=null; n.cool=300; }); Q.anim("fadeIn",16); }
+ Q.say(`¡${HERO()} está agotado!`);
+ if(mg.final){ Q.run(()=>{ mg.hp=mg.maxHp; sfx.power(); }); Q.drain(); Q.say("¡Pero el equipo no se rinde! ¡Otra vez!"); Q.run(()=>rpgOpen("root")); return; }
+ Q.say("Vuelves al inicio de la misión a descansar...");
+ Q.anim("fadeOut",16); Q.run(()=>{ mg.hp=mg.maxHp; mg.disp=mg.hp; mg.view="map"; mg.enemy=null; mg.menu=null; rpgEnterZone(0,...TPL[mg.zones[0].tpl].start); }); Q.anim("fadeIn",16);
+ Q.say("¡PS recuperados! Inténtalo otra vez.");
+}
+function rpgFlee(){ rpgClose(); const e=mg.enemy;
+ if(e.boss||mg.final){ Q.say("¡No puedes huir de un jefe!"); Q.run(()=>rpgOpen("root")); return; }
+ Q.say("¡Escapas sin problemas!"); rpgBackToMap(()=>{ e.n.cool=300; }); }
 function rpgMonster(){
- const battle=mg.view==="battle", back=()=>rpgOpen("bag"); rpgClose();
- if(mg.items.monster<=0){ Q.say("No te quedan latas de MONSTER."); Q.run(back); return; }
- if(mg.hp>=mg.maxHp){ Q.say("Ya tienes los PS al máximo."); Q.run(back); return; }
+ const battle=mg.view==="battle", inFight=battle&&!(mg.enemy&&mg.enemy.check); rpgClose();
+ if(mg.items.monster<=0){ Q.say("No te quedan latas de MONSTER."); Q.run(()=>rpgOpen("bag")); return; }
+ if(mg.hp>=mg.maxHp){ Q.say("Ya tienes los PS al máximo."); Q.run(()=>rpgOpen("bag")); return; }
  mg.items.monster--; const heal=Math.min(35,mg.maxHp-mg.hp);
  Q.say(`¡${HERO()} se bebe una MONSTER!`); Q.run(()=>{ mg.hp+=heal; sfx.power(); }); Q.drain(); Q.say(`Recupera ${heal} PS.`);
- if(battle) Q.run(rpgEnemyTurn);
+ if(inFight) Q.run(rpgEnemyTurn); else if(battle) Q.run(()=>rpgOpen("check"));
 }
 function rpgContract(){
- rpgClose(); const e=mg.enemy;
+ rpgClose(); const e=mg.enemy, act=e.n.data.act;
+ if(e.boss){ Q.say("¡A un jefe no se le ofrece contrato!"); Q.run(()=>rpgOpen("root")); return; }
+ if(act==="reject"){ Q.say(`${e.name} solo hace Glovo...`); Q.say("¡Solo Glovo no puede ser! Recházalo."); Q.run(()=>rpgOpen("root")); return; }
+ if(act==="fire"){ Q.say(`${e.name} ya trabaja con FLiiTS... ¡y falla!`); Q.say("Aquí toca DESPEDIR."); Q.run(()=>rpgOpen("root")); return; }
  if(e.hp>e.maxHp*.45){ Q.say(`${e.name} aún no está convencido.`); Q.say("Baja sus PS por debajo de la mitad."); Q.run(()=>rpgOpen("root")); return; }
  Q.say(`¡${HERO()} ofrece un CONTRATO!`); Q.run(()=>slide(400,900,.3,.05)); Q.anim("throw",30); Q.anim("sign",46);
  if(Math.random()<.82){ Q.run(()=>{ e.signed=true; tone(70,.3,0,"square",.14); }); Q.anim("stamp",24); Q.run(()=>{ e.hidden=true; sfx.win(); });
-  Q.say("¡CONTRATO FIRMADO!"); Q.say(`¡${e.name} se une a tu equipo!`); Q.run(()=>rpgResolve(true)); }
+  Q.run(()=>{ mg.c1++; mg.hires++; mg.team.push({name:RPG_NPCS[e.n.look].name,role:RPG_NPCS[e.n.look].role}); });
+  Q.say("¡CONTRATO FIRMADO!"); Q.say(`¡${e.name} CONTRATADO! ¡Tú a ${mg.zi?"Sabadell":"Barcelona"}!`); Q.run(()=>rpgResolveNpc(e.n)); }
  else { Q.anim("tear",30); Q.say(`¡${e.name} rompe el contrato!`); Q.run(rpgEnemyTurn); }
 }
-function rpgResolve(captured){
- const e=mg.enemy, n=e.n;
- if(captured){ mg.gone.push(n.id); mg.team.push({id:n.id,name:n.d.name,role:n.d.role}); mg.npcs=mg.npcs.filter(x=>x!==n); }
- else { mg.beaten.push(n.id); n.beaten=true; }
- mg.encounterCount++;
- Q.anim("fadeOut",16); Q.run(()=>{ mg.view="map"; mg.enemy=null; }); Q.anim("fadeIn",16);
- if(mg.encounterCount>=4&&!mg.finished){ Q.run(()=>{ mg.finished=true; sfx.clear(); });
-  Q.say("¡Has superado 4 encuentros!"); Q.say(`Riders contratados: ${mg.team.length}. ¡El equipo está listo!`); Q.run(()=>rpgOpen("finish")); }
+// Fin de la misión → página de resultados del modo plataforma con los datos de esta partida.
+function rpgMissionDone(){
+ const M=mg.M, a=mg.c1, b=mg.c2; rpgQuit(); c1=a; c2=b;
+ if(M.kind==="raul"){ openRaulPanel(); return; }
+ scr=SCREENS[M.screen]; openCityPanel();
+}
+// Jefe final del RPG: las mochilas gigantes. Las 3 monedas dan el PODER FLiiTS a Raül.
+function rpgStartFinal(){
+ rpgOverlay(); mg=rpgNewState(1,MISSIONS[1]); GP=GB_PALS[mg.pal].c; mg.final=true; mg.view="battle"; mg.hp=mg.maxHp=mg.disp=140;
+ mg.enemy={name:"MOCHILAS",hp:160,maxHp:160,disp:160,lv:99,boss:true,spr:"bags",boxes:true,hidden:false,
+  moves:enemyMoves(["No hay más zonas","Pedido gigante","Lluvia de pedidos","Aplastón"])};
+ mg.moves=rpgMovesFor(1); mg.zones=[{tpl:3,name:"FINAL",npcs:[]}]; mg.grid=TPL[3].grid; mg.p={x:9,y:7,fx:9,fy:7,t:16,dir:"down"};
+ Q.say("¡Las MOCHILAS GIGANTES no dejan repartir en Catalunya!"); Q.say("MOCHILAS: ¡¡NO HAY MÁS ZONAS!!");
+ Q.say("¡Ivan, Gerard y Azlan te dan sus monedas de oro!"); Q.anim("coins",80);
+ Q.run(()=>{ mg.armor=true; sfx.power(); setTimeout(()=>sfx.win(),300); }); Q.anim("flash",24); Q.say("¡¡PODER FLiiTS!!"); Q.run(()=>rpgOpen("root"));
+}
+function rpgFinalWin(){
+ const e=mg.enemy;
+ Q.run(()=>{ e.dizzy=true; sfx.win(); }); Q.say("MOCHILAS: ¡¡ESTÁ BIEN!! ¡¡ESTÁ BIEN!!"); Q.say("¡¡NUEVAS ZONAS PARA REPARTIR!!");
+ Q.anim("fadeOut",24); Q.run(()=>{ rpgQuit(); openFinalPanel(); });
 }
 
 /* --- bucle y dibujo --- */
@@ -2152,11 +2336,13 @@ function rpgDrawMap(c,P){
  const tx0=Math.floor(cx/16), ty0=Math.floor(cy/16), wv=(frame>>4)&3;
  for(let ty=ty0;ty<=ty0+9&&ty<MH;ty++) for(let tx=tx0;tx<=tx0+10&&tx<MW;tx++){ const ch=mg.grid[ty][tx];
   c.drawImage(tileCv(ch,ch==="~"||ch==="F"?wv:(tx*7+ty*13)&3,P),tx*16-cx,ty*16-cy); }
- ZONES[mg.zone].bld.forEach(b=>drawBuilding(c,b,b.x*16-cx,b.y*16-cy,P));
+ TPL[mg.zones[mg.zi].tpl].bld.forEach(b=>drawBuilding(c,b,b.x*16-cx,b.y*16-cy,P));
  const ents=[];
- mg.npcs.forEach(n=>{ const [x,y]=lerpPos(n); ents.push({y,draw:()=>c.drawImage(sprNpc(n.id,n.dir,strideOf(n),P),x-cx,y-8-cy),o:n,x}); });
- ents.push({y:ppy,draw:()=>c.drawImage(sprCrew(mg.ci,mg.p.dir,strideOf(mg.p),P),ppx-cx,ppy-8-cy),o:mg.p,x:ppx});
- if(mg.dog){ const [x,y]=lerpPos(mg.dog); ents.push({y:y-1,draw:()=>c.drawImage(sprDog((mg.dog.moving&&mg.dog.t<8)?1:0,mg.dog.flip,P),x-6-cx,y-2-cy),o:mg.dog,x}); }
+ mg.npcs.forEach(n=>{ const [x,y]=lerpPos(n);
+  if(n.boss){ const s=sprBoss(mg.M.boss.spr,false,P); ents.push({y,o:n,draw:()=>c.drawImage(s,x-cx-(s.width-16)/2,y-12-cy)}); }
+  else ents.push({y,o:n,draw:()=>c.drawImage(sprNpc(n.look,n.dir,strideOf(n),P,n.data.red),x-cx,y-8-cy)}); });
+ ents.push({y:ppy,o:mg.p,draw:()=>c.drawImage(sprCrew(mg.ci,mg.p.dir,strideOf(mg.p),P),ppx-cx,ppy-8-cy)});
+ if(mg.dog){ const [x,y]=lerpPos(mg.dog); ents.push({y:y-1,o:mg.dog,draw:()=>c.drawImage(sprDog((mg.dog.moving&&mg.dog.t<8)?1:0,mg.dog.flip,P),x-6-cx,y-2-cy)}); }
  ents.sort((a,b)=>a.y-b.y).forEach(e=>{ e.draw();
   const o=e.o; if(mg.grid[o.y]&&mg.grid[o.y][o.x]===","&&!o.moving){ c.save(); c.beginPath(); c.rect(o.x*16-cx,o.y*16-cy+10,16,6); c.clip(); c.drawImage(tileCv(",",0,P),o.x*16-cx,o.y*16-cy); c.restore(); } });
  mg.npcs.forEach(n=>{ if(n.state!=="alert") return; const [x,y]=lerpPos(n), bx=x-cx+3, by=y-cy-22;
@@ -2169,6 +2355,7 @@ function drawContract(c,x,y,P,sig,stamp,stampR){
  c.fillStyle=P[3]; const n=Math.round(sig*18); for(let i=0;i<n;i++) c.fillRect(x+5+i,y+29+Math.round(Math.sin(i/1.6)*2),1,1);
  if(stamp){ pxEllipse(c,x+21,y+27,stampR,stampR,P[2]); c.fillStyle=P[0]; c.fillRect(x+20,y+24,1,6); c.fillRect(x+20,y+24,3,1); c.fillRect(x+20,y+27,2,1); }
 }
+function drawDocCard(c,x,y,P){ c.fillStyle=P[3]; c.fillRect(x,y,22,16); c.fillStyle=P[0]; c.fillRect(x+1,y+1,20,14); c.fillStyle=P[1]; c.fillRect(x+3,y+3,6,8); c.fillStyle=P[2]; c.fillRect(x+11,y+4,8,1); c.fillRect(x+11,y+7,7,1); c.fillRect(x+11,y+10,5,1); }
 function rpgDrawBattle(c,P){
  const A=mg.anim, a=A&&A.a, k=A?A.t/A.n:1, E=mg.enemy; if(!E) return;
  c.fillStyle=P[0]; c.fillRect(0,0,GBW,GBH);
@@ -2179,34 +2366,44 @@ function rpgDrawBattle(c,P){
  if(a==="enemyDodge") ex+=Math.round(Math.sin(k*Math.PI)*18);
  if(a==="heroDodge") hx-=Math.round(Math.sin(k*Math.PI)*14);
  if(a==="heroHit") hx+=(A.t>>1)&1?2:-2;
- pxEllipse(c,ex+16,ey+48,28,5,P[1]); pxEllipse(c,hx+26,100,40,8,P[1]);
- if(!E.hidden&&!(a==="enemyHit"&&(A.t>>2)&1)){
-  if(a==="faint"){ c.save(); c.beginPath(); c.rect(0,0,GBW,ey+50); c.clip(); c.drawImage(sprNpc(E.n.id,"down",0,P),ex,ey+Math.round(k*50),32,48); c.restore(); }
-  else c.drawImage(sprNpc(E.n.id,"down",0,P),ex,ey,32,48); }
- if(!(a==="heroHit"&&(A.t>>2)&1)) c.drawImage(sprCrew(mg.ci,"up",0,P),hx,hy,48,72);
+ pxEllipse(c,ex+16,ey+48,30,5,P[1]); pxEllipse(c,hx+26,100,40,8,P[1]);
+ const enemyImg=()=>{ const s=E.spr;
+  if(s==="npc") return [sprNpc(E.n.look,"down",0,P,E.n.data.red),ex,ey,32,48];
+  if(s==="person") return [sprPerson(E.n.look,{...GEAR_ALL,...Object.fromEntries(E.n.data.need.map(x=>[x,0]))},P),ex-40,ey-6,80,56];
+  if(s==="bags") return [sprBags(!!E.dizzy,Math.min(14,Math.floor((1-E.hp/E.maxHp)*14)),P),ex-42,ey+22,76,34];
+  const b=sprBoss(s,!!E.good,P); return s==="almacen"?[b,ex-20,ey+6,54,42]:[b,ex-2,ey-8,36,56]; };
+ if(!E.hidden&&!(a==="enemyHit"&&(A.t>>2)&1)){ const [img,x,y,w,h]=enemyImg();
+  if(a==="faint"){ c.save(); c.beginPath(); c.rect(0,0,GBW,ey+50); c.clip(); c.drawImage(img,x,y+Math.round(k*50),w,h); c.restore(); }
+  else c.drawImage(img,x,y,w,h); }
+ if(E.check&&mg.M.kind==="docs"&&!E.hidden) drawDocCard(c,ex-26,ey+26,P);
+ if(!(a==="heroHit"&&(A.t>>2)&1)) c.drawImage(mg.armor?sprArmor(P):sprCrew(mg.ci,"up",0,P),hx,hy,48,72);
  if(mg.ci===0) c.drawImage(sprDog(0,false,P),hx+46,78);
  if(a==="throw"){ const x=hx+40+(ex+12-hx-40)*k, y=70+(ey+16-70)*k-Math.sin(k*Math.PI)*34; c.drawImage(sprContract(P),Math.round(x),Math.round(y),16,16); }
  if(a==="sign") drawContract(c,ex+2,ey+4,P,k,false,0);
  if(a==="stamp"||E.signed&&a!=="tear") drawContract(c,ex+2,ey+4,P,1,true,a==="stamp"?Math.max(5,Math.round(5+(1-k)*8)):5);
  if(a==="tear"){ const off=Math.round(k*20), dy=Math.round(k*k*30); c.save(); c.beginPath(); c.rect(0,0,ex+16,GBH); c.clip(); drawContract(c,ex+2-off,ey+4+dy,P,1,false,0); c.restore();
   c.save(); c.beginPath(); c.rect(ex+16,0,GBW,GBH); c.clip(); drawContract(c,ex+2+off,ey+4+dy,P,1,false,0); c.restore(); }
+ if(a==="coin"){ const x=Math.round(ex+16+(hx+24-ex-16)*Math.max(0,k*1.4-.4)), y=Math.round(ey+20-Math.min(1,k*2.5)*16+Math.max(0,k*1.4-.4)*40); drawCoin(c,x,y,P,A.t); }
+ if(a==="coins"){ const cx=hx+24, cy=66; for(let i=0;i<3;i++){ const ang=k*10+i*2.09, r=(1-k)*34+4; drawCoin(c,Math.round(cx+Math.cos(ang)*r),Math.round(cy+Math.sin(ang)*r*.6),P,A.t+i*4); } }
 }
 // Capa HTML: cuadros de texto, cajas de PS y menús.
 function rpgUI(){
- const ov=$("#gbOv"); if(!ov) return; const scr=$("#gbScr"), E=mg.enemy;
+ const ov=$("#gbOv"); if(!ov) return; const scr=$("#gbScr"), E=mg.enemy, kind=mg.M.kind;
  GP.forEach((col,i)=>scr.style.setProperty("--g"+i,col));
  let h="";
  if(mg.view==="battle"&&E&&E.boxes){
-  h+=`<div class="gbx gb-ebox"><div class="gb-nm"><b>${esc(E.name)}</b><span>Nv${E.lv}</span></div><div class="gb-bar"><span>PS</span><div class="gbhp"><i id="gbEhp"></i></div></div></div>`;
-  h+=`<div class="gbx gb-hbox"><div class="gb-nm"><b>${esc(HERO())}</b><span>Nv1</span></div><div class="gb-bar"><span>PS</span><div class="gbhp"><i id="gbHhp"></i></div></div><div class="gb-hpn" id="gbHpn"></div></div>`; }
- if(mg.view==="map"&&mg.banner>0&&!mg.anim&&!mg.menu) h+=`<div class="gbx gb-banner">${esc(ZONES[mg.zone].name)}</div>`;
+  const info=E.check?(kind==="docs"?`DOC: ${E.n.data.doc.toUpperCase()}`:kind==="epis"?`FALTA: ${E.n.data.need.map(x=>x.toUpperCase()).join(" ")}`:RPG_NPCS[E.n.look].role.toUpperCase()):"";
+  h+=`<div class="gbx gb-ebox"><div class="gb-nm"><b>${esc(E.name)}</b>${E.check||E.boss?"":`<span>Nv${E.lv}</span>`}</div>`+(E.check?`<div class="gb-sub">${esc(info)}</div>`:`<div class="gb-bar"><span>PS</span><div class="gbhp"><i id="gbEhp"></i></div></div>`)+`</div>`;
+  h+=`<div class="gbx gb-hbox"><div class="gb-nm"><b>${esc(HERO())}</b><span>Nv${mg.final?99:1}</span></div><div class="gb-bar"><span>PS</span><div class="gbhp"><i id="gbHhp"></i></div></div><div class="gb-hpn" id="gbHpn"></div></div>`; }
+ if(mg.view==="map"&&mg.banner>0&&!mg.anim&&!mg.menu) h+=`<div class="gbx gb-banner">${esc(mg.zones[mg.zi].name)}</div>`;
  const M=mg.menu&&rpgMenuDef(), s=mg.q[0], textNow=s&&s.k==="text";
  if(textNow||(M&&M.prompt)||(mg.view==="battle"&&E&&E.boxes)) h+=`<div class="gbx gb-text" id="gbText"><span id="gbTxt"></span><i class="gb-more" id="gbMore" hidden></i></div>`;
  if(M&&!textNow){
   if(M.info) h+=`<div class="gbx gb-info">${M.info}</div>`;
   h+=`<div class="gbx gb-menu ${M.cls}">`+M.items.map((it,i)=>`<div class="gb-it${i===mg.mcur?" on":""}${it.dis?" dis":""}" data-i="${i}">${esc(it.t)}</div>`).join("")+`</div>`; }
  ov.innerHTML=h; mg.liveTxt=null;
- $("#mgProgress").textContent=`${ZONES[mg.zone].name} · CONTRATADOS ${mg.team.length} · ENCUENTROS ${Math.min(4,mg.encounterCount)}/4`;
+ const [l1,l2]=LABELS[kind];
+ $("#mgProgress").textContent=mg.final?"JEFE FINAL":`${mg.zones[mg.zi].name} · ${l1.toUpperCase()} ${mg.c1} · ${l2.toUpperCase()} ${mg.c2} · QUEDAN ${rpgRemaining()}`;
 }
 function rpgLive(){
  const s=mg.q[0], el=$("#gbTxt");
@@ -2227,28 +2424,30 @@ function buildRoster(){
   const r=$("#roster"); r.innerHTML="";
   SEL.forEach(i=>{ const fin_=i===1, sIdx=SCREEN_OF[i], b=document.createElement("div"), locked=fin_&&!raulOpen();
     b.className="pick"+(i===pick?" on":"")+(fin_?" final":"")+(locked?" locked":"")+(fin_&&justUnlocked?" unlock":""); b.tabIndex=0; b.setAttribute("role","button");
-    if(locked){ const cv=document.createElement("canvas"); cv.width=16; cv.height=24; const g=cv.getContext("2d"); CREW[1].spr.forEach((row,rr)=>[...row].forEach((ch,q)=>{ if(ch!=="."){ g.fillStyle="#120b0c"; g.fillRect(q,rr,1,1); } })); b.appendChild(cv);
+    if(locked){ const cv=document.createElement("canvas"); cv.width=16; cv.height=24; const g=cv.getContext("2d"); CREW[1].spr.forEach((row,rr)=>[...row].forEach((ch,q)=>{ if(ch!=="."){ g.fillStyle="#120b0c"; g.fillRect(q,rr,1,1); } })); b.appendChild(themed(cv));
       b.insertAdjacentHTML("beforeend",`<div class="ped"></div><div class="pn">???</div><div class="pr">Personaje secreto</div><div class="coinbadge">${gold()}/3 MONEDAS DE ORO</div>`); }
-    else { b.appendChild(standCanvas(i));
-    const badge = fin_ ? `<div class="coinbadge">¡DESBLOQUEADO!</div>` : (done[sIdx]?`<div class="coinbadge">MONEDA ✓</div>`:"");
+    else { b.appendChild(themed(standCanvas(i)));
+    const badge = fin_ ? `<div class="coinbadge">¡DESBLOQUEADO!</div>` : (DONE()[sIdx]?`<div class="coinbadge">MONEDA ✓</div>`:"");
     b.insertAdjacentHTML("beforeend",`<div class="ped"></div><div class="pn" data-k="pl.${i}.n">${esc(nm(i))}</div><div class="pr">${esc(rl(i))}</div>${badge}`); }
     b.addEventListener("click",()=>{ if(editing) return; pick=i; confirmPick(); });
     r.appendChild(b); });
   if(editing) r.querySelectorAll("[data-k]").forEach(el=>el.contentEditable="true");
 }
-let justUnlocked=false, forcedOpen=false;
-const raulOpen=()=>gold()>=3||forcedOpen;
+let justUnlocked=false;
+const raulOpen=()=>gold()>=3||!!FORCED[activeGameMode];
 function showSelect(){
   gamePaused=false; $("#pauseScreen").classList.remove("show");
   mode="select"; clearBubbles(); hideRaulUI(); $("#vehOv").hidden=true; $("#selOv").hidden=false;
-  if(activeGameMode==="platform" && pick!==1&&done[SCREEN_OF[pick]]){ const nx=[0,2,3].find(i=>!done[SCREEN_OF[i]]); pick=nx??1; }
+  setTheme(activeGameMode==="rpg");
+  if(activeGameMode!=="arcade" && pick!==1&&DONE()[SCREEN_OF[pick]]){ const nx=[0,2,3].find(i=>!DONE()[SCREEN_OF[i]]); pick=nx??1; }
   buildRoster(); justUnlocked=false; $("#pilotNote").textContent=raulOpen()?`¡${nm(1)} desbloqueado! Su pantalla lleva al jefe final.`:`Consigue las 3 monedas de oro para desbloquear un personaje secreto: llevas ${gold()}/3.`;
 }
 function confirmPick(force){
-  if(activeGameMode!=="platform" && pick!==1){ $("#selOv").hidden=true; sfx.select(); customStart(pick); return; }
-  if(pick===1 && activeGameMode!=="platform"){ $("#selOv").hidden=true; sfx.select(); customStart(pick); return; }
-  if(pick===1){ if(force) forcedOpen=true; if(!raulOpen()){ toast("BLOQUEADO"); sfx.back(); return; } forceFinal=!!force; $("#selOv").hidden=true; sfx.open(); startRaul(); return; }
-  $("#selOv").hidden=true; sfx.select(); showVeh();
+  if(activeGameMode==="arcade"){ $("#selOv").hidden=true; sfx.select(); customStart(pick); return; }
+  if(pick===1){ if(force) FORCED[activeGameMode]=true; if(!raulOpen()){ toast("BLOQUEADO"); sfx.back(); return; } forceFinal=!!force; $("#selOv").hidden=true; sfx.open();
+    if(activeGameMode==="rpg") rpgStart(1); else startRaul(); return; }
+  $("#selOv").hidden=true; sfx.select();
+  if(activeGameMode==="rpg") rpgStart(pick); else showVeh();
 }
 function buildVeh(){
   const r=$("#vroster"); r.innerHTML="";
@@ -2292,11 +2491,11 @@ function openCityPanel(){
   openPanel(`MUNDO ${i+1} · ${nm(S.who)}`,"¡PANTALLA SUPERADA!",html,"ENTER · GUARDAR MONEDA DE ORO",()=>finishScreen(i),b=>updTotals(b));
 }
 function finishScreen(i){
-  done[i]=true; updHud(); sfx.clear(); toast("¡MONEDA DE ORO!"); setTimeout(()=>{ if(gold()===3&&!forcedOpen){ pick=1; justUnlocked=true; showSelect(); toast("¡NUEVO PERSONAJE DESBLOQUEADO!"); sfx.power(); setTimeout(()=>sfx.win(),400); } else showSelect(); },1300);
+  DONE()[i]=true; updHud(); sfx.clear(); toast("¡MONEDA DE ORO!"); setTimeout(()=>{ if(gold()===3&&!FORCED[activeGameMode]){ pick=1; justUnlocked=true; showSelect(); toast("¡NUEVO PERSONAJE DESBLOQUEADO!"); sfx.power(); setTimeout(()=>sfx.win(),400); } else showSelect(); },1300);
 }
 let motoURL=null;
 function openMotoPanel(i){
-  if(!motoURL){ const c=document.createElement("canvas"); c.width=16; c.height=13; drawSpr(c.getContext("2d"),MOTO,0,0); motoURL=c.toDataURL(); }
+  { const c=document.createElement("canvas"); c.width=16; c.height=13; drawSpr(c.getContext("2d"),MOTO,0,0); motoURL=themed(c).toDataURL(); }
   const html=`${K("mo.intro","Documentación validada: ALL APPROVED. Y la flota de motos sigue creciendo:","p","intro")}
    <div class="runline">EN ESTA PARTIDA · APROBADOS: ${c1} · RECHAZADOS: ${c2}</div>
    <div class="mgrid">
@@ -2357,9 +2556,9 @@ function showCredits(){
    <div class="h">Y A TODOS NUESTROS RIDERS</div><div class="big" style="font-size:clamp(18px,3vw,34px)">¿PREGUNTAS?</div>
    <div class="h">PUNTUACIÓN ${String(score).padStart(6,"0")} · MONEDAS ${coins} · ORO ${gold()}/3</div><div class="press">ESC · VOLVER</div>`;
   const cr=$("#crewRoll");
-  who.forEach(i=>{ const d=document.createElement("div"); d.appendChild(standCanvas(i)); d.insertAdjacentHTML("beforeend",`<span>${esc(nm(i))}</span>`); cr.appendChild(d); });
-  const m=document.createElement("div"); const mc=document.createElement("canvas"); mc.width=18; mc.height=28; drawPal(mc.getContext("2d"),MARTI,0,0,MPAL_I); m.appendChild(mc); m.insertAdjacentHTML("beforeend",`<span>${esc(saved["pl.m.n"]??"MARTÍ")}</span>`); cr.appendChild(m);
-  const fr=document.createElement("div"); const fc=document.createElement("canvas"); fc.width=16; fc.height=24; drawPal(fc.getContext("2d"),FRANCO,0,0,FPAL); fr.appendChild(fc); fr.insertAdjacentHTML("beforeend",`<span>FRANCO</span>`); cr.appendChild(fr);
+  who.forEach(i=>{ const d=document.createElement("div"); d.appendChild(themed(standCanvas(i))); d.insertAdjacentHTML("beforeend",`<span>${esc(nm(i))}</span>`); cr.appendChild(d); });
+  const m=document.createElement("div"); const mc=document.createElement("canvas"); mc.width=18; mc.height=28; drawPal(mc.getContext("2d"),MARTI,0,0,MPAL_I); m.appendChild(themed(mc)); m.insertAdjacentHTML("beforeend",`<span>${esc(saved["pl.m.n"]??"MARTÍ")}</span>`); cr.appendChild(m);
+  const fr=document.createElement("div"); const fc=document.createElement("canvas"); fc.width=16; fc.height=24; drawPal(fc.getContext("2d"),FRANCO,0,0,FPAL); fr.appendChild(themed(fc)); fr.insertAdjacentHTML("beforeend",`<span>FRANCO</span>`); cr.appendChild(fr);
   $("#credOv").hidden=false; sfx.win();
 }
 $("#credOv").addEventListener("click",()=>{ $("#credOv").hidden=true; showSelect(); });
@@ -2401,7 +2600,7 @@ document.addEventListener("keydown",e=>{
     else if(k==="ArrowLeft"||k==="ArrowUp"||k==="a"||k==="w"){ pick=SEL[(p+3)%4]; buildRoster(); sfx.select(); }
     else if(k==="r"){ pick=1; confirmPick(true); }
     else if(k==="Enter"||k===" "||k==="x"||k==="z"||k==="b"){ e.preventDefault(); confirmPick(); }
-    else if(k==="Escape"){ $("#selOv").hidden=true; $("#modeOv").hidden=false; sfx.back(); }
+    else if(k==="Escape"){ $("#selOv").hidden=true; setTheme(false); $("#modeOv").hidden=false; sfx.back(); }
     return; }
   if(!$("#vehOv").hidden){
     if(k==="ArrowRight"||k==="ArrowDown"||k==="d"||k==="s"){ veh=(veh+1)%3; buildVeh(); sfx.select(); }
@@ -2438,7 +2637,7 @@ function dropPanels(){ open=-1; panelDone=null; $("#lvlOv").hidden=true; $("#cre
 function returnToGameMenu(){
  gamePaused=false; keys={}; $("#pauseScreen").classList.remove("show"); dropPanels();
  $("#modeGameOv").hidden=true; $("#selOv").hidden=true; $("#vehOv").hidden=true;
- mode="select"; modeCursor=Math.max(0,["platform","rpg","arcade"].indexOf(activeGameMode));
+ mode="select"; setTheme(false); modeCursor=Math.max(0,["platform","rpg","arcade"].indexOf(activeGameMode));
  $("#modeOv").hidden=false;
 }
 function returnToPlayerSelect(){
