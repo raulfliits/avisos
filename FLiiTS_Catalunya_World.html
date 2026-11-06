@@ -625,6 +625,7 @@ button{font:inherit;color:inherit}
 .roll .h{font-family:var(--f-display);font-size:11px;color:var(--sky)}
 .roll .crew{display:flex;gap:clamp(12px,3cqw,40px);flex-wrap:wrap;justify-content:center}
 .roll .crew div{display:grid;justify-items:center;gap:6px;font-size:24px}
+.roll .crew .duo{display:grid;grid-template-columns:16fr 30fr;width:184px;text-align:center}.roll .crew .duo em{font-style:normal}
 .roll .crew canvas{height:96px;width:auto;image-rendering:pixelated;animation:float .5s steps(2) infinite alternate}
 .roll .crew div:nth-child(2) canvas{animation-delay:.25s}
 .roll .crew div:nth-child(4) canvas{animation-delay:.25s}
@@ -3309,8 +3310,7 @@ function stockHTML(){
            ["Pendientes de entrega","Lo que no hay en stock queda pendiente para ese rider y se entrega al volver a escanearlo.","Lo que faltaba se perdía de vista"],
            ["Devoluciones y PPIs Returned","Devolución completa o incompleta, por producto. Si trae todo lo obligatorio, va solo a PPIs Returned.","Devoluciones sin registrar"],
            ["Permisos y trazabilidad","Solo cuentas @fliits.com; cada oficina ve lo suyo y queda guardado quién registra cada cosa.","Cualquiera podía tocar el tracker"]];
-  return `<div class="retos-h" style="margin-top:22px">NUEVO SISTEMA DE STOCK</div>
-   ${K("st.intro","Del tracker a mano a una app de escaneo: así controlamos ahora los EPIs y las mochilas.","p","intro")}
+  return `${K("st.intro","Del tracker a mano a una app de escaneo: así controlamos ahora los EPIs y las mochilas.","p","intro")}
    <div class="quest" id="stQuest">${K("st.q0","Escaneo el QR del rider","div","qs")}${K("st.q1","Kit según su vehículo","div","qs")}${K("st.q2","Firma en el móvil o con QR","div","qs")}${K("st.q3","Stock descontado al momento","div","qs")}</div>
    <div class="vsc"><div class="vh"></div><div class="vh">ANTES</div><div class="vh us">SISTEMA FLiiTS</div>
    ${F.map((f,i)=>`<div class="vf">${K(`st.f${i}.t`,f[0],"b")}${K(`st.f${i}.d`,f[1],"span")}</div><div class="vno">✗ ${K(`st.f${i}.c`,f[2],"span")}</div><div class="vok">✓</div>`).join("")}</div>
@@ -3327,8 +3327,11 @@ function openCityPanel(){
     return `<div class="ccard">${K(`${id}.n`,c[0],"div","cn")}${K(`${id}.p`,c[1]||"—","div","cp")}
     <div class="cnums"><div><span>MOTOS</span>${K(`${id}.m`,c[2],"b","nmo")}</div><div><span>BICIS</span>${K(`${id}.b`,c[3],"b","nbi")}</div></div></div>`; }).join("");
   const html=`${K(`d2.${i}.intro`,S.intro,"p","intro")}<div class="runline">EN ESTA PARTIDA · ${S.c1.toUpperCase()}: ${c1} · ${S.c2.toUpperCase()}: ${c2}</div>
-    <div class="ccards${many?" many":""}">${cards}</div><div class="ctot" id="ctot"></div><div class="src">Riders activos por tipo de vehículo · Rider forecast, 06/11/2026</div>${S.type==="epis"?episHTML()+stockHTML():""}${notes(`d.${i}.notes`,S.type==="epis"?S.note+" Después, el nuevo sistema de stock: escaneo del QR, kit según vehículo, firma y stock al momento; envíos caja a caja, pendientes, devoluciones y permisos por oficina.":S.note)}`;
-  openPanel(`MUNDO ${i+1} · ${nm(S.who)}`,"¡PANTALLA SUPERADA!",html,"ENTER · GUARDAR MONEDA DE ORO",()=>finishScreen(i),b=>{ updTotals(b); animEpis(b); animStock(b); });
+    <div class="ccards${many?" many":""}">${cards}</div><div class="ctot" id="ctot"></div><div class="src">Riders activos por tipo de vehículo · Rider forecast, 06/11/2026</div>${S.type==="epis"?episHTML():""}${notes(`d.${i}.notes`,S.type==="epis"?S.note+" Después, el nuevo sistema de stock: escaneo del QR, kit según vehículo, firma y stock al momento; envíos caja a caja, pendientes, devoluciones y permisos por oficina.":S.note)}`;
+  const kick=`MUNDO ${i+1} · ${nm(S.who)}`;
+  // Azlan: 1ª parte datos de EPIs; ENTER/ESPACIO pasa a la 2ª parte, el nuevo sistema de stock.
+  if(S.type==="epis") return openPanel(kick,"¡PANTALLA SUPERADA!",html,"ENTER · VER SISTEMA DE STOCK",()=>openPanel(kick,"NUEVO SISTEMA DE STOCK",stockHTML(),"ENTER · GUARDAR MONEDA DE ORO",()=>finishScreen(i),animStock),b=>{ updTotals(b); animEpis(b); });
+  openPanel(kick,"¡PANTALLA SUPERADA!",html,"ENTER · GUARDAR MONEDA DE ORO",()=>finishScreen(i),b=>updTotals(b));
 }
 // Al acabar una pantalla: tarjeta de "¡PANTALLA SUPERADA!" (tapa el juego) y vuelta al selector.
 let winNext=null, winTimer=0;
@@ -3440,7 +3443,7 @@ function showCredits(){
    <div class="h">Y A TODOS NUESTROS RIDERS</div><div class="big" style="font-size:clamp(18px,3vw,34px)">¿PREGUNTAS?</div>
    <div class="h">PUNTUACIÓN ${String(score).padStart(6,"0")} · MONEDAS ${coins} · ORO ${gold()}/3</div>${newRep?`<div class="big" style="font-size:clamp(14px,2.6cqw,28px)">¡MODO REPARTIDOR<br>DESBLOQUEADO!</div><div class="h">YA APARECE EN EL SELECTOR DE JUGADORES</div>`:""}<div class="press">ESC · VOLVER</div>`;
   const cr=$("#crewRoll");
-  who.forEach(i=>{ const d=document.createElement("div"); d.appendChild(themed(standCanvas(i))); d.insertAdjacentHTML("beforeend",`<span>${esc(nm(i))}</span>`); cr.appendChild(d); });
+  who.forEach(i=>{ const d=document.createElement("div"); d.appendChild(themed(standCanvas(i))); d.insertAdjacentHTML("beforeend",CREW[i]&&CREW[i].dog?`<span class="duo"><em>${esc(nm(i))}</em><em>${esc(saved["cr.dog"]??"OREO")}</em></span>`:`<span>${esc(nm(i))}</span>`); cr.appendChild(d); });
   const co=$("#collabRoll");
   [[MARTI,18,28,MPAL_I,"MARTÍ PUJOL"],[MARTI_B,18,28,MPAL_A,"MARTÍ ESPRIU"],[FRANCO,16,24,FPAL,"FRANCO"]].forEach(([S,w,h,P,n],k)=>{
     const d=document.createElement("div"), cv=document.createElement("canvas"); cv.width=w; cv.height=h; drawPal(cv.getContext("2d"),S,0,0,P); d.appendChild(themed(cv));
@@ -3509,7 +3512,7 @@ document.addEventListener("keydown",e=>{
   if(!$("#credOv").hidden){ if(k==="Escape"||k==="Enter"){ $("#credOv").hidden=true; showSelect(); } return; }
   if(k==="Escape"){ if(open<0&&(mode==="play"||mode==="final"||mode==="raul")){ restorePauseLabels(); setGamePaused(true); } return; }
   if(k==="n"){ showNotes=!showNotes; document.querySelectorAll("#lvlBody .notes").forEach(n=>n.hidden=!showNotes); return; }
-  if(open>=0){ if(k==="Enter"&&t.tagName!=="BUTTON"){ e.preventDefault(); closePanel(); } return; }
+  if(open>=0){ if((k==="Enter"||k===" ")&&t.tagName!=="BUTTON"){ e.preventDefault(); closePanel(); } return; }
   if(k==="j"){ showSelect(); return; }
   if(mode==="final"){ if(k==="Enter"||k===" "){ e.preventDefault(); if(fin&&fin.t>=340&&!fin.done) for(let i=0;i<4;i++) addSticker(); } return; }
   if(mode!=="play"||bossS.on) return;
