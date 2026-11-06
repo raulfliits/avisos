@@ -2417,8 +2417,9 @@ const REP={on:false,done:false};
 const repUnlocked=()=>REP.on, repDone=()=>REP.done;
 function unlockRep(){ if(REP.on) return false; REP.on=true; return true; }
 if(saved["rep.on"]||saved["rep.done"]){ delete saved["rep.on"]; delete saved["rep.done"]; persist(); }
-function saveGame(){ saved["save.v1"]=JSON.stringify({prog:PROG,rep:REP}); persist(); toast("PARTIDA GUARDADA"); sfx.coin(); }
-try{ const sv=JSON.parse(saved["save.v1"]||"null"); if(sv){ Object.keys(PROG).forEach(k=>{ if(Array.isArray(sv.prog&&sv.prog[k])) sv.prog[k].forEach((v,i)=>PROG[k][i]=!!v); }); if(sv.rep) Object.assign(REP,{on:!!sv.rep.on,done:!!sv.rep.done}); } }catch(e){}
+const FIN={platform:false,rpg:false,arcade:false}, finDone=()=>!!FIN[activeGameMode];
+function saveGame(){ saved["save.v1"]=JSON.stringify({prog:PROG,rep:REP,fin:FIN}); persist(); toast("PARTIDA GUARDADA"); sfx.coin(); }
+try{ const sv=JSON.parse(saved["save.v1"]||"null"); if(sv){ Object.keys(PROG).forEach(k=>{ if(Array.isArray(sv.prog&&sv.prog[k])) sv.prog[k].forEach((v,i)=>PROG[k][i]=!!v); }); if(sv.rep) Object.assign(REP,{on:!!sv.rep.on,done:!!sv.rep.done}); if(sv.fin) Object.keys(FIN).forEach(k=>FIN[k]=!!sv.fin[k]); } }catch(e){}
 function repName(){ return REP_RIDERS[repLook].name; }
 // Sprite lateral del rider (para el selector de vehículo): la plantilla de aspirante con ropa FLiiTS.
 const repSprCache={};
@@ -3179,11 +3180,12 @@ function buildRoster(){
     if(i===4){ const b=document.createElement("div"); b.className="pick rep"+(pick===4?" on":"")+(repDone()?" done":""); b.tabIndex=0; b.setAttribute("role","button");
       b.appendChild(themed(repSelCanvas())); b.insertAdjacentHTML("beforeend",`<div class="ped"></div><div class="pn">REPARTIDOR</div><div class="pr">Modo libre · reparte por Barcelona</div>${repDone()?`<div class="coinbadge">SUPERADO</div><span class="ck" aria-label="Superado"></span>`:`<div class="coinbadge">¡NUEVO!</div>`}`);
       b.addEventListener("click",()=>{ if(editing) return; pick=4; confirmPick(); }); r.appendChild(b); return; } const fin_=i===1, sIdx=SCREEN_OF[i], b=document.createElement("div"), locked=fin_&&!raulOpen();
-    b.className="pick"+(i===pick?" on":"")+(fin_?" final":"")+(locked?" locked":"")+(fin_&&justUnlocked?" unlock":"")+(!fin_&&DONE()[sIdx]?" done":""); b.tabIndex=0; b.setAttribute("role","button");
+    b.className="pick"+(i===pick?" on":"")+(fin_?" final":"")+(locked?" locked":"")+(fin_&&justUnlocked?" unlock":"")+((!fin_&&DONE()[sIdx])||(fin_&&finDone())?" done":""); b.tabIndex=0; b.setAttribute("role","button");
     if(locked){ const cv=document.createElement("canvas"); cv.width=16; cv.height=24; const g=cv.getContext("2d"); CREW[1].spr.forEach((row,rr)=>[...row].forEach((ch,q)=>{ if(ch!=="."){ g.fillStyle="#120b0c"; g.fillRect(q,rr,1,1); } })); b.appendChild(themed(cv));
       b.insertAdjacentHTML("beforeend",`<div class="ped"></div><div class="pn">???</div><div class="pr">Personaje secreto</div><div class="coinbadge">${gold()}/3 MONEDAS DE ORO</div>`); }
     else { b.appendChild(themed(standCanvas(i)));
-    const badge = fin_ ? `<div class="coinbadge">¡DESBLOQUEADO!</div>` : (DONE()[sIdx]?`<div class="coinbadge">SUPERADO</div><span class="ck" aria-label="Superado"></span>`:"");
+    const ck=`<div class="coinbadge">SUPERADO</div><span class="ck" aria-label="Superado"></span>`;
+    const badge = fin_ ? (finDone()?ck:`<div class="coinbadge">¡DESBLOQUEADO!</div>`) : (DONE()[sIdx]?`<div class="coinbadge">SUPERADO</div><span class="ck" aria-label="Superado"></span>`:"");
     b.insertAdjacentHTML("beforeend",`<div class="ped"></div><div class="pn" data-k="pl.${i}.n">${esc(nm(i))}</div><div class="pr">${esc(rl(i))}</div>${badge}`); }
     b.addEventListener("click",()=>{ if(editing) return; pick=i; confirmPick(); });
     r.appendChild(b); });
@@ -3196,7 +3198,8 @@ function showSelect(){
   mode="select"; clearBubbles(); hideRaulUI(); $("#vehOv").hidden=true; $("#selOv").hidden=false;
   setTheme(activeGameMode==="rpg");
   if(activeGameMode!=="arcade" && pick!==1&&DONE()[SCREEN_OF[pick]]){ const nx=[0,2,3].find(i=>!DONE()[SCREEN_OF[i]]); pick=nx??1; }
-  buildRoster(); justUnlocked=false; $("#pilotNote").textContent=raulOpen()?`¡${nm(1)} desbloqueado! Su pantalla lleva al jefe final.`:`Consigue las 3 monedas de oro para desbloquear un personaje secreto: llevas ${gold()}/3.`;
+  buildRoster(); justUnlocked=false; const all=finDone()&&(!repUnlocked()||repDone());
+  $("#pilotNote").textContent=all?"¡Todo completado! Puedes volver a jugar con cualquier personaje.":finDone()?"¡Juego completado! Te queda el modo repartidor.":raulOpen()?`¡${nm(1)} desbloqueado! Su pantalla lleva al jefe final.`:`Consigue las 3 monedas de oro para desbloquear un personaje secreto: llevas ${gold()}/3.`;
 }
 function confirmPick(force){
   if(pick===4){ if(!repUnlocked()) return; sfx.select(); showRid(); return; }
@@ -3330,6 +3333,7 @@ function updHud(){ $("#score").textContent=String(score).padStart(6,"0"); $("#co
 function toast(t){ const d=document.createElement("div"); d.className="toast"; d.textContent=t; (document.getElementById("screen")||document.body).appendChild(d); setTimeout(()=>d.remove(),1450); }
 
 function showCredits(){
+  FIN[activeGameMode]=true;
   const who=[0,2,3,1], newRep=unlockRep();
   $("#roll").innerHTML=`<div class="big">¡GRACIAS<br>POR JUGAR!</div><div class="h">EQUIPO CATALUNYA</div><div class="crew" id="crewRoll"></div>
    <div class="h">Y A TODOS NUESTROS RIDERS</div><div class="big" style="font-size:clamp(18px,3vw,34px)">¿PREGUNTAS?</div>
