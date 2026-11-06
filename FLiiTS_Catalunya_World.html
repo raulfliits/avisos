@@ -2598,11 +2598,20 @@ function repPlayer(g,x,y,blink,lean,brk,t,v){ if(blink) return; const K="#1b1212
  else if(veh===1){ R(-3,-17,6,17,LT); R(-1,-16,2,16,K); R(-6,-21,12,4,LT); R(-5,-20,10,2,"#1f9e8f"); R(-2,-26,4,6,"#7fe0d0"); R(-11,-36,22,3,LT); R(-10,-35,20,1,K); }
  else { R(-4,-9,8,9,LT); R(-2,-8,4,8,K); R(-8,-5,16,5,LT); R(-7,-4,14,3,"#58c4ff"); R(-2,-36,4,28,LT); R(-1,-35,2,27,"#555a66"); R(-10,-37,20,3,LT); R(-9,-36,18,1,K); }
  const leg=veh===1&&v>.05?((t>>3)&1?2:-2):0;
- R(-7,-24-bob+leg,5,12,"#2d3a5c"); R(2,-24-bob-leg,5,12,"#2d3a5c");
- R(-10,-39-bob,20,17,LT); R(-9,-51-bob,18,16,LT); R(-9,-38-bob,18,15,K); R(-8,-37-bob,16,13,"#d62839"); R(-11,-35-bob,3,8,"#d62839"); R(8,-35-bob,3,8,"#d62839"); R(-11,-28-bob,3,2,L.S); R(8,-28-bob,3,2,L.S);
- R(-8,-50-bob,16,14,K); R(-7,-49-bob,14,12,"#d62839"); R(-7,-49-bob,14,2,"#ff5a66"); R(-7,-38-bob,14,1,"#a51d2b");
- g.fillStyle="#fff"; for(const [a,b] of [[-4,-47],[-4,-46],[-4,-45],[-4,-44],[-4,-43],[-3,-47],[-2,-47],[-3,-45]]) g.fillRect(a,b-bob,1,1);
- g.fillStyle=LT; g.beginPath(); g.arc(0,-55-bob,7,0,7); g.fill(); g.fillStyle=K; g.beginPath(); g.arc(0,-55-bob,6,0,7); g.fill(); g.fillStyle="#e63946"; g.beginPath(); g.arc(0,-55-bob,5,0,7); g.fill(); g.fillStyle="#ff8a92"; g.fillRect(-3,-58-bob,3,1);
+ // cadera, sillín y piernas sin huecos (antes se veía el asfalto entre la mochila y el vehículo)
+ R(-9,-26-bob,18,6,LT); R(-8,-25-bob,16,4,"#4a6fa5"); R(-3,-22-bob,6,9,K); R(-2,-22-bob,4,8,"#333");
+ R(-9,-24-bob+leg,7,14,LT); R(-8,-24-bob+leg,5,13,K); R(-7,-23-bob+leg,3,11,"#4a6fa5");
+ R(2,-24-bob-leg,7,14,LT); R(3,-24-bob-leg,5,13,K); R(4,-23-bob-leg,3,11,"#4a6fa5");
+ // en el RPG el rojo es más claro para que, en 4 tonos, no se confunda con el asfalto
+ const RED=activeGameMode==="rpg"?"#ff7a86":"#d62839", RED2=activeGameMode==="rpg"?"#ffb3bd":"#ff5a66", RED3=activeGameMode==="rpg"?"#ff5a66":"#a51d2b";
+ // chaqueta y brazos
+ R(-10,-39-bob,20,17,LT); R(-9,-38-bob,18,15,K); R(-8,-37-bob,16,13,RED); R(-11,-35-bob,3,8,RED); R(8,-35-bob,3,8,RED); R(-11,-28-bob,3,2,L.S); R(8,-28-bob,3,2,L.S);
+ // casco visto por detrás: cúpula con franja central y borde, metido detrás de la mochila
+ const hy=-53-bob, dome=(r,c)=>{ g.fillStyle=c; g.beginPath(); g.moveTo(-r,hy+4); g.lineTo(-r,hy); g.arc(0,hy,r,Math.PI,0); g.lineTo(r,hy+4); g.closePath(); g.fill(); };
+ dome(8.5,LT); dome(7.5,K); dome(6.5,RED); R(-1,hy-6,2,10,"#fff"); R(-6,hy-4,2,2,RED2); R(-7,hy+2,14,2,K);
+ // mochila FLiiTS
+ R(-9,-50-bob,18,16,LT); R(-8,-49-bob,16,14,K); R(-7,-48-bob,14,12,RED); R(-7,-48-bob,14,2,RED2); R(-7,-37-bob,14,1,RED3);
+ g.fillStyle="#fff"; for(const [a,b] of [[-4,-46],[-4,-45],[-4,-44],[-4,-43],[-4,-42],[-3,-46],[-2,-46],[-3,-44]]) g.fillRect(a,b-bob,1,1);
  g.restore();
 }
 
@@ -3247,6 +3256,23 @@ function openPanel(kick,title,html,btn,onDone,after){
 }
 function closePanel(){ if(open<0) return; open=-1; $("#lvlOv").hidden=true; const f=panelDone; panelDone=null; if(f) f(); }
 $("#clearBtn").addEventListener("click",closePanel);
+// Novedades del nuevo sistema de control de stock (se muestran en el panel de Azlan).
+function stockHTML(){
+  const F=[["Stock calculado solo","El stock de cada oficina se calcula con cada entrega, envío y recuento. En rojo lo que baja del punto de reposición.","Se apuntaba a mano en el Tracker EPIs"],
+           ["Envíos caja a caja","Se prepara y se recibe caja a caja; si no cuadra, se avisa. Lo que falta queda EN CAMINO.","No sabíamos qué faltaba al llegar"],
+           ["Pendientes de entrega","Lo que no hay en stock queda pendiente para ese rider y se entrega al volver a escanearlo.","Lo que faltaba se perdía de vista"],
+           ["Devoluciones y PPIs Returned","Devolución completa o incompleta, por producto. Si trae todo lo obligatorio, va solo a PPIs Returned.","Devoluciones sin registrar"],
+           ["Permisos y trazabilidad","Solo cuentas @fliits.com; cada oficina ve lo suyo y queda guardado quién registra cada cosa.","Cualquiera podía tocar el tracker"]];
+  return `<div class="retos-h" style="margin-top:22px">NUEVO SISTEMA DE STOCK</div>
+   ${K("st.intro","Del tracker a mano a una app de escaneo: así controlamos ahora los EPIs y las mochilas.","p","intro")}
+   <div class="quest" id="stQuest">${K("st.q0","Escaneo el QR del rider","div","qs")}${K("st.q1","Kit según su vehículo","div","qs")}${K("st.q2","Firma en el móvil o con QR","div","qs")}${K("st.q3","Stock descontado al momento","div","qs")}</div>
+   <div class="vsc"><div class="vh"></div><div class="vh">ANTES</div><div class="vh us">SISTEMA FLiiTS</div>
+   ${F.map((f,i)=>`<div class="vf">${K(`st.f${i}.t`,f[0],"b")}${K(`st.f${i}.d`,f[1],"span")}</div><div class="vno">✗ ${K(`st.f${i}.c`,f[2],"span")}</div><div class="vok">✓</div>`).join("")}</div>
+   <div class="src">${K("st.src","Control de stock FLiiTS · app web con cuenta @fliits.com · se sincroniza con los trackers cada 15 minutos","span")}</div>`;
+}
+function animStock(b){ const q=b.querySelector("#stQuest"); if(!q) return;
+  [...q.children].forEach((x,k)=>setTimeout(()=>{ if(open>0){ x.classList.add("on"); sfx.tick(); } },900+k*450));
+  b.querySelectorAll(".vok").forEach((v,k)=>setTimeout(()=>{ if(open>0){ v.classList.add("on"); sfx.coin(); } },2800+k*450)); }
 function openCityPanel(){
   const i=SCREENS.indexOf(scr), S=scr;
   if(S.type==="docs") return openMotoPanel(i);
@@ -3258,8 +3284,8 @@ function openCityPanel(){
     return `<div class="ccard">${K(`${id}.n`,c[0],"div","cn")}${K(`${id}.p`,c[1]||"—","div","cp")}
     <div class="cnums"><div><span>RIDERS</span>${K(`${id}.r`,c[2],"b","nr")}</div><div><span>MOTOS</span>${motos}</div></div>${bk}</div>`; }).join("");
   const html=`${K(`d2.${i}.intro`,S.intro,"p","intro")}<div class="runline">EN ESTA PARTIDA · ${S.c1.toUpperCase()}: ${c1} · ${S.c2.toUpperCase()}: ${c2}</div>
-    <div class="ccards${many?" many":""}">${cards}</div><div class="ctot" id="ctot"></div><div class="src">Riders contratados y tipo de vehículo según contrato · Rider forecast, 04/11/2026</div>${notes(`d.${i}.notes`,S.note)}`;
-  openPanel(`MUNDO ${i+1} · ${nm(S.who)}`,"¡PANTALLA SUPERADA!",html,"ENTER · GUARDAR MONEDA DE ORO",()=>finishScreen(i),b=>updTotals(b));
+    <div class="ccards${many?" many":""}">${cards}</div><div class="ctot" id="ctot"></div><div class="src">Riders contratados y tipo de vehículo según contrato · Rider forecast, 04/11/2026</div>${S.type==="epis"?stockHTML():""}${notes(`d.${i}.notes`,S.type==="epis"?S.note+" Después, el nuevo sistema de stock: escaneo del QR, kit según vehículo, firma y stock al momento; envíos caja a caja, pendientes, devoluciones y permisos por oficina.":S.note)}`;
+  openPanel(`MUNDO ${i+1} · ${nm(S.who)}`,"¡PANTALLA SUPERADA!",html,"ENTER · GUARDAR MONEDA DE ORO",()=>finishScreen(i),b=>{ updTotals(b); animStock(b); });
 }
 // Al acabar una pantalla: tarjeta de "¡PANTALLA SUPERADA!" (tapa el juego) y vuelta al selector.
 let winNext=null, winTimer=0;
