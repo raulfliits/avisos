@@ -734,6 +734,12 @@ body.theme-gb .mfleet img.fut{filter:none;opacity:.35}
 body.theme-gb .pick.unlock{animation:unlgb .9s steps(2) 3}
 @keyframes unlgb{50%{background:var(--g3);box-shadow:0 0 0 8px var(--g1)}}
 body.theme-gb .hud,body.theme-gb .hint{color:var(--g3)}
+body.theme-gb .modegame.arc{background:var(--g2)}
+body.theme-gb .modegame.arc .mg-panel{background:var(--g0);border:6px double var(--g3);box-shadow:0 0 0 4px var(--g0);border-radius:0;color:var(--g3)}
+body.theme-gb .modegame.arc .mg-panel h2{color:var(--g3);text-shadow:2px 2px 0 var(--g1)}
+body.theme-gb .modegame.arc .kick{color:var(--g2)}
+body.theme-gb .modegame.arc .mg-status,body.theme-gb .modegame.arc .foot{color:var(--g3)}
+body.theme-gb .modegame.arc .mg-scene{border-color:var(--g3);background:var(--g3)}
 </style>
 <style id="rpg-portatil">
 /* RPG · consola portátil de 4 tonos. Las medidas del interior van en cqw (ancho de la pantalla)
@@ -1129,9 +1135,9 @@ const CREW=[
   "....cC.Cc.Cc....",
   "...CCcCCcCCcC...",
   "....KcCCcCCK....",
-  "....ZZZDDZZZ....",
+  "....KDDDDDDK....",
   "....ZvKZZvKZ....",
-  "....ZZZDDZZZK...",
+  "....KDDDDDDdK...",
   "....KDDDDDDK....",
   "....KDDKKDDK....",
   ".....KDDDDK.....",
@@ -2072,6 +2078,8 @@ function arcTick(){
  const g=cv.getContext("2d"), A=ARC_GAMES[mg.ci]; g.imageSmoothingEnabled=false;
  if(mg.state==="play") A.update(mg.G);
  A.draw(g,mg.G); arcDrawBanner(g,cv.width,cv.height);
+ // en el RPG, la máquina se ve en los 4 tonos de la paleta Game Boy
+ if(activeGameMode==="rpg") gbQuantize(cv,GP);
  if(mg&&mg.state==="won"&&mg.t>=mg.endAt) arcDone();
 }
 function arcPress(b){
