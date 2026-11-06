@@ -658,6 +658,27 @@ body.theme-gb .pick .ck{background:var(--g3);border-color:var(--g0);box-shadow:0
 body.theme-gb .pick .ck::after{border-color:var(--g0)}
 body.theme-gb .pick.done{border-color:var(--g3)}
 </style>
+<style id="repartidor">
+.roster.five{grid-template-columns:repeat(5,minmax(0,1fr))}
+.pick.rep canvas{height:clamp(96px,13cqw,192px)}
+/* Consola: selectores compactos para que todo quepa dentro de la pantalla */
+html.frame-gb .sel-ov h2{font-size:12px;margin:0 0 4px}
+html.frame-gb .sel-ov p{font-size:13px;line-height:1.1;margin:0 0 6px}
+html.frame-gb .roster,html.frame-gb .roster.five{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+html.frame-gb .roster.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+html.frame-gb .pick{padding:5px 3px 6px;gap:3px;border-width:2px}
+html.frame-gb .pick canvas{height:40px!important;width:auto;max-width:100%}
+html.frame-gb .pick.veh canvas{height:auto!important;width:100%}
+html.frame-gb .pick .ped{height:4px;width:70%;box-shadow:0 2px 0 var(--edge)}
+html.frame-gb .pick .pn{font-size:6px}
+html.frame-gb .pick .pr{font-size:11px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+html.frame-gb .pick .coinbadge{font-size:5px;padding:3px 4px}
+html.frame-gb .pick .ck{width:16px;top:3px;right:3px;border-width:2px}
+html.frame-gb .pick.on::before{top:-12px;border-width:8px 6px 0}
+html.frame-gb .pick.veh .vst{font-size:5px;gap:2px 4px}
+html.frame-gb #pilotNote{font-size:12px!important;margin:6px 0 4px!important}
+html.frame-gb #selectBack,html.frame-gb #vehBack,html.frame-gb #ridBack{font-size:7px;padding:6px 8px;margin-top:4px}
+</style>
 <style id="tema-gameboy">
 /* Tema Game Boy: al elegir RPG, selector, resultados, pausa y créditos pasan a los 4 tonos
    de la paleta del juego (--g0 claro … --g3 oscuro). Se redefinen las variables de color
@@ -846,6 +867,16 @@ body.theme-gb .hud,body.theme-gb .hint{color:var(--g3)}
     <div class="roster" id="roster"></div>
     <p style="margin-top:22px" id="pilotNote"></p>
     <button class="btn ghost" id="selectBack" type="button">← VOLVER A MODOS DE JUEGO</button>
+  </div>
+</div>
+
+<!-- Repartidor select -->
+<div class="ov sel-ov" id="ridOv" hidden>
+  <div style="width:100%">
+    <h2>ELIGE REPARTIDOR</h2>
+    <p>Todos van de FLiiTS · ← → para elegir · ENTER para continuar · ESC volver</p>
+    <div class="roster" id="rroster"></div>
+    <button class="btn ghost" id="ridBack" type="button">← VOLVER A JUGADORES</button>
   </div>
 </div>
 
@@ -1154,8 +1185,8 @@ const VEH=[
 ];
 const riderCache={};
 function composeRider(ci,vi,f){
-  const key=ci+"-"+vi+"-"+f; if(riderCache[key]) return riderCache[key];
-  const c=CREW[ci], W=68, H=44, cv=document.createElement("canvas"); cv.width=W; cv.height=H;
+  const c=typeof ci==="object"?ci:CREW[ci], key=(c.key||ci)+"-"+vi+"-"+f; if(riderCache[key]) return riderCache[key];
+  const W=68, H=44, cv=document.createElement("canvas"); cv.width=W; cv.height=H;
   const g=cv.getContext("2d"); g.translate(4,0); const pants=PAL[c.pants], sleeve=PAL[c.sleeve], skin=PAL[c.skin], K="#1b1212";
   let sx,sy,ax,hand,topY;
   if(vi===0){ // moto
@@ -1419,7 +1450,9 @@ let pick=0, veh=0, score=0, coins=0, c1=0, c2=0, docs=0, hireN=0;
 const pl={x:40,y:GY,vx:0,vy:0,on:true,flip:false,step:0};
 const dog={x:0,flip:false,step:0};
 let cam=0, keys={}, auto=false, plats=[], coinsArr=[], TOPS=[], npcs=[], proj=[], fx=[], bubbles=[], placeEls=[], bossS={on:false,t:0}, lastShot=0;
-const RH=()=>composeRider(pick,veh,0).h;
+// El repartidor (pick 4) no está en la plantilla: se usa su sprite de rider FLiiTS.
+const pickRider=()=>pick===4?repSpr():pick;
+const RH=()=>composeRider(pickRider(),veh,0).h;
 const headY=()=>pl.y-RH()-2;
 const gold=()=>DONE().filter(Boolean).length;
 
@@ -1544,7 +1577,7 @@ function physics(){
   if(!bossS.on && pl.x>=stopX()-1) startBoss();
 }
 function followCam(t){ cam+=(t-cam)*.12; cam=Math.max(0,Math.min(scr.len-VW,cam)); }
-function moveDog(){ if(!CREW[pick].dog) return; const tgt=pl.x+(pl.flip?44:-44), ox=dog.x; dog.x+=(tgt-dog.x)*.08; const dv=dog.x-ox; if(Math.abs(dv)>.15){ dog.flip=dv<0; dog.step++; } }
+function moveDog(){ if(!(CREW[pick]||{}).dog) return; const tgt=pl.x+(pl.flip?44:-44), ox=dog.x; dog.x+=(tgt-dog.x)*.08; const dv=dog.x-ox; if(Math.abs(dv)>.15){ dog.flip=dv<0; dog.step++; } }
 
 /* ---------- BOSSES ---------- */
 function startBoss(){ bossS={on:true,t:0,epiTip:1}; if(scr.type==="epis"){ const x0=scr.len-230; bossS.rec=[0,1,2].map(i=>({x:x0+80+i*27,look:LOOKS[(i+1)%6],gear:{}})); } auto=false; keys={}; pl.vx=0; pl.flip=false; }
@@ -1807,7 +1840,7 @@ function openRaulPanel(){
 }
 
 let bagDocs=0;
-function boxWorld(){ const R=composeRider(pick,veh,0), d=R.ax-R.bxc; return {x:pl.flip?pl.x+d:pl.x-d, y:pl.y-R.H+1+R.byt}; }
+function boxWorld(){ const R=composeRider(pickRider(),veh,0), d=R.ax-R.bxc; return {x:pl.flip?pl.x+d:pl.x-d, y:pl.y-R.H+1+R.byt}; }
 const bagX=()=>boxWorld().x, handX=()=>pl.x+(pl.flip?-3:3);
 function drawDocBag(c){
   const bw=boxWorld(), n=Math.min(bagDocs,6), K="#1b1212";
@@ -1849,9 +1882,9 @@ function drawPlay(){
       if(Math.abs(p.tx-p.x)<3){ if(p.rec){ p.rec.gear[p.item]=1; sfx.coin(); } else tone(200,.06,0,"square",.07); return false; } return p.life>0; }
     if(p.type==="conf"){ p.x+=p.vx+Math.sin((frame+p.y)/9)*.3; p.y+=p.vy; ctx.fillStyle=p.c; ctx.fillRect(Math.round(p.x-c),Math.round(p.y),2,2); return p.life>0&&p.y<GY; }
     return false; });
-  if(CREW[pick].dog) drawPal(ctx,DOG[(dog.step>>3)&1],Math.round(dog.x-14-c),GY-18,DOGPAL,dog.flip);
+  if((CREW[pick]||{}).dog) drawPal(ctx,DOG[(dog.step>>3)&1],Math.round(dog.x-14-c),GY-18,DOGPAL,dog.flip);
   if(bossS.charge){ const r=6+((frame>>1)%4)*2; ctx.fillStyle=(frame>>1)&1?"rgba(255,255,255,.7)":"rgba(255,210,63,.7)"; ctx.fillRect(Math.round(pl.x+10-c-r/2),Math.round(pl.y-22-r/2),r,r); }
-  const R=composeRider(pick,veh,(pl.step>>2)&3), ry=Math.round(pl.y-R.H+1+((veh===0&&pl.on&&Math.abs(pl.vx)>.3&&(frame>>1)&1)?1:0));
+  const R=composeRider(pickRider(),veh,(pl.step>>2)&3), ry=Math.round(pl.y-R.H+1+((veh===0&&pl.on&&Math.abs(pl.vx)>.3&&(frame>>1)&1)?1:0));
   if(pl.flip){ ctx.save(); ctx.translate(Math.round(pl.x+R.ax-c),ry); ctx.scale(-1,1); ctx.drawImage(R.cv,0,0); ctx.restore(); } else ctx.drawImage(R.cv,Math.round(pl.x-R.ax-c),ry);
   if(scr.type==="docs") drawDocBag(c);
   if(bossS.coin) bigCoin(bossS.coin.x-c,bossS.coin.y,frame);
@@ -1921,6 +1954,7 @@ const ARC_INFO={
  0:{title:"PINBALL DE CONTRATACIÓN",w:204,h:368,help:"A: LANZAR LA BOLA · ← →: FLIPPERS · B: GOLPE DOBLE. ¡Dale a los aspirantes para contratarlos!"},
  2:{title:"GRÚA DE MOTOS",w:200,h:300,help:"← →: MOVER LA GRÚA · A: BAJAR. Solo cuentan las MOTOS: ¡saca 3!"},
  3:{title:"EPI SHOOTER",w:192,h:144,help:"↑ ↓: ANDAR · ← →: GIRAR · A: LANZAR EPI · B: CAMBIAR EPI. ¡Viste a 3 riders de FLiiTS!"},
+ 4:{title:"MODO REPARTIDOR",w:224,h:160,help:"← →: CAMBIAR DE CARRIL · ↑: ACELERAR · ↓/B: FRENAR · A: CLAXON / ENTREGAR. Para en los semáforos en rojo y entrega en el carril derecho, junto a la casa del cliente."},
  1:{title:"CONTROL DE CITAS",w:192,h:160,help:"FLECHAS: MOVER EL ESCÁNER · A: PASA A FORMACIÓN · B: NO PASA. Solo pasa quien tiene cita HOY."}
 };
 const ARC_GAMES={};
@@ -1931,20 +1965,21 @@ function arcText(g,t,x,y,col,align="center",size=8){ g.font=`${size}px "Press St
 function arcBubble(g,t,x,y,col="#fff",bg="#120b0c"){ g.font='8px "Press Start 2P"'; const w=Math.ceil(g.measureText(t).width)+8; const bx=Math.round(Math.max(2,Math.min(g.canvas.width-w-2,x-w/2)));
  g.fillStyle=bg; g.fillRect(bx,y,w,13); g.strokeStyle=col; g.lineWidth=1; g.strokeRect(bx+.5,y+.5,w-1,12); g.fillStyle=col; g.textAlign="left"; g.textBaseline="top"; g.fillText(t,bx+4,y+3); }
 function drawItem(g,it,x,y,sc=1){ g.save(); g.translate(Math.round(x),Math.round(y)); g.scale(sc,sc); drawPal(g,ITEM[it],0,0,IPAL); g.restore(); }
-function customStart(ci){ gamePaused=false; $("#pauseScreen").classList.remove("show"); if(activeGameMode==="rpg"){ rpgStart(ci); return; } arcStart(ci); }
+function customStart(ci){ gamePaused=false; $("#pauseScreen").classList.remove("show"); if(activeGameMode==="rpg"&&ci!==4){ rpgStart(ci); return; } arcStart(ci); }
 function arcStart(ci){
  const I=ARC_INFO[ci], ov=$("#modeGameOv"); ov.classList.remove("rpg-classic"); ov.classList.add("arc"); ov.hidden=false;
- $("#mgKick").textContent="MINI ARCADE · "+nm(ci); $("#mgTitle").textContent=I.title;
+ $("#mgKick").textContent=ci===4?"MODO REPARTIDOR · "+repName():"MINI ARCADE · "+nm(ci); $("#mgTitle").textContent=I.title;
  $("#mgScene").innerHTML=`<div class="arc-wrap" style="--ar:${I.w}/${I.h}"><canvas id="arcCv" width="${I.w}" height="${I.h}"></canvas></div>`;
  $("#mgStatus").textContent=I.help; $("#mgActions").innerHTML=""; $("#mgTeam").textContent="";
  mg={typ:"arcade",ci,hires:0,c1:0,c2:0,t:0,state:"play",ban:null,G:null}; mg.G=ARC_GAMES[ci].init(); arcProgress();
 }
-function arcProgress(){ if(!mg) return; $("#mgProgress").textContent=mg.ci===1?`ACIERTOS ${mg.c1} · FALLOS ${mg.c2}/3`:`CONTRATADOS ${mg.hires}/3`; }
+function arcProgress(){ if(!mg) return; $("#mgProgress").textContent=mg.ci===4?`PEDIDOS ${mg.c1}/3 · ESTADO ${Math.max(0,Math.round(mg.G?mg.G.estado:100))}%`:mg.ci===1?`ACIERTOS ${mg.c1} · FALLOS ${mg.c2}/3`:`CONTRATADOS ${mg.hires}/3`; }
 function arcBanner(t,sub,n=90){ mg.ban={t,sub,n,t0:mg.t}; }
 function arcHire(name){ mg.hires++; sfx.power(); arcProgress(); if(mg.hires>=3) arcWin(); else arcBanner("¡CONTRATADO!",(name?name+" · ":"")+mg.hires+"/3",80); }
-function arcWin(){ mg.state="won"; arcBanner(mg.ci===1?"¡OFICINA EN ORDEN!":"¡3 CONTRATADOS!","¡MONEDA DE ORO!",180); setTimeout(()=>{ sfx.win(); sfx.coin(); },250); mg.endAt=mg.t+180; }
+function arcWin(){ mg.state="won"; arcBanner(mg.ci===4?"¡REPARTIDOR DEL MES!":mg.ci===1?"¡OFICINA EN ORDEN!":"¡3 CONTRATADOS!",mg.ci===4?"3 PEDIDOS ENTREGADOS":"¡MONEDA DE ORO!",180); setTimeout(()=>{ sfx.win(); sfx.coin(); },250); mg.endAt=mg.t+180; }
 function arcLose(why){ mg.state="lost"; arcBanner("GAME OVER",why,1e9); sfx.hit(); }
-function arcDone(){ const ci=mg.ci, a=mg.c1, b=mg.c2; mg=null; const ov=$("#modeGameOv"); ov.hidden=true; ov.classList.remove("arc");
+function arcDone(){ const ci=mg.ci, a=mg.c1, b=mg.c2, stars=ci===4?mg.G.stars:0; mg=null; const ov=$("#modeGameOv"); ov.hidden=true; ov.classList.remove("arc");
+ if(ci===4){ saved["rep.done"]="1"; persist(); showRepWin(stars); return; }
  if(ci===1){ c1=a; c2=b; openRaulPanel(); return; } scr=SCREENS[SCREEN_OF[ci]]; c1=a; c2=b; openCityPanel(); }
 function arcTick(){
  if(!mg||mg.typ!=="arcade") return; const cv=$("#arcCv"); if(!cv) return; mg.t++;
@@ -2285,6 +2320,186 @@ ARC_GAMES[1]={
  }
 };
 
+
+/* --- MODO REPARTIDOR (se desbloquea al llegar a los créditos) ---
+   Eliges un rider vestido de FLiiTS y su vehículo; te entra un pedido y tienes que llevarlo
+   a casa del cliente por una calle de 4 carriles: adelantar, esquivar y parar en los semáforos. */
+const REP_RIDERS=[{name:"AAMIR",look:0},{name:"SAIRA",look:4},{name:"NIL",look:3},{name:"AYESHA",look:1}];
+let repLook=0;
+const repUnlocked=()=>saved["rep.on"]==="1", repDone=()=>saved["rep.done"]==="1";
+function unlockRep(){ if(repUnlocked()) return false; saved["rep.on"]="1"; persist(); return true; }
+function repName(){ return REP_RIDERS[repLook].name; }
+// Sprite lateral del rider (para el selector de vehículo): la plantilla de aspirante con ropa FLiiTS.
+const repSprCache={};
+function repSpr(){ const L=REP_RIDERS[repLook].look; if(repSprCache[L]) return repSprCache[L];
+ const dark=parseInt(LOOKS[L].S.slice(1,3),16)<0xb0, sk=dark?"D":"S", sk2=dark?"d":"s";
+ const spr=CAND_T.map(r=>r.replace(/[SsCcPb]/g,ch=>({S:sk,s:sk2,C:"R",c:"r",P:"N",b:LOOKS[L].beard?"H":sk})[ch]));
+ return repSprCache[L]={key:"rep"+L,spr,pants:"N",sleeve:"R",skin:sk,helm:3}; }
+function repStand(i){ const c=document.createElement("canvas"); c.width=40; c.height=28; drawPerson(c.getContext("2d"),LOOKS[REP_RIDERS[i].look],20,3,false,0,GEAR_ALL); return c; }
+function repSelCanvas(){ const c=document.createElement("canvas"); c.width=40; c.height=28; drawPerson(c.getContext("2d"),LOOKS[0],20,3,false,0,GEAR_ALL); return c; }
+function showRid(){ mode="rid"; $("#selOv").hidden=true; $("#ridOv").hidden=false; buildRid(); }
+function buildRid(){ const r=$("#rroster"); r.innerHTML="";
+ REP_RIDERS.forEach((R,i)=>{ const b=document.createElement("div"); b.className="pick"+(i===repLook?" on":""); b.tabIndex=0; b.setAttribute("role","button");
+  b.appendChild(themed(repStand(i))); b.insertAdjacentHTML("beforeend",`<div class="ped"></div><div class="pn">${R.name}</div><div class="pr">Rider FLiiTS</div>`);
+  b.addEventListener("click",()=>{ repLook=i; confirmRid(); }); r.appendChild(b); }); }
+function confirmRid(){ $("#ridOv").hidden=true; sfx.select(); showVeh(); }
+$("#ridBack").addEventListener("click",()=>{ $("#ridOv").hidden=true; showSelect(); });
+
+const REP_ORDERS=[
+ {rest:"PIZZERIA NAPOLI",food:"2 PIZZAS",addr:"C/ MALLORCA 140",dist:520,icon:0,target:40},
+ {rest:"SUSHI GRÀCIA",food:"SUSHI PARA 4",addr:"AV. DIAGONAL 520",dist:680,icon:3,target:52},
+ {rest:"BURGER SANTS",food:"3 HAMBURGUESAS",addr:"GRAN VIA 610",dist:840,icon:1,target:64}
+];
+/* Vista trasera en perspectiva (estilo arcade de carreras): calzada de 4 carriles, cámara detrás del rider. */
+const RW=2, LANES=[-1.5,-.5,.5,1.5], CH=1.4, FOC=90, HZ=64, ZP=1.6;
+const CAR_COLS=["#2f6fe0","#e8e8e8","#62d26f","#c45a83","#ff8a5c","#8a94aa","#ffd23f"];
+const VDIM={car:{w:.8,h:.62,len:1.8},taxi:{w:.8,h:.62,len:1.8},van:{w:.9,h:.95,len:2.2},bus:{w:1,h:1.45,len:4.5},moto:{w:.3,h:.8,len:.9}};
+function repLight(I,t){ const k=(t+I.off)%420; return k<210?"G":k<260?"Y":"R"; }
+function repCurve(s){ return Math.sin(s/90)*.55+Math.sin(s/37)*.2; }
+ARC_GAMES[4]={
+ init(){ return {W:224,H:160,order:0,phase:"order",t:0,done:0,estado:100,multas:0,choques:0,stars:0,s:0,v:0,lane:1,x:LANES[1],traffic:[],cross:[],inter:[],sky:0}; },
+ startOrder(G){ const O=REP_ORDERS[G.order]; Object.assign(G,{phase:"ride",s:0,v:0,lane:1,x:LANES[1],traffic:[],cross:[],inv:0,brake:0,horn:0,dest:O.dist,time:0,deliverT:0,
+   inter:Array.from({length:Math.floor((O.dist-100)/150)},(_,i)=>({s:110+i*150,off:(i*130+G.order*70)%420,passed:false}))}); arcProgress(); },
+ press(G,b){
+  if(G.phase==="order"){ if(b==="A"){ sfx.open(); this.startOrder(G); } return; }
+  if(G.phase==="delivered"){ if(b==="A"){ G.order++; if(G.order>=REP_ORDERS.length) arcWin(); else { G.phase="order"; sfx.select(); } } return; }
+  if(G.phase!=="ride") return;
+  if(b==="LEFT"&&G.lane>0){ G.lane--; tone(500,.03); } if(b==="RIGHT"&&G.lane<3){ G.lane++; tone(500,.03); }
+  if(b==="B") G.brake=18;
+  if(b==="A"&&Math.abs(G.dest-G.s-ZP)<4&&G.lane===3&&G.v<.2){ G.v=0; this.deliver(G); return; }
+  if(b==="A"){ G.horn=14; tone(440,.12,0,"square",.05); tone(554,.12,0,"square",.05);
+   const ps=G.s+ZP, ah=G.traffic.find(c=>c.lane===G.lane&&c.s>ps&&c.s-ps<14&&c.type!=="bus"); if(ah&&ah.mv==null){ const to=ah.lane+(ah.lane<3?1:-1); if(!G.traffic.some(o=>o.lane===to&&Math.abs(o.s-ah.s)<5)) ah.mv=to; } }
+ },
+ update(G){
+  G.t++; if(G.phase!=="ride") return;
+  const P=[{max:.55,acc:.008,turn:.08},{max:.4,acc:.006,turn:.11},{max:.46,acc:.007,turn:.095}][veh];
+  const braking=keys.ArrowDown||keys.s||G.brake>0; if(G.brake>0) G.brake--; if(G.horn>0) G.horn--; if(G.inv>0) G.inv--;
+  G.braking=braking; if(braking) G.v=Math.max(0,G.v-.02); else G.v=Math.min(P.max*((keys.ArrowUp||keys.w)?1:.88),G.v+P.acc);
+  const tx=LANES[G.lane]; G.x+=Math.sign(tx-G.x)*Math.min(Math.abs(tx-G.x),P.turn); G.lean=tx-G.x;
+  const prev=G.s+ZP; G.s+=G.v; G.time++; const ps=G.s+ZP; G.sky+=repCurve(G.s)*G.v*6;
+  // semáforos: multa al cruzar en rojo; con tu rojo pasan coches por el cruce
+  G.inter.forEach(I=>{ const L=repLight(I,G.t);
+   if(!I.passed&&prev<I.s&&ps>=I.s){ I.passed=true; if(L==="R"){ G.estado-=15; G.multas++; sfx.hit(); arcBanner("¡SEMÁFORO EN ROJO!","MULTA · PEDIDO -15%",70); } }
+   if(L==="R"&&I.s-G.s<70&&I.s-G.s>-4&&G.t%40===0){ const fromL=Math.random()<.5; G.cross.push({s:I.s+(fromL?3:7),x:fromL?-9:9,dx:fromL?.16:-.16,col:CAR_COLS[(G.t>>3)%CAR_COLS.length]}); } });
+  G.cross=G.cross.filter(c=>{ c.x+=c.dx; if(G.inv<=0&&Math.abs(c.s-ps)<1.1&&Math.abs(c.x-G.x)<1) this.crash(G,"¡CUIDADO EN EL CRUCE!"); return Math.abs(c.x)<10; });
+  // tráfico: coches, taxis, buses, furgonetas y motos; frenan en rojo y a veces cambian de carril
+  for(let k=0;k<3&&G.traffic.length<9&&G.s<G.dest-30;k++){ const lane=(Math.random()*4)|0, s=G.s+45+Math.random()*70; if(G.traffic.some(c=>c.lane===lane&&Math.abs(c.s-s)<8)) continue;
+   const r=Math.random(), type=r<.1?"bus":r<.3?"taxi":r<.45?"van":r<.62?"moto":"car";
+   G.traffic.push({lane,x:LANES[lane],s,type,v:type==="bus"?.18:type==="moto"?.34+Math.random()*.08:.2+Math.random()*.16,col:CAR_COLS[(Math.random()*CAR_COLS.length)|0],len:VDIM[type].len,mv:null,blink:0}); }
+  G.traffic.forEach(c=>{ let want=c.base||(c.base=c.v);
+   const ah=G.traffic.filter(o=>o!==c&&o.lane===c.lane&&o.s>c.s).sort((a,b)=>a.s-b.s)[0]; if(ah&&ah.s-c.s<ah.len/2+c.len/2+1.5) want=Math.min(want,ah.v-.01);
+   G.inter.forEach(I=>{ const d=I.s-.5-(c.s+c.len/2); if(d>-.3&&d<12&&repLight(I,G.t)!=="G") want=Math.min(want,Math.max(0,d/30)); });
+   c.braking=want<c.v-.005; c.v+=Math.sign(want-c.v)*Math.min(Math.abs(want-c.v),.01); c.v=Math.max(0,c.v); c.s+=c.v;
+   if(c.mv==null&&c.type!=="bus"&&Math.random()<.0015){ const to=c.lane+(Math.random()<.5?-1:1); if(to>=0&&to<4&&!G.traffic.some(o=>o!==c&&o.lane===to&&Math.abs(o.s-c.s)<6)) c.mv=to; }
+   if(c.mv!=null){ c.blink++; if(c.blink>40){ const tx=LANES[c.mv]; c.x+=Math.sign(tx-c.x)*Math.min(Math.abs(tx-c.x),.03); if(Math.abs(c.x-tx)<.01){ c.lane=c.mv; c.mv=null; c.blink=0; } } }
+   if(G.inv<=0&&Math.abs(c.x-G.x)<VDIM[c.type].w/2+.25&&Math.abs(c.s-ps)<c.len/2+.5) this.crash(G,c.type==="bus"?"¡CHOQUE CON EL BUS!":"¡CHOQUE!"); });
+  G.traffic=G.traffic.filter(c=>c.s>G.s-2&&c.s<G.s+160);
+  // entrega: parado en el carril derecho junto a la casa del cliente
+  const d=G.dest-ps;
+  if(Math.abs(d)<3&&G.lane===3&&G.v<.04&&Math.abs(G.x-LANES[3])<.05){ if(++G.deliverT>20) this.deliver(G); } else G.deliverT=0;
+  if(d<-8){ G.dest=ps+70; G.time+=300; arcBanner("¡TE LO HAS PASADO!","VUELTA A LA MANZANA · +5 s",80); sfx.back(); }
+  if(G.estado<=0) arcLose("¡EL PEDIDO HA LLEGADO DESTROZADO!");
+  arcProgress();
+ },
+ crash(G,msg){ G.inv=70; G.v=0; G.estado-=20; G.choques++; sfx.hit(); arcBanner(msg,"PEDIDO -20%",60); },
+ deliver(G){ const O=REP_ORDERS[G.order], sec=G.time/60; G.phase="delivered"; G.done++;
+  G.lastStars=(G.estado>=80&&sec<=O.target?3:G.estado>=50?2:1); G.stars+=G.lastStars; G.lastTime=sec; sfx.win(); mg.c1=G.done; arcProgress(); },
+ draw(g,G){
+  const W=G.W,H=G.H,K="#1b1212",t=G.t, cam=G.x*.85, cv=repCurve(G.s);
+  // cielo y skyline de Barcelona
+  let gr=g.createLinearGradient(0,0,0,HZ); gr.addColorStop(0,"#3a7bd5"); gr.addColorStop(1,"#bfe3ff"); g.fillStyle=gr; g.fillRect(0,0,W,HZ);
+  g.fillStyle="#fff"; for(let i=0;i<4;i++){ const x=((i*71-G.sky*.3)%(W+60)+W+60)%(W+60)-30; g.fillRect(x,10+i*7,22,4); g.fillRect(x+4,7+i*7,12,3); }
+  const sk=((-G.sky*.6)%W+W)%W; g.fillStyle="#7d8fb5";
+  for(const off of [sk-W,sk]){ g.beginPath(); g.moveTo(off,HZ); g.lineTo(off+30,HZ-14); g.lineTo(off+70,HZ-8); g.lineTo(off+110,HZ-16); g.lineTo(off+160,HZ-6); g.lineTo(off+W,HZ); g.fill();
+   g.fillStyle="#6a7ca3"; [[18,10],[60,22],[64,30],[68,28],[72,22],[130,18],[180,12]].forEach(([x,h])=>g.fillRect(off+x,HZ-h,3,h)); g.beginPath(); g.ellipse(off+131,HZ-18,3,5,0,Math.PI,0); g.fill(); g.fillStyle="#7d8fb5"; }
+  // calzada por líneas (perspectiva)
+  const shift=z=>cv*z*1.6;
+  for(let y=HZ+1;y<H;y++){ const z=CH*FOC/(y-HZ), sr=G.s+z, sc=FOC/z, cx=W/2-cam*sc+shift(z), rw=RW*sc, seg=Math.floor(sr/2)&1;
+   const inX=(G.inter||[]).some(I=>sr>=I.s&&sr<I.s+10), zebra=(G.inter||[]).some(I=>sr>=I.s-2&&sr<I.s);
+   g.fillStyle=inX?"#4a4a52":seg?"#c9c0ae":"#bdb39f"; g.fillRect(0,y,W,1);
+   g.fillStyle=inX?"#4a4a52":seg?"#45454e":"#41414a"; g.fillRect(Math.round(cx-rw),y,Math.round(rw*2),1);
+   if(!inX){ g.fillStyle=seg?"#d62839":"#fff"; g.fillRect(Math.round(cx-rw-.12*sc),y,Math.max(1,Math.round(.12*sc)),1); g.fillRect(Math.round(cx+rw),y,Math.max(1,Math.round(.12*sc)),1);
+    if(seg&&!zebra){ g.fillStyle="#e8e8e8"; [-1,0,1].forEach(l=>g.fillRect(Math.round(cx+l*sc-.04*sc),y,Math.max(1,Math.round(.08*sc)),1)); } }
+   if(zebra){ g.fillStyle="#f2f2f2"; for(let k=-RW+.1;k<RW;k+=.36) g.fillRect(Math.round(cx+k*sc),y,Math.max(1,Math.round(.2*sc)),1); }
+   if(sr>=G.dest-1&&sr<G.dest+1&&G.phase!=="order"){ g.fillStyle="rgba(98,210,111,.45)"; g.fillRect(Math.round(cx+sc),y,Math.round(sc),1); } }
+  // objetos de la calle (de lejos a cerca)
+  const proj=(s,x)=>{ const z=s-G.s; if(z<.35) return null; const sc=FOC/z; return {z,sc,x:W/2+(x-cam)*sc+shift(z),y:HZ+CH*sc}; };
+  const objs=[], s0=Math.floor(G.s/6)*6;
+  for(let s=s0;s<G.s+110;s+=6){ if((G.inter||[]).some(I=>s>=I.s-3&&s<I.s+11)) continue; objs.push({s,k:"bld",x:-3.7,i:s/6}); objs.push({s,k:"bld",x:3.7,i:s/6+7}); if((s/6)%2===0){ objs.push({s:s+3,k:"tree",x:-2.45}); objs.push({s:s+3,k:"tree",x:2.45}); } }
+  (G.inter||[]).forEach(I=>{ objs.push({s:I.s-.6,k:"light",x:2.35,I}); objs.push({s:I.s-.6,k:"light",x:-2.35,I,small:1}); });
+  if(G.phase!=="order") objs.push({s:G.dest,k:"house",x:3.2});
+  (G.traffic||[]).forEach(c=>objs.push({s:c.s,k:"car",x:c.x,c})); (G.cross||[]).forEach(c=>objs.push({s:c.s,k:"cross",x:c.x,c}));
+  objs.map(o=>({o,p:proj(o.s,o.x)})).filter(q=>q.p&&q.p.z<115).sort((a,b)=>b.p.z-a.p.z).forEach(({o,p})=>{
+   const sc=p.sc, R=(x,y,w,h,c)=>{ g.fillStyle=c; g.fillRect(Math.round(x),Math.round(y),Math.max(1,Math.round(w)),Math.max(1,Math.round(h))); };
+   if(o.k==="bld"){ const w=4.2*sc, h=3.6*sc, x=p.x-w/2, y=p.y-h, cols=["#e8d2a8","#d9b98c","#f0e0c0","#d0a878","#e0c8b0"];
+    R(x,y,w,h,cols[Math.abs(Math.round(o.i))%5]); R(x,y,w,.18*sc,"#a8865c");
+    if(sc>3) for(let r=0;r<4;r++) for(let q=0;q<3;q++){ R(x+(.45+q*1.25)*sc,y+(.45+r*.8)*sc,.55*sc,.45*sc,"#5a4030"); R(x+(.35+q*1.25)*sc,y+(.9+r*.8)*sc,.75*sc,.06*sc,"#2a2a2a"); }
+    if(sc>3) R(x+1.7*sc,p.y-.9*sc,.8*sc,.9*sc,"#7a4a2a"); }
+   else if(o.k==="tree"){ R(p.x-.05*sc,p.y-1.1*sc,.1*sc,1.1*sc,"#5a3a24"); g.fillStyle="#2f7d3a"; g.beginPath(); g.arc(p.x,p.y-1.4*sc,.55*sc,0,7); g.fill(); g.fillStyle="#62b85c"; g.beginPath(); g.arc(p.x-.15*sc,p.y-1.55*sc,.22*sc,0,7); g.fill(); }
+   else if(o.k==="light"){ const L=repLight(o.I,t); R(p.x-.04*sc,p.y-2.4*sc,.08*sc,2.4*sc,"#333"); R(p.x-.18*sc,p.y-3*sc,.36*sc,.9*sc,K);
+    [["R","#ff2a2a"],["Y","#ffd23f"],["G","#62d26f"]].forEach(([k,c],i)=>{ g.fillStyle=L===k?c:"#3a3a3a"; g.beginPath(); g.arc(p.x,p.y-(2.85-i*.3)*sc,.11*sc,0,7); g.fill(); if(L===k&&sc>6){ g.fillStyle="rgba(255,255,255,.4)"; g.fillRect(p.x-.04*sc,p.y-(2.9-i*.3)*sc,.05*sc,.05*sc); } }); }
+   else if(o.k==="house"){ const w=3*sc, h=2.6*sc, x=p.x-w/2, y=p.y-h; R(x,y,w,h,"#62d26f"); R(x,y,w,.25*sc,"#2f7d3a"); R(x+.3*sc,y+.6*sc,.7*sc,.6*sc,"#9fd8ff"); R(x+1.9*sc,y+.6*sc,.7*sc,.6*sc,"#9fd8ff"); R(x+1.1*sc,y+1.4*sc,.7*sc,1.2*sc,"#7a4a2a");
+    const pc=personCv(2,{}); if(sc>2) g.drawImage(pc,Math.round(p.x-1.6*sc),Math.round(p.y-1.6*sc),Math.round(.95*sc),Math.round(1.6*sc));
+    g.fillStyle="#d62839"; g.beginPath(); g.arc(p.x,y-.9*sc,.45*sc,Math.PI,0); g.lineTo(p.x,y-.1*sc); g.closePath(); g.fill(); g.fillStyle="#fff"; g.beginPath(); g.arc(p.x,y-.95*sc,.15*sc,0,7); g.fill();
+    if(sc>4) arcText(g,"CLIENTE",p.x,y-2*sc,"#62d26f"); }
+   else if(o.k==="car") repRear(g,p.x,p.y,sc,o.c.type,o.c.col,o.c.braking,o.c.mv!=null&&o.c.blink<=40?(o.c.mv>o.c.lane?1:-1):0,t);
+   else if(o.k==="cross") repSide(g,p.x,p.y,sc,o.c.col,o.c.dx>0);
+  });
+  if(G.phase!=="order") repPlayer(g,W/2+(G.x-cam)*FOC/ZP,H-4,G.inv>0&&(t>>2)&1,G.lean||0,G.braking,t,G.v);
+  if(G.horn>0) arcText(g,"¡PIII!",W/2,H-60,"#ffd23f");
+  // marcador
+  g.fillStyle="rgba(18,11,12,.85)"; g.fillRect(0,0,W,20); const O=REP_ORDERS[Math.min(G.order,REP_ORDERS.length-1)];
+  g.save(); g.translate(4,4); g.scale(1.5,1.5); drawFood(g,O.icon,0,0); g.restore();
+  arcText(g,`PEDIDO ${Math.min(G.order+1,3)}/3`,22,2,"#ffd23f","left"); const sec=Math.floor((G.time||0)/60); arcText(g,`${String(sec/60|0).padStart(2,"0")}:${String(sec%60).padStart(2,"0")}`,W-4,2,"#fff","right");
+  g.fillStyle="#333"; g.fillRect(22,12,70,5); g.fillStyle=G.estado>60?"#62d26f":G.estado>30?"#ffd23f":"#ff4a5c"; g.fillRect(22,12,Math.max(0,70*G.estado/100),5);
+  if(G.phase==="ride"){ const k=Math.max(0,Math.min(1,(G.s+ZP)/G.dest)); g.fillStyle="#333"; g.fillRect(100,12,80,5); g.fillStyle="#d62839"; g.fillRect(100,12,80*k,5); g.fillStyle="#62d26f"; g.fillRect(178,10,4,9);
+   g.fillStyle="rgba(18,11,12,.8)"; g.fillRect(2,H-14,60,12); arcText(g,`${Math.round(G.v*90)} KM/H`,32,H-12,"#fff");
+   const near=(G.inter||[]).find(I=>I.s>G.s+ZP&&I.s-G.s<45); if(near&&repLight(near,t)!=="G") arcText(g,repLight(near,t)==="R"?"¡ROJO! FRENA":"ÁMBAR",W/2,24,(t>>3)&1?"#ff4a5c":"#ffd23f");
+   if(Math.abs(G.dest-G.s-ZP)<30) arcText(g,G.lane===3?"¡FRENA Y ENTREGA (A)!":"CARRIL DERECHO »",W/2,36,"#62d26f"); }
+  if(G.phase==="order") repCard(g,W,H,"NUEVO PEDIDO",[O.rest,O.food,"DIR: "+O.addr],"A: ACEPTAR",O.icon);
+  if(G.phase==="delivered") repCard(g,W,H,"¡ENTREGADO!",[O.food,`TIEMPO ${Math.round(G.lastTime)} s · ${Math.max(0,G.estado)}%`,"CLIENTE: ¡GRACIAS!"],G.order<2?"A: SIGUIENTE":"A: TERMINAR",O.icon,G.lastStars);
+ }
+};
+function repCard(g,W,H,title,lines,btn,icon,stars){
+ const x=16, y=22, w=W-32, h=118; g.fillStyle="#120b0c"; g.fillRect(x-2,y-2,w+4,h+4); g.fillStyle="#fff"; g.fillRect(x,y,w,h); g.fillStyle="#d0102c"; g.fillRect(x,y,w,16);
+ arcText(g,title,W/2,y+4,"#fff"); g.save(); g.translate(x+6,y+22); g.scale(2,2); drawFood(g,icon,0,0); g.restore();
+ g.font='8px "Press Start 2P"'; g.fillStyle="#1b1212"; g.textAlign="left"; g.textBaseline="top"; lines.forEach((l,i)=>g.fillText(l,i?x+6:x+30,y+24+i*15+(i?6:0)));
+ if(stars){ for(let i=0;i<3;i++){ const cx=W/2-22+i*22, cy=y+82; g.fillStyle=i<stars?"#ffd23f":"#ccc"; g.beginPath(); for(let k=0;k<10;k++){ const r=k%2?3.5:8, a=-Math.PI/2+k*Math.PI/5; g[k?"lineTo":"moveTo"](cx+Math.cos(a)*r,cy+Math.sin(a)*r); } g.closePath(); g.fill(); g.strokeStyle="#c9971a"; g.stroke(); } }
+ g.fillStyle=(mg.t>>4)&1?"#d0102c":"#a51d2b"; g.fillRect(W/2-50,y+h-18,100,14); arcText(g,btn,W/2,y+h-15,"#fff");
+}
+// Vehículos vistos por detrás (con luces de freno e intermitentes)
+function repRear(g,x,y,sc,type,col,brk,blink,t){ const D=VDIM[type], w=D.w*sc, h=D.h*sc, K="#1b1212", R=(a,b,ww,hh,c)=>{ g.fillStyle=c; g.fillRect(Math.round(a),Math.round(b),Math.max(1,Math.round(ww)),Math.max(1,Math.round(hh))); };
+ R(x-w/2,y-.06*sc,w,.08*sc,"rgba(0,0,0,.35)");
+ if(type==="moto"){ R(x-.06*sc,y-.35*sc,.12*sc,.35*sc,K); R(x-.14*sc,y-.75*sc,.28*sc,.42*sc,col); R(x-.1*sc,y-.95*sc,.2*sc,.22*sc,"#333"); R(x-.05*sc,y-.4*sc,.1*sc,.06*sc,brk?"#ff2a2a":"#a01010"); return; }
+ const bc=type==="taxi"?"#1b1b1b":type==="bus"?"#d0102c":type==="van"?"#f0f0f0":col;
+ R(x-w/2+.05*sc,y-.18*sc,.16*sc,.18*sc,K); R(x+w/2-.21*sc,y-.18*sc,.16*sc,.18*sc,K);
+ R(x-w/2,y-h,w,h-.12*sc,bc);
+ if(type==="taxi"){ R(x-w/2,y-h*.55,w*.18,h*.4,"#ffd23f"); R(x+w/2-w*.18,y-h*.55,w*.18,h*.4,"#ffd23f"); R(x-.12*sc,y-h-.08*sc,.24*sc,.08*sc,"#62d26f"); }
+ R(x-w/2+.08*sc,y-h+.06*sc,w-.16*sc,h*(type==="bus"?.25:.35),type==="bus"?"#2a2a33":"#3a4a5c"); R(x-w/2+.1*sc,y-h+.08*sc,w*.3,.04*sc,"rgba(255,255,255,.35)");
+ if(type==="bus"){ R(x-w/2,y-h*.55,w,.05*sc,"#ffd23f"); }
+ const lc=brk?"#ff2a2a":"#a01010"; R(x-w/2+.04*sc,y-.38*sc,.16*sc,.1*sc,lc); R(x+w/2-.2*sc,y-.38*sc,.16*sc,.1*sc,lc);
+ if(brk&&sc>8){ g.fillStyle="rgba(255,60,60,.35)"; g.fillRect(Math.round(x-w/2-.05*sc),Math.round(y-.45*sc),Math.round(.3*sc),Math.round(.24*sc)); g.fillRect(Math.round(x+w/2-.25*sc),Math.round(y-.45*sc),Math.round(.3*sc),Math.round(.24*sc)); }
+ if(blink&&(t>>3)&1) R(blink>0?x+w/2-.12*sc:x-w/2+.02*sc,y-.5*sc,.1*sc,.08*sc,"#ffb000");
+ R(x-.14*sc,y-.3*sc,.28*sc,.09*sc,"#f2f2f2");
+}
+function repSide(g,x,y,sc,col,right){ const w=1.9*sc, h=.62*sc, R=(a,b,ww,hh,c)=>{ g.fillStyle=c; g.fillRect(Math.round(a),Math.round(b),Math.max(1,Math.round(ww)),Math.max(1,Math.round(hh))); };
+ R(x-w/2,y-h,w,h*.75,col); R(x-w*.3,y-h-.25*sc,w*.55,.28*sc,col); R(x-w*.26,y-h-.2*sc,w*.22,.18*sc,"#9fd8ff"); R(x+w*.0,y-h-.2*sc,w*.2,.18*sc,"#9fd8ff");
+ g.fillStyle="#1b1212"; [[-.32],[.32]].forEach(([k])=>{ g.beginPath(); g.arc(x+k*w,y-.12*sc,.14*sc,0,7); g.fill(); }); R(right?x+w/2-.08*sc:x-w/2,y-h*.6,.08*sc,.08*sc,"#fff6b0"); }
+// El rider FLiiTS visto por detrás: casco rojo, chaqueta FLiiTS y la caja de reparto a la espalda.
+function repPlayer(g,x,y,blink,lean,brk,t,v){ if(blink) return; const K="#1b1212", L=LOOKS[REP_RIDERS[repLook].look], R=(a,b,w,h,c)=>{ g.fillStyle=c; g.fillRect(Math.round(a),Math.round(b),w,h); };
+ g.save(); g.translate(Math.round(x),y); g.rotate(-lean*.25); const bob=v>.05?((t>>2)&1):0;
+ R(-12,-2,24,3,"rgba(0,0,0,.35)");
+ if(veh===0){ R(-4,-14,8,14,K); R(-3,-13,6,12,"#333"); R(-7,-22,14,8,K); R(-6,-21,12,6,"#555a66"); R(-3,-20,6,2,brk?"#ff2a2a":"#a01010"); R(-9,-34,2,6,"#9aa3b5"); R(7,-34,2,6,"#9aa3b5"); }
+ else if(veh===1){ R(-1,-14,2,14,K); R(-3,-11,6,2,"#1f9e8f"); R(-9,-34,18,2,K); }
+ else { R(-2,-10,4,10,K); R(-6,-3,12,3,K); R(-1,-34,2,24,K); R(-8,-34,16,2,K); }
+ const leg=veh===1&&v>.05?((t>>3)&1?2:-2):0;
+ R(-7,-24-bob+leg,5,12,"#2d3a5c"); R(2,-24-bob-leg,5,12,"#2d3a5c");
+ R(-9,-38-bob,18,15,K); R(-8,-37-bob,16,13,"#d62839"); R(-11,-35-bob,3,8,"#d62839"); R(8,-35-bob,3,8,"#d62839"); R(-11,-28-bob,3,2,L.S); R(8,-28-bob,3,2,L.S);
+ R(-8,-50-bob,16,14,K); R(-7,-49-bob,14,12,"#d62839"); R(-7,-49-bob,14,2,"#ff5a66"); R(-7,-38-bob,14,1,"#a51d2b");
+ g.fillStyle="#fff"; for(const [a,b] of [[-4,-47],[-4,-46],[-4,-45],[-4,-44],[-4,-43],[-3,-47],[-2,-47],[-3,-45]]) g.fillRect(a,b-bob,1,1);
+ g.fillStyle=K; g.beginPath(); g.arc(0,-55-bob,6,0,7); g.fill(); g.fillStyle="#e63946"; g.beginPath(); g.arc(0,-55-bob,5,0,7); g.fill(); g.fillStyle="#ff8a92"; g.fillRect(-3,-58-bob,3,1);
+ g.restore();
+}
 
 /* ---------- RPG · PORTÁTIL CLÁSICO (pantalla 160×144, 4 tonos) ----------
    Mismo recorrido que el modo plataforma, adaptado: cada personaje tiene su misión
@@ -2864,10 +3079,13 @@ const RPG_KEYS={ArrowUp:"UP",w:"UP",ArrowDown:"DOWN",s:"DOWN",ArrowLeft:"LEFT",a
 
 /* ---------- SELECT SCREENS ---------- */
 const nm=i=>saved[`pl.${i}.n`]??CREW[i].name, rl=i=>CREW[i].role;
-const SEL=[0,2,3,1];
+const SEL=[0,2,3,1], selList=()=>repUnlocked()?[...SEL,4]:SEL;
 function buildRoster(){
-  const r=$("#roster"); r.innerHTML="";
-  SEL.forEach(i=>{ const fin_=i===1, sIdx=SCREEN_OF[i], b=document.createElement("div"), locked=fin_&&!raulOpen();
+  const r=$("#roster"); r.innerHTML=""; r.classList.toggle("five",repUnlocked());
+  selList().forEach(i=>{
+    if(i===4){ const b=document.createElement("div"); b.className="pick rep"+(pick===4?" on":"")+(repDone()?" done":""); b.tabIndex=0; b.setAttribute("role","button");
+      b.appendChild(themed(repSelCanvas())); b.insertAdjacentHTML("beforeend",`<div class="ped"></div><div class="pn">REPARTIDOR</div><div class="pr">Modo libre · reparte por Barcelona</div>${repDone()?`<div class="coinbadge">SUPERADO</div><span class="ck" aria-label="Superado"></span>`:`<div class="coinbadge">¡NUEVO!</div>`}`);
+      b.addEventListener("click",()=>{ if(editing) return; pick=4; confirmPick(); }); r.appendChild(b); return; } const fin_=i===1, sIdx=SCREEN_OF[i], b=document.createElement("div"), locked=fin_&&!raulOpen();
     b.className="pick"+(i===pick?" on":"")+(fin_?" final":"")+(locked?" locked":"")+(fin_&&justUnlocked?" unlock":"")+(!fin_&&DONE()[sIdx]?" done":""); b.tabIndex=0; b.setAttribute("role","button");
     if(locked){ const cv=document.createElement("canvas"); cv.width=16; cv.height=24; const g=cv.getContext("2d"); CREW[1].spr.forEach((row,rr)=>[...row].forEach((ch,q)=>{ if(ch!=="."){ g.fillStyle="#120b0c"; g.fillRect(q,rr,1,1); } })); b.appendChild(themed(cv));
       b.insertAdjacentHTML("beforeend",`<div class="ped"></div><div class="pn">???</div><div class="pr">Personaje secreto</div><div class="coinbadge">${gold()}/3 MONEDAS DE ORO</div>`); }
@@ -2888,6 +3106,7 @@ function showSelect(){
   buildRoster(); justUnlocked=false; $("#pilotNote").textContent=raulOpen()?`¡${nm(1)} desbloqueado! Su pantalla lleva al jefe final.`:`Consigue las 3 monedas de oro para desbloquear un personaje secreto: llevas ${gold()}/3.`;
 }
 function confirmPick(force){
+  if(pick===4){ if(!repUnlocked()) return; sfx.select(); showRid(); return; }
   if(pick===1){ if(force) FORCED[activeGameMode]=true; if(!raulOpen()){ toast("BLOQUEADO"); sfx.back(); return; } forceFinal=!!force; $("#selOv").hidden=true; sfx.open();
     if(activeGameMode==="platform") startRaul(); else customStart(1); return; }
   $("#selOv").hidden=true; sfx.select();
@@ -2896,16 +3115,16 @@ function confirmPick(force){
 function buildVeh(){
   const r=$("#vroster"); r.innerHTML="";
   VEH.forEach((v,i)=>{ const b=document.createElement("div"); b.className="pick veh"+(i===veh?" on":""); b.tabIndex=0; b.setAttribute("role","button");
-    const cv=document.createElement("canvas"); cv.width=68; cv.height=44; cv.getContext("2d").drawImage(composeRider(pick,i,0).cv,0,0); b.appendChild(cv);
+    const cv=document.createElement("canvas"); cv.width=68; cv.height=44; cv.getContext("2d").drawImage(composeRider(pick===4?repSpr():pick,i,0).cv,0,0); b.appendChild(themed(cv));
     const st=["VELOCIDAD","CARGA","ECO"].map((l,k)=>`<span>${l}</span><span class="stars">${"★".repeat(v.st[k])}${"☆".repeat(3-v.st[k])}</span>`).join("");
     b.insertAdjacentHTML("beforeend",`<div class="ped"></div><div class="pn">${v.n}</div><div class="vst">${st}</div>`);
     b.addEventListener("click",()=>{ veh=i; confirmVeh(); });
     r.appendChild(b); });
-  $("#vehWho").textContent=nm(pick);
+  $("#vehWho").textContent=pick===4?repName():nm(pick);
 }
 let vehResume=false;
 function showVeh(resume){ vehResume=!!resume; mode="veh"; $("#vehOv").hidden=false; buildVeh(); }
-function confirmVeh(){ $("#vehOv").hidden=true; $("#pname").textContent=nm(pick); $("#pveh").textContent=VEH[veh].n.split(" ")[0]; sfx.open(); if(vehResume){ mode="play"; vehResume=false; } else startScreen(SCREEN_OF[pick]); }
+function confirmVeh(){ if(pick===4&&!vehResume){ $("#vehOv").hidden=true; sfx.open(); customStart(4); return; } $("#vehOv").hidden=true; $("#pname").textContent=nm(pick); $("#pveh").textContent=VEH[veh].n.split(" ")[0]; sfx.open(); if(vehResume){ mode="play"; vehResume=false; } else startScreen(SCREEN_OF[pick]); }
 
 /* ---------- PANELS ---------- */
 const K=(k,def,tag="span",cls="")=>`<${tag} data-k="${k}"${cls?` class="${cls}"`:""}>${def}</${tag}>`;
@@ -2949,6 +3168,13 @@ function showWin(who,i,next){
   $("#winMsg").textContent=gold()===3?"¡3 monedas! Se desbloquea el personaje secreto.":`Moneda de oro conseguida · llevas ${gold()}/3`;
   winNext=next; $("#winOv").hidden=false; setTimeout(()=>sfx.coin(),500);
   clearTimeout(winTimer); winTimer=setTimeout(closeWin,5000);
+}
+function showRepWin(stars){
+  mode="win"; keys={}; $("#winKick").textContent="MODO REPARTIDOR · "+repName();
+  const sp=$("#winSpr"); sp.innerHTML=""; sp.appendChild(themed(repStand(repLook)));
+  $("#winCoins").innerHTML=[0,1,2].map(k=>`<i class="on${k===2?" new":""}"></i>`).join("");
+  $("#winMsg").textContent=`¡Repartidor del mes! 3 pedidos entregados · ${stars}/9 estrellas`;
+  winNext=()=>showSelect(); $("#winOv").hidden=false; sfx.win(); clearTimeout(winTimer); winTimer=setTimeout(closeWin,5000);
 }
 function closeWin(){ if($("#winOv").hidden) return; clearTimeout(winTimer); $("#winOv").hidden=true; const f=winNext; winNext=null; if(f) f(); }
 $("#winGo").addEventListener("click",closeWin);
@@ -3010,10 +3236,10 @@ function updHud(){ $("#score").textContent=String(score).padStart(6,"0"); $("#co
 function toast(t){ const d=document.createElement("div"); d.className="toast"; d.textContent=t; (document.getElementById("screen")||document.body).appendChild(d); setTimeout(()=>d.remove(),1450); }
 
 function showCredits(){
-  const who=[0,2,3,1];
+  const who=[0,2,3,1], newRep=unlockRep();
   $("#roll").innerHTML=`<div class="big">¡GRACIAS<br>POR JUGAR!</div><div class="h">EQUIPO CATALUNYA</div><div class="crew" id="crewRoll"></div>
    <div class="h">Y A TODOS NUESTROS RIDERS</div><div class="big" style="font-size:clamp(18px,3vw,34px)">¿PREGUNTAS?</div>
-   <div class="h">PUNTUACIÓN ${String(score).padStart(6,"0")} · MONEDAS ${coins} · ORO ${gold()}/3</div><div class="press">ESC · VOLVER</div>`;
+   <div class="h">PUNTUACIÓN ${String(score).padStart(6,"0")} · MONEDAS ${coins} · ORO ${gold()}/3</div>${newRep?`<div class="big" style="font-size:clamp(14px,2.6cqw,28px)">¡MODO REPARTIDOR<br>DESBLOQUEADO!</div><div class="h">YA APARECE EN EL SELECTOR DE JUGADORES</div>`:""}<div class="press">ESC · VOLVER</div>`;
   const cr=$("#crewRoll");
   who.forEach(i=>{ const d=document.createElement("div"); d.appendChild(themed(standCanvas(i))); d.insertAdjacentHTML("beforeend",`<span>${esc(nm(i))}</span>`); cr.appendChild(d); });
   const m=document.createElement("div"); const mc=document.createElement("canvas"); mc.width=18; mc.height=28; drawPal(mc.getContext("2d"),MARTI,0,0,MPAL_I); m.appendChild(themed(mc)); m.insertAdjacentHTML("beforeend",`<span>${esc(saved["pl.m.n"]??"MARTÍ")}</span>`); cr.appendChild(m);
@@ -3056,12 +3282,19 @@ document.addEventListener("keydown",e=>{
       if(["UP","DOWN","LEFT","RIGHT"].includes(btn)) keys[k]=true; if(!e.repeat) arcPress(btn); return; }
     if(k==="Escape") leaveModeGame(); return; }
   if(!$("#selOv").hidden){
-    const p=SEL.indexOf(pick);
-    if(k==="ArrowRight"||k==="ArrowDown"||k==="d"||k==="s"){ pick=SEL[(p+1)%4]; buildRoster(); sfx.select(); }
-    else if(k==="ArrowLeft"||k==="ArrowUp"||k==="a"||k==="w"){ pick=SEL[(p+3)%4]; buildRoster(); sfx.select(); }
+    const Lst=selList(), p=Math.max(0,Lst.indexOf(pick)), n=Lst.length;
+    if(k==="ArrowRight"||k==="ArrowDown"||k==="d"||k==="s"){ pick=Lst[(p+1)%n]; buildRoster(); sfx.select(); }
+    else if(k==="ArrowLeft"||k==="ArrowUp"||k==="a"||k==="w"){ pick=Lst[(p+n-1)%n]; buildRoster(); sfx.select(); }
+    else if(k==="p"){ if(unlockRep()){ toast("¡MODO REPARTIDOR!"); sfx.power(); } buildRoster(); }
     else if(k==="r"){ pick=1; confirmPick(true); }
     else if(k==="Enter"||k===" "||k==="x"||k==="z"||k==="b"){ e.preventDefault(); confirmPick(); }
     else if(k==="Escape"){ $("#selOv").hidden=true; setTheme(false); $("#modeOv").hidden=false; sfx.back(); }
+    return; }
+  if(!$("#ridOv").hidden){
+    if(k==="ArrowRight"||k==="ArrowDown"||k==="d"||k==="s"){ repLook=(repLook+1)%REP_RIDERS.length; buildRid(); sfx.select(); }
+    else if(k==="ArrowLeft"||k==="ArrowUp"||k==="a"||k==="w"){ repLook=(repLook+REP_RIDERS.length-1)%REP_RIDERS.length; buildRid(); sfx.select(); }
+    else if(k==="Escape"){ $("#ridOv").hidden=true; showSelect(); }
+    else if(k==="Enter"||k===" "||k==="x"||k==="z"||k==="b"){ e.preventDefault(); confirmRid(); }
     return; }
   if(!$("#vehOv").hidden){
     if(k==="ArrowRight"||k==="ArrowDown"||k==="d"||k==="s"){ veh=(veh+1)%3; buildVeh(); sfx.select(); }
@@ -3118,7 +3351,7 @@ function restorePauseLabels(){
 function pressStart(){
  audio();
  if(gamePaused){ restorePauseLabels(); setGamePaused(false); return; }
- const mainScreenVisible=!$("#titleOv").hidden||!$("#introOv").hidden||!$("#modeOv").hidden||!$("#selOv").hidden||!$("#vehOv").hidden;
+ const mainScreenVisible=!$("#titleOv").hidden||!$("#introOv").hidden||!$("#modeOv").hidden||!$("#selOv").hidden||!$("#vehOv").hidden||!$("#ridOv").hidden;
  if(mainScreenVisible){ controllerConfirm("start"); return; }
  if(!$("#modeGameOv").hidden&&mg){ controllerConfirm("start"); return; }
  const promptVisible=open>=0||!$("#lvlOv").hidden||!$("#credOv").hidden||mode==="final"||mode==="raul";
@@ -3138,7 +3371,7 @@ document.querySelectorAll("#mobilePad [data-system]").forEach(b=>b.addEventListe
 document.querySelectorAll("#mobilePad [data-key]").forEach(b=>{
  const key=b.dataset.key;
  const down=e=>{e.preventDefault();if(gamePaused)return;
-  const inMenu=!$("#titleOv").hidden||!$("#introOv").hidden||!$("#modeOv").hidden||!$("#selOv").hidden||!$("#vehOv").hidden||(!$("#modeGameOv").hidden&&mg);
+  const inMenu=!$("#titleOv").hidden||!$("#introOv").hidden||!$("#modeOv").hidden||!$("#selOv").hidden||!$("#vehOv").hidden||!$("#ridOv").hidden||(!$("#modeGameOv").hidden&&mg);
   if(inMenu){document.dispatchEvent(new KeyboardEvent("keydown",{key,bubbles:true}));return;}
   keys[key]=true;auto=false;
  };
@@ -3152,6 +3385,7 @@ function controllerConfirm(which){
  if(!$("#introOv").hidden){continueIntro();return;}
  if(!$("#modeOv").hidden){const cards=[...document.querySelectorAll(".mode-card")];const ix=Math.max(0,modeCursor||0);chooseMode(cards[ix]?.dataset.mode||"platform");return;}
  if(!$("#selOv").hidden){confirmPick();return;}
+ if(!$("#ridOv").hidden){confirmRid();return;}
  if(!$("#vehOv").hidden){confirmVeh();return;}
  if(!$("#modeGameOv").hidden&&mg){
   if(mg.typ==="rpg"){ rpgPress(which==="jump"?"B":which==="start"?"START":"A"); return; }
