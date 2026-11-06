@@ -127,6 +127,19 @@
  .intro-ov .intro-scene .intro-dog{left:29%!important;width:clamp(58px,17cqw,76px)!important}
  .intro-ov .press{position:relative;z-index:90}
 }
+/* Oreo: a la misma escala de píxel que los personajes, entre Raül e Ivan y por delante */
+.intro-ov .intro-scene #introRaul{left:13%!important}
+.intro-ov .intro-scene .crew-a{left:48%!important}
+.intro-ov .intro-scene .crew-b{left:67%!important}
+.intro-ov .intro-scene .crew-c{left:86%!important}
+.intro-ov .intro-scene #introDog{scale:none!important;left:30.5%!important;bottom:7%!important;width:clamp(115px,15.75cqw,182px)!important;z-index:6!important}
+@media(max-width:600px){
+ .intro-ov .intro-scene #introRaul{left:12%!important}
+ .intro-ov .intro-scene .crew-a{left:49%!important}
+ .intro-ov .intro-scene .crew-b{left:68%!important}
+ .intro-ov .intro-scene .crew-c{left:87%!important}
+ .intro-ov .intro-scene #introDog{left:30.5%!important;width:clamp(74px,19.25cqw,108px)!important}
+}
 </style>
 
 
@@ -2073,7 +2086,7 @@ function paintIntroSprites(){
  [[1,"introRaul"],[0,"introIvan"],[2,"introGerard"],[3,"introAzlan"]].forEach(([i,id])=>{
   const c=$("#"+id),g=c.getContext("2d"); g.clearRect(0,0,c.width,c.height); drawSpr(g,CREW[i].spr,0,0);
  });
- const dc=$("#introDog"); if(dc){const dg=dc.getContext("2d");dg.clearRect(0,0,28,18);drawPal(dg,DOG[0],0,0,DOGPAL,true);}
+ const dc=$("#introDog"); if(dc){const dg=dc.getContext("2d");dg.clearRect(0,0,28,18);drawPal(dg,DOG[0],0,0,DOGPAL,false);}
 }
 function showIntro(){ $("#introOv").hidden=false; $("#titleOv").hidden=true; paintIntroSprites(); }
 function continueIntro(){ const sc=$("#introScene"); sc.classList.add("disperse"); $("#introLine").textContent="¡REUNIÓN TERMINADA! CADA UNO A SU MISIÓN."; setTimeout(()=>{sc.classList.remove("disperse");$("#introOv").hidden=true;$("#modeOv").hidden=false;sfx.open();},650); }
