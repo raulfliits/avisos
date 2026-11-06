@@ -940,7 +940,7 @@ body.theme-gb .hud,body.theme-gb .hint{color:var(--g3)}
  <div class="pad-actions"><button class="ab" data-action="jump" aria-label="B: saltar">B</button><button class="ab" data-action="action" aria-label="A: acción">A</button></div>
  <div class="pad-system"><button class="sys" data-system="select">SELECT</button><button class="sys" data-system="start">START</button></div>
 </div>
-<div class="pause-screen" id="pauseScreen"><div class="pause-card"><h2 id="pauseTitle">PARTIDA EN PAUSA</h2><button id="pauseResume">CONTINUAR · START</button><button id="pauseMenu">MENÚ · SELECT</button><button id="pauseExit">SALIR AL SELECTOR</button></div></div>
+<div class="pause-screen" id="pauseScreen"><div class="pause-card"><h2 id="pauseTitle">PARTIDA EN PAUSA</h2><button id="pauseResume">CONTINUAR · START</button><button id="pauseMenu">MENÚ · SELECT</button><button id="pauseSave">GUARDAR PARTIDA</button><button id="pauseExit">SALIR AL SELECTOR</button></div></div>
 
 <div class="editbar" id="editbar" hidden>
   <strong>MODO EDICIÓN</strong>
@@ -2065,7 +2065,7 @@ function arcHire(name){ mg.hires++; sfx.power(); arcProgress(); if(mg.hires>=3) 
 function arcWin(){ mg.state="won"; arcBanner(mg.ci===4?"¡REPARTIDOR DEL MES!":mg.ci===1?"¡OFICINA EN ORDEN!":"¡3 CONTRATADOS!",mg.ci===4?"3 PEDIDOS ENTREGADOS":"¡MONEDA DE ORO!",180); setTimeout(()=>{ sfx.win(); sfx.coin(); },250); mg.endAt=mg.t+180; }
 function arcLose(why){ mg.state="lost"; arcBanner("GAME OVER",why,1e9); sfx.hit(); }
 function arcDone(){ const ci=mg.ci, a=mg.c1, b=mg.c2, stars=ci===4?mg.G.stars:0; mg=null; const ov=$("#modeGameOv"); ov.hidden=true; ov.classList.remove("arc");
- if(ci===4){ saved["rep.done"]="1"; persist(); showRepWin(stars); return; }
+ if(ci===4){ REP.done=true; showRepWin(stars); return; }
  if(ci===1){ c1=a; c2=b; openRaulPanel(); return; } scr=SCREENS[SCREEN_OF[ci]]; c1=a; c2=b; openCityPanel(); }
 function arcTick(){
  if(!mg||mg.typ!=="arcade") return; const cv=$("#arcCv"); if(!cv) return; mg.t++;
@@ -2412,8 +2412,13 @@ ARC_GAMES[1]={
    a casa del cliente por una calle de 4 carriles: adelantar, esquivar y parar en los semáforos. */
 const REP_RIDERS=[{name:"AAMIR",look:0},{name:"SAIRA",look:4},{name:"NIL",look:3},{name:"AYESHA",look:1}];
 let repLook=0;
-const repUnlocked=()=>saved["rep.on"]==="1", repDone=()=>saved["rep.done"]==="1";
-function unlockRep(){ if(repUnlocked()) return false; saved["rep.on"]="1"; persist(); return true; }
+// El repartidor solo dura la sesión; se guarda únicamente con "GUARDAR PARTIDA" (pausa/SELECT o tecla G en el selector).
+const REP={on:false,done:false};
+const repUnlocked=()=>REP.on, repDone=()=>REP.done;
+function unlockRep(){ if(REP.on) return false; REP.on=true; return true; }
+if(saved["rep.on"]||saved["rep.done"]){ delete saved["rep.on"]; delete saved["rep.done"]; persist(); }
+function saveGame(){ saved["save.v1"]=JSON.stringify({prog:PROG,rep:REP}); persist(); toast("PARTIDA GUARDADA"); sfx.coin(); }
+try{ const sv=JSON.parse(saved["save.v1"]||"null"); if(sv){ Object.keys(PROG).forEach(k=>{ if(Array.isArray(sv.prog&&sv.prog[k])) sv.prog[k].forEach((v,i)=>PROG[k][i]=!!v); }); if(sv.rep) Object.assign(REP,{on:!!sv.rep.on,done:!!sv.rep.done}); } }catch(e){}
 function repName(){ return REP_RIDERS[repLook].name; }
 // Sprite lateral del rider (para el selector de vehículo): la plantilla de aspirante con ropa FLiiTS.
 const repSprCache={};
@@ -3375,7 +3380,8 @@ document.addEventListener("keydown",e=>{
     const Lst=selList(), p=Math.max(0,Lst.indexOf(pick)), n=Lst.length;
     if(k==="ArrowRight"||k==="ArrowDown"||k==="d"||k==="s"){ pick=Lst[(p+1)%n]; buildRoster(); sfx.select(); }
     else if(k==="ArrowLeft"||k==="ArrowUp"||k==="a"||k==="w"){ pick=Lst[(p+n-1)%n]; buildRoster(); sfx.select(); }
-    else if(k==="p"){ if(unlockRep()){ toast("¡MODO REPARTIDOR!"); sfx.power(); } buildRoster(); }
+    else if(k==="p"){ REP.on=!REP.on; if(!REP.on&&pick===4) pick=0; toast(REP.on?"MODO REPARTIDOR: SÍ":"MODO REPARTIDOR: NO"); REP.on?sfx.power():sfx.back(); buildRoster(); }
+    else if(k==="g"){ saveGame(); }
     else if(k==="r"){ pick=1; confirmPick(true); }
     else if(k==="Enter"||k===" "||k==="x"||k==="z"||k==="b"){ e.preventDefault(); confirmPick(); }
     else if(k==="Escape"){ $("#selOv").hidden=true; setTheme(false); $("#modeOv").hidden=false; sfx.back(); }
@@ -3432,6 +3438,7 @@ function returnToPlayerSelect(){
 $("#pauseResume").addEventListener("click",()=>{ $("#pauseTitle").textContent="PARTIDA EN PAUSA"; $("#pauseResume").textContent="CONTINUAR · START"; $("#pauseMenu").textContent="MENÚ · SELECT"; $("#pauseExit").textContent="SALIR AL SELECTOR"; setGamePaused(false); });
 $("#pauseMenu").addEventListener("click",returnToGameMenu);
 $("#pauseExit").addEventListener("click",returnToPlayerSelect);
+$("#pauseSave").addEventListener("click",saveGame);
 function restorePauseLabels(){
  $("#pauseTitle").textContent="PARTIDA EN PAUSA";
  $("#pauseResume").textContent="CONTINUAR · START";
