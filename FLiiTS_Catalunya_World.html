@@ -406,6 +406,32 @@ button{font:inherit;color:inherit}
 .mfleet{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 8px}
 .mfleet img{width:clamp(28px,2.6cqw,40px);image-rendering:pixelated;animation:pop .25s steps(3) both}
 .mfleet img.fut{opacity:.35;filter:grayscale(1)}
+.mfleet img.need{opacity:.5;filter:grayscale(1) brightness(2.2);outline:2px dashed var(--gold);outline-offset:1px}
+.mrows.m4{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-bottom:10px}
+.mrow.need{border-color:var(--gold);border-style:dashed} .mrow.need b{color:var(--gold)}
+.mt{display:grid;grid-template-columns:minmax(0,2.4fr) repeat(5,minmax(0,1fr));gap:3px 10px;font-size:19px;align-items:center;line-height:1.05}
+.mt .th{font-family:var(--f-display);font-size:7px;color:var(--dim);line-height:1.4;text-align:right}
+.mt .th:first-child{text-align:left}
+.mt b{font-weight:400;text-align:right;font-variant-numeric:tabular-nums}
+.mt .miss{color:var(--gold)} .mt .ok{color:var(--green)}
+.mt .tt{border-top:3px solid var(--ink);padding-top:4px;font-family:var(--f-display);font-size:11px}
+.eps{display:grid;gap:5px}
+.ep{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,2fr) 5ch minmax(0,1.1fr);gap:10px;align-items:center;font-size:19px;line-height:1.05}
+.epb{height:16px;border:2px solid var(--ink);background:rgba(18,11,12,.4)}
+.epb i{display:block;height:100%;width:0;background:var(--green);transition:width 1s steps(10)}
+.eps.on .epb i{width:var(--p)} .ep.lo .epb i{background:var(--gold)}
+.ep b{font-family:var(--f-display);font-weight:400;font-size:11px;text-align:right}
+.ep em{font-style:normal;color:var(--dim);text-align:right}
+.cal{border:3px dashed var(--gold);padding:10px 12px;margin-top:12px;font-size:21px;line-height:1.15}
+.cal::before{content:"CALENDARIO DE VISITAS";display:block;font-family:var(--f-display);font-size:8px;color:var(--gold);margin-bottom:6px}
+.cities.req .city-t::before{content:"PETICIÓN"}
+.goal{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:12px;align-items:center;margin-bottom:14px}
+.goal>div:not(.arr){border:3px solid var(--ink);background:rgba(18,11,12,.4);padding:10px 14px;display:grid;gap:4px}
+.goal .g{border-color:var(--gold)!important} .goal .g b{color:var(--gold)}
+.goal span{font-family:var(--f-display);font-size:8px;color:var(--dim);line-height:1.5}
+.goal b{font-weight:400;font-size:clamp(34px,3.6cqw,50px);line-height:1}
+.goal .arr{font-family:var(--f-display);font-size:20px}
+@media (max-width:700px){.mt{grid-template-columns:minmax(0,1.6fr) repeat(5,minmax(0,1fr));font-size:15px;gap:3px 6px}.ep{grid-template-columns:minmax(0,1fr) 5ch minmax(0,1fr)}.epb{grid-column:1/-1;order:5}.goal{grid-template-columns:1fr}.goal .arr{display:none}}
 .mtl{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-family:var(--f-display);font-size:clamp(8px,.9cqw,11px);color:var(--dim);border-top:3px solid var(--ink);padding-top:8px}
 .mtl b{color:#fff;font-weight:400}
 @media (max-width:700px){.mgrid{grid-template-columns:1fr}}
@@ -731,6 +757,11 @@ body.theme-gb .pause-card button{background:var(--g0);color:var(--g3);border:3px
 body.theme-gb .pause-card button:hover{background:var(--g1)}
 body.theme-gb .toast{color:var(--g3);text-shadow:3px 3px 0 var(--g0),5px 5px 0 var(--g1)}
 body.theme-gb .mfleet img.fut{filter:none;opacity:.35}
+body.theme-gb .mfleet img.need{filter:none;opacity:.2;outline-color:var(--g3)}
+body.theme-gb .epb,body.theme-gb .goal>div:not(.arr){background:var(--g0);border-color:var(--g3)}
+body.theme-gb .epb i{background:var(--g3)} body.theme-gb .ep.lo .epb i{background:var(--g2)}
+body.theme-gb .mt .miss,body.theme-gb .mt .ok,body.theme-gb .mrow.need b,body.theme-gb .goal .g b,body.theme-gb .cal::before{color:var(--g3)}
+body.theme-gb .cal,body.theme-gb .mrow.need,body.theme-gb .goal .g{border-color:var(--g3)!important}
 body.theme-gb .pick.unlock{animation:unlgb .9s steps(2) 3}
 @keyframes unlgb{50%{background:var(--g3);box-shadow:0 0 0 8px var(--g1)}}
 body.theme-gb .hud,body.theme-gb .hint{color:var(--g3)}
@@ -800,7 +831,7 @@ body.theme-gb .modegame.arc .mg-scene{border-color:var(--g3);background:var(--g3
       <div><b>Mundo</b><span class="val" id="world">CAT</span></div>
     </div>
     <div class="grp">
-      <button class="badge" id="demoBadge" type="button" title="En modo edición, pulsa para quitar este aviso">DATOS DE EJEMPLO · PULSA E</button>
+      <button class="badge" id="demoBadge" type="button" hidden title="En modo edición, pulsa para quitar este aviso">DATOS DE EJEMPLO · PULSA E</button>
       <button class="snd" id="snd" type="button">SONIDO ON</button><button class="snd" id="demoMode" type="button">DEMO OFF</button>
       <div><b>Tiempo</b><span class="val" id="time">00:00</span></div>
     </div>
@@ -1440,25 +1471,25 @@ const SCREENS=[
  { who:0, type:"hire", len:1320, c1:"Contratados", c2:"Despedidos",
    land:[["sagrada",175],["valles",560]], places:[[150,"Barcelona"],[900,"Sabadell"]], bossName:"JEFE: MARTÍ",
    hint:"¡Uber + Glovo se contrata, el resto fuera!",
-   cities:[["Barcelona","Glovo 517 · Uber Eats 201 · 5 sin asignar","723",["10","77","22","614","0"]],["Sabadell","Glovo 113 · Uber Eats 15 · 3 sin asignar","131",["1","24","0","106","0"]],
-     ["Parets del Vallès","Uber Eats","35",["0","6","0","29","0"]],["Martorell","Uber Eats","30",["0","3","0","27","0"]],["Gavà","Uber Eats","22",["0","2","0","20","0"]],["Mataró","Uber Eats","22",["0","6","0","16","0"]],
-     ["Lleida","Uber Eats","22",["0","9","0","13","0"]],["Sant Cugat","Uber Eats","16",["0","3","0","13","0"]],["Molins de Rei","Uber Eats","16",["0","3","0","13","0"]]],
+   cities:[["Barcelona","728 riders · Glovo 529 · Uber Eats 193","106","622"],["Sabadell","131 riders · Glovo 111 · Uber Eats 15","24","107"],
+     ["Parets del Vallès","35 riders · Uber Eats","6","29"],["Martorell","28 riders · Uber Eats","3","25"],["Gavà","22 riders · Uber Eats","2","20"],["Mataró","22 riders · Uber Eats","6","16"],
+     ["Lleida","23 riders · Uber Eats","10","13"],["Sant Cugat","15 riders · Uber Eats","3","12"],["Molins de Rei","16 riders · Uber Eats","3","13"]],
    intro:"¡Forecast perfecto! Así está Catalunya, ciudad por ciudad:",
-   note:"~2 min. Foto de toda Catalunya: riders y motos por ciudad. Barcelona y Sabadell trabajan con Glovo y Uber Eats; el resto, con Uber Eats. Explica por qué solo contratamos a quien hace las dos plataformas.",
+   note:"~2 min. Foto de toda Catalunya: motos y bicis por ciudad (Rider forecast). Barcelona y Sabadell trabajan con Glovo y Uber Eats; el resto, con Uber Eats. Explica por qué solo contratamos a quien hace las dos plataformas.",
    npcs:[["s","¡Glovo y Uber!","hire"],["s","Solo Glovo","reject"],["r","Solo Glovo","fire"],["s","¡Glovo y Uber!","hire"],["r","Mañana no trabajo","fire"],["s","Solo Glovo","reject"],["s","¡Glovo y Uber!","hire"],["r","¡Este pedido está muy lejos!","fire"]] },
  { who:2, type:"docs", len:1320, c1:"Aprobados", c2:"Rechazados",
    land:[["sagrada",175],["beach",410],["mataro",600]], places:[[150,"Barcelona"],[620,"Gavà"],[1000,"Mataró"]], bossName:"JEFE: VALIDACIÓN",
    hint:"¡Pide los papeles a todos!",
-   cities:[["Barcelona","Uber Eats (de los 723 de Barcelona)","201",null],["Gavà","Uber Eats","22",["0","2","0","20","0"]],["Mataró","Uber Eats","22",["0","6","0","16","0"]]],
+   cities:[["Barcelona","193 riders · Uber Eats","37","156"],["Gavà","22 riders · Uber Eats","2","20"],["Mataró","22 riders · Uber Eats","6","16"]],
    intro:"Todo validado: ALL APPROVED. Así quedan las ciudades de Gerard:",
    note:"~2 min. Barcelona (Uber), Gavà y Mataró. Comenta cuánto cuesta validar documentación (NIE, carnets, permisos) y cómo lo hemos agilizado.",
    npcs:[["NIE",1,"Aquí tienes mi NIE"],["Carnet de moto",0,"Tengo carnet extranjero"],["Pasaporte",1,"¡Pasaporte en regla!"],["Permiso de trabajo",0,"Me caducó en 2025..."],["Carnet de moto",1,"Carnet español, ¡toma!"],["NIE",0,"NIE caducado..."],["Permiso de trabajo",1,"Permiso vigente"],["Pasaporte",0,"Pasaporte caducado"]] },
  { who:3, type:"epis", len:1460, c1:"EPIs entregados", c2:"Riders completos",
    land:[["seu",170],["aqueduct",320],["monastery",470],["industrial",595],["valles",690]], places:[[140,"Lleida"],[440,"Martorell"],[740,"Sant Cugat"],[990,"Molins de Rei"],[1180,"Parets del Vallès"]], bossName:"ALMACÉN EPIs",
    hint:"¡Nadie se va sin su equipo!",
-   cities:[["Lleida","Uber Eats","22",["0","9","0","13","0"]],["Martorell","Uber Eats","30",["0","3","0","27","0"]],["Sant Cugat","Uber Eats","16",["0","3","0","13","0"]],["Molins de Rei","Uber Eats","16",["0","3","0","13","0"]],["Parets del Vallès","Uber Eats","35",["0","6","0","29","0"]]],
-   intro:"EPIs 100% entregados. Así quedan las ciudades de Azlan:",
-   note:"~2 min. En el almacén, Martí y Franco escanean y entregan los EPIs. Cinco ciudades: Lleida, Martorell, Sant Cugat, Molins de Rei y Parets. Destaca que todos los riders tienen casco, chaqueta, guantes y mochila.",
+   cities:[["Lleida","23 riders · Uber Eats","10","13"],["Martorell","28 riders · Uber Eats","3","25"],["Sant Cugat","15 riders · Uber Eats","3","12"],["Molins de Rei","16 riders · Uber Eats","3","13"],["Parets del Vallès","35 riders · Uber Eats","6","29"]],
+   intro:"¡Almacén superado! Así quedan las ciudades de Azlan:",
+   note:"~2 min. En el almacén, Martí y Franco escanean y entregan los EPIs. Cinco ciudades: Lleida, Martorell, Sant Cugat, Molins de Rei y Parets. Después, el % de EPIs entregados en cada ciudad de Catalunya, lo que queda por entregar y el calendario de visitas para dejarlo todo entregado.",
    npcs:[["casco"],["chaqueta","guantes"],["mochila"],["casco","guantes"],["chaqueta"],["mochila","casco"],["guantes","chaqueta","mochila"]] }
 ];
 // Niveles más largos para las cajas, los agujeros y los obstáculos (ciudades y fondos escalados igual).
@@ -1889,12 +1920,13 @@ function updateStats(root,animate){
 function openRaulPanel(){
   const F=[["Validación de cita","Cada candidato solo puede tener una cita. Nadie acapara huecos.","Permite reservar varias veces"],
            ["Validación en oficina","En la puerta se comprueba el código: nadie entra sin cita.","Cualquiera se presenta en la oficina"],
-           ["Autorrelleno de cancelaciones","Cuando alguien cancela, el hueco se rellena solo: máxima afluencia y adelantamos a quien tenía cita lejana.","El hueco se queda vacío"]];
+           ["Autorrelleno de cancelaciones","Cuando alguien cancela, el hueco se rellena solo: máxima afluencia y adelantamos a quien tenía cita lejana.","El hueco se queda vacío"],
+           ["Citas vinculadas a turnos","El sistema de citas se ha vinculado al de turnos para garantizar el control de las citas.","Citas y turnos por separado"]];
   const html=`${K("r.intro","Del caos a una oficina ordenada. Nuestro sistema de citas frente a Calendly:","p","intro")}
    <div class="quest" id="quest">${K("r.q0","El candidato reserva su cita","div","qs")}${K("r.q1","Recibe un mail con su código","div","qs")}${K("r.q2","Validamos el código en oficina","div","qs")}${K("r.q3","Formación y turno asignado","div","qs")}</div>
    <div class="vsc"><div class="vh"></div><div class="vh">CALENDLY</div><div class="vh us">SISTEMA FLiiTS</div>
    ${F.map((f,i)=>`<div class="vf">${K(`r.f${i}.t`,f[0],"b")}${K(`r.f${i}.d`,f[1],"span")}</div><div class="vno">✗ ${K(`r.f${i}.c`,f[2],"span")}</div><div class="vok">✓</div>`).join("")}</div>
-   ${notes("r.notes","~2 min. Cuenta el antes: colas y gente colándose en la formación. Después las tres mejoras frente a Calendly: una cita por persona, validación en oficina y autorrelleno de cancelaciones.")}`;
+   ${notes("r.notes","~2 min. Cuenta el antes: colas y gente colándose en la formación. Después las mejoras frente a Calendly: una cita por persona, validación en oficina, autorrelleno de cancelaciones y citas vinculadas al sistema de turnos para garantizar su control.")}`;
   const go=gold()>=3||forceFinal;
   openPanel("OFICINA · "+nm(1),"CITAS: MEJOR QUE CALENDLY",html,go?"ENTER · AL JEFE FINAL":"ENTER · VOLVER",()=>{ hideRaulUI(); if(!go) showSelect(); else if(activeGameMode==="rpg") rpgStartFinal(); else startFinal(); },b=>{
     [...b.querySelector("#quest").children].forEach((q,k)=>setTimeout(()=>{ if(open>0){ q.classList.add("on"); sfx.tick(); } },400+k*450));
@@ -3256,6 +3288,20 @@ function openPanel(kick,title,html,btn,onDone,after){
 }
 function closePanel(){ if(open<0) return; open=-1; $("#lvlOv").hidden=true; const f=panelDone; panelDone=null; if(f) f(); }
 $("#clearBtn").addEventListener("click",closePanel);
+// EPIs entregados por ciudad: riders con el documento de EPIs firmado (Control de stock FLiiTS, solo totales por ciudad).
+const EPIS=[["Barcelona",716,686],["Sabadell",130,88],["Parets del Vallès",36,34],["Martorell",30,25],["Gavà",22,15],["Mataró",22,11],["Lleida",21,16],["Sant Cugat",17,10],["Molins de Rei",16,13]];
+function episHTML(){
+  let T=0,D=0;
+  const rows=EPIS.map(([n,t,d])=>{ T+=t; D+=d; const p=Math.round(100*d/t);
+    return `<div class="ep${p<75?" lo":""}"><span>${n}</span><div class="epb"><i style="--p:${p}%"></i></div><b>${p}%</b><em>${t-d?`${t-d} por entregar`:"todo entregado"}</em></div>`; }).join("");
+  return `<div class="retos-h" style="margin-top:22px">EPIs ENTREGADOS EN CATALUNYA</div>
+   ${K("ep.intro","Porcentaje de riders de cada ciudad con sus EPIs entregados y firmados, y lo que queda por entregar:","p","intro")}
+   <div class="eps" id="eps">${rows}</div>
+   <div class="ctot">TOTAL CATALUNYA: ${Math.round(100*D/T)}% ENTREGADO · ${fmtN(D)} DE ${fmtN(T)} RIDERS · ${T-D} POR ENTREGAR</div>
+   <div class="cal">${K("ep.cal","Tenemos un calendario de visitas a las ciudades para dejarlo todo entregado.","span")}</div>
+   <div class="src">${K("ep.src","Control de stock FLiiTS · riders con el documento de EPIs firmado, 06/11/2026","span")}</div>`;
+}
+function animEpis(b){ const e=b.querySelector("#eps"); if(e) setTimeout(()=>{ if(open>0){ e.classList.add("on"); sfx.tick(); } },500); }
 // Novedades del nuevo sistema de control de stock (se muestran en el panel de Azlan).
 function stockHTML(){
   const F=[["Stock calculado solo","El stock de cada oficina se calcula con cada entrega, envío y recuento. En rojo lo que baja del punto de reposición.","Se apuntaba a mano en el Tracker EPIs"],
@@ -3276,16 +3322,13 @@ function animStock(b){ const q=b.querySelector("#stQuest"); if(!q) return;
 function openCityPanel(){
   const i=SCREENS.indexOf(scr), S=scr;
   if(S.type==="docs") return openMotoPanel(i);
-  const LB=["Moto-mensajero","Moto-conductor","Moto empresa","Bici propia","Bici empresa"];
   const many=S.cities.length>5;
-  const cards=S.cities.map((c,j)=>{ const id=`d3.${i}.${j}`, v=c[3];
-    const motos=v?K(`${id}.m`,String(+v[0]+ +v[1]+ +v[2]),"b","nmo"):`<b class="nmo na">—</b>`;
-    const bk=v?`<div class="cbk">${LB.map((l,q)=>`<span>${l}</span>${K(`${id}.k${q}`,v[q],"em",q<3?"km":"")}`).join("")}</div>`:`<div class="cbk1">El desglose de vehículos de Barcelona (10 moto-mensajero · 77 moto-conductor · 22 moto empresa · 614 bici propia) está en la pantalla de Ivan.</div>`;
+  const cards=S.cities.map((c,j)=>{ const id=`c4.${i}.${j}`;
     return `<div class="ccard">${K(`${id}.n`,c[0],"div","cn")}${K(`${id}.p`,c[1]||"—","div","cp")}
-    <div class="cnums"><div><span>RIDERS</span>${K(`${id}.r`,c[2],"b","nr")}</div><div><span>MOTOS</span>${motos}</div></div>${bk}</div>`; }).join("");
+    <div class="cnums"><div><span>MOTOS</span>${K(`${id}.m`,c[2],"b","nmo")}</div><div><span>BICIS</span>${K(`${id}.b`,c[3],"b","nbi")}</div></div></div>`; }).join("");
   const html=`${K(`d2.${i}.intro`,S.intro,"p","intro")}<div class="runline">EN ESTA PARTIDA · ${S.c1.toUpperCase()}: ${c1} · ${S.c2.toUpperCase()}: ${c2}</div>
-    <div class="ccards${many?" many":""}">${cards}</div><div class="ctot" id="ctot"></div><div class="src">Riders contratados y tipo de vehículo según contrato · Rider forecast, 04/11/2026</div>${S.type==="epis"?stockHTML():""}${notes(`d.${i}.notes`,S.type==="epis"?S.note+" Después, el nuevo sistema de stock: escaneo del QR, kit según vehículo, firma y stock al momento; envíos caja a caja, pendientes, devoluciones y permisos por oficina.":S.note)}`;
-  openPanel(`MUNDO ${i+1} · ${nm(S.who)}`,"¡PANTALLA SUPERADA!",html,"ENTER · GUARDAR MONEDA DE ORO",()=>finishScreen(i),b=>{ updTotals(b); animStock(b); });
+    <div class="ccards${many?" many":""}">${cards}</div><div class="ctot" id="ctot"></div><div class="src">Riders activos por tipo de vehículo · Rider forecast, 06/11/2026</div>${S.type==="epis"?episHTML()+stockHTML():""}${notes(`d.${i}.notes`,S.type==="epis"?S.note+" Después, el nuevo sistema de stock: escaneo del QR, kit según vehículo, firma y stock al momento; envíos caja a caja, pendientes, devoluciones y permisos por oficina.":S.note)}`;
+  openPanel(`MUNDO ${i+1} · ${nm(S.who)}`,"¡PANTALLA SUPERADA!",html,"ENTER · GUARDAR MONEDA DE ORO",()=>finishScreen(i),b=>{ updTotals(b); animEpis(b); animStock(b); });
 }
 // Al acabar una pantalla: tarjeta de "¡PANTALLA SUPERADA!" (tapa el juego) y vuelta al selector.
 let winNext=null, winTimer=0;
@@ -3313,41 +3356,61 @@ function showRepWin(stars){
 function closeWin(){ if($("#winOv").hidden) return; clearTimeout(winTimer); $("#winOv").hidden=true; const f=winNext; winNext=null; if(f) f(); }
 $("#winGo").addEventListener("click",closeWin);
 let motoURL=null;
+// Motos que piden las plataformas: % de motos por ciudad y cliente (Rider forecast, pestaña "motos"; Uber Eats 20 %).
+// [ciudad · plataforma, riders, motos hoy, % pedido, motos necesarias = redondeo hacia arriba de riders × %]
+const MOTOREQ=[["Barcelona · Glovo",529,66,"13,8%",73],["Barcelona · Uber Eats",193,37,"20%",39],["Sabadell · Glovo",111,21,"29,5%",33],["Sabadell · Uber Eats",15,3,"—",0],
+  ["Parets del Vallès",35,6,"20%",7],["Martorell",28,3,"20%",6],["Gavà",21,2,"20%",5],["Mataró",18,6,"20%",4],["Lleida",20,10,"20%",4],["Sant Cugat",14,3,"20%",3],["Molins de Rei",16,3,"20%",4]];
 function openMotoPanel(i){
   { const c=document.createElement("canvas"); c.width=16; c.height=13; drawSpr(c.getContext("2d"),MOTO,0,0); motoURL=themed(c).toDataURL(); }
-  const html=`${K("mo.intro","Documentación validada: ALL APPROVED. Y la flota de motos sigue creciendo:","p","intro")}
+  let NE=0,FA=0;
+  const rows=MOTOREQ.map(([n,r,m,p,q])=>{ const f=Math.max(0,q-m); NE+=q; FA+=f;
+    return `<span>${n}</span><b>${r}</b><b>${m}</b><b>${p}</b><b>${q}</b><b class="${f?"miss":"ok"}">${f?"+"+f:"✓"}</b>`; }).join("");
+  const html=`${K("mo2.intro","Documentación validada: ALL APPROVED. Y ahora, las motos de Catalunya:","p","intro")}
    <div class="runline">EN ESTA PARTIDA · APROBADOS: ${c1} · RECHAZADOS: ${c2}</div>
    <div class="mgrid">
      <div class="mbig"><span>MOTOS HOY EN CATALUNYA</span><b id="moTotal">0</b></div>
      <div class="mrows">
-       <div class="mrow"><span>Moto-conductor</span>${K("mo.c","133","b","mv")}</div>
-       <div class="mrow"><span>Moto-mensajero</span>${K("mo.m","11","b","mv")}</div>
-       <div class="mrow hl"><span>Moto de empresa · incorporadas desde septiembre</span>${K("mo.e","23","b","mv")}</div>
-       <div class="mrow nx"><span>Motos de empresa en breve</span>${K("mo.n","+10","b")}</div>
+       <div class="mrow"><span>Barcelona · Glovo 66 · Uber Eats 37 · 3 sin plataforma</span>${K("mo2.bcn","106","b","mv")}</div>
+       <div class="mrow"><span>Sabadell · Glovo 21 · Uber Eats 3</span>${K("mo2.qsa","24","b","mv")}</div>
+       <div class="mrow"><span>Parets 6 · Martorell 3 · Gavà 2 · Mataró 6 · Lleida 10 · Sant Cugat 3 · Molins de Rei 3</span>${K("mo2.rest","33","b","mv")}</div>
      </div>
    </div>
-   <div class="retos-h">FLOTA DE MOTOS DE EMPRESA</div>
+   <div class="retos-h">¿CUÁNTAS MOTOS NOS PIDEN?</div>
+   <div class="mt"><span class="th">CIUDAD</span><span class="th">RIDERS</span><span class="th">MOTOS HOY</span><span class="th">% PEDIDO</span><span class="th">HACEN FALTA</span><span class="th">FALTAN</span>
+     ${rows}<span class="tt">TOTAL</span><b class="tt"></b><b class="tt">163</b><b class="tt"></b><b class="tt">${NE}</b><b class="tt miss">+${FA}</b></div>
+   <div class="src">Las ciudades que van sobradas (Lleida, Mataró) no compensan a las que no llegan: faltan ${FA} motos para garantizar el % que pide cada plataforma.</div>
+   <div class="retos-h" style="margin-top:18px">FLOTA DE MOTOS DE EMPRESA</div>
+   <div class="mrows m4">
+     <div class="mrow hl"><span>Motos de empresa · incorporadas desde septiembre</span>${K("mo2.e","23","b")}</div>
+     <div class="mrow nx"><span>Pendientes de recibir</span>${K("mo2.n","+10","b")}</div>
+     <div class="mrow"><span>Lista de espera · riders pidiendo moto</span>${K("mo2.w","20","b")}</div>
+     <div class="mrow need"><span>Faltan de empresa para cubrir los mínimos (${FA} − las que llegan)</span><b id="moNeed">0</b></div>
+   </div>
    <div class="mfleet" id="mfleet"></div>
-   <div class="mtl"><span>SEPTIEMBRE · 0</span><span>HOY · <b id="mtlNow">23</b></span><span>EN BREVE · <b id="mtlNext">33</b></span></div>
-   <div class="src">Moto-conductor y moto-mensajero: contratos en Rider forecast (04/11/2026). Motos de empresa: dato actual.</div>
-   ${notes("mo.notes","~2 min. Gerard valida la documentación (NIE, carnets, permisos). Luego las motos: cuántas tenemos hoy, las de empresa incorporadas desde septiembre y las 10 que llegan en breve.")}`;
+   <div class="mtl"><span>SEPTIEMBRE · 0</span><span>HOY · <b id="mtlNow">23</b></span><span>EN BREVE · <b id="mtlNext">33</b></span><span>OBJETIVO · <b id="mtlGoal">52</b></span></div>
+   <div class="src">Motos y riders: Rider forecast (06/11/2026), pestaña motos (% por ciudad y plataforma). Motos de empresa y lista de espera: dato actual.</div>
+   ${notes("mo2.notes",`~2 min. Gerard valida la documentación (NIE, carnets, permisos). Luego las motos: ${163} hoy en Catalunya, por ciudad y, en Barcelona y Sabadell, por Glovo y Uber Eats. Para cumplir el % que piden harían falta ${NE} motos y faltan ${FA} en las ciudades que no llegan. Tenemos 23 de empresa desde septiembre y 10 en camino: faltan ${FA-10} más (flota de ${23+FA}) y hay 20 riders en lista de espera pidiendo moto.`)}`;
   openPanel(`MUNDO ${i+1} · ${nm(scr.who)}`,"¡PANTALLA SUPERADA!",html,"ENTER · GUARDAR MONEDA DE ORO",()=>finishScreen(i),b=>updMotos(b,true));
 }
 function updMotos(b,anim){
   b=b||$("#lvlBody"); const f=b.querySelector("#mfleet"); if(!f) return;
   let tot=0; b.querySelectorAll(".mv").forEach(e=>tot+=num(e.textContent)); b.querySelector("#moTotal").textContent=tot;
-  const e=Math.max(0,Math.min(200,num(b.querySelector('[data-k="mo.e"]').textContent))), n=Math.max(0,Math.min(200,num(b.querySelector('[data-k="mo.n"]').textContent)));
-  b.querySelector("#mtlNow").textContent=e; b.querySelector("#mtlNext").textContent=e+n;
-  f.innerHTML=Array.from({length:e+n},(_,k)=>`<img src="${motoURL}" alt="" class="${k>=e?"fut":""}" style="${anim?`animation-delay:${(k*.06).toFixed(2)}s`:"animation:none"}">`).join("");
+  const FA=MOTOREQ.reduce((a,r)=>a+Math.max(0,r[4]-r[2]),0);
+  const e=Math.max(0,Math.min(200,num(b.querySelector('[data-k="mo2.e"]').textContent))), n=Math.max(0,Math.min(200,num(b.querySelector('[data-k="mo2.n"]').textContent))), x=Math.max(0,FA-n);
+  b.querySelector("#mtlNow").textContent=e; b.querySelector("#mtlNext").textContent=e+n; b.querySelector("#mtlGoal").textContent=e+n+x; b.querySelector("#moNeed").textContent=x;
+  f.innerHTML=Array.from({length:e+n+x},(_,k)=>`<img src="${motoURL}" alt="" class="${k>=e+n?"need":k>=e?"fut":""}" style="${anim?`animation-delay:${(k*.05).toFixed(2)}s`:"animation:none"}">`).join("");
 }
-function updTotals(root){ root=root||$("#lvlBody"); const t=root.querySelector("#ctot"); if(!t) return; root.querySelectorAll(".ccard").forEach(cd=>{ const ks=cd.querySelectorAll(".km"), mo=cd.querySelector(".nmo"); if(ks.length&&mo&&document.activeElement!==mo){ let x=0; ks.forEach(e=>x+=num(e.textContent)); mo.textContent=x; } }); let r=0,m=0; root.querySelectorAll(".nr").forEach(e=>r+=num(e.textContent)); root.querySelectorAll(".nmo").forEach(e=>m+=num(e.textContent)); t.textContent=`TOTAL${root.querySelector(".ccards.many")?" CATALUNYA":""}: ${r} RIDERS · ${m} MOTOS`; }
+function updTotals(root){ root=root||$("#lvlBody"); const t=root.querySelector("#ctot"); if(!t) return; let m=0,k=0; root.querySelectorAll(".nmo").forEach(e=>m+=num(e.textContent)); root.querySelectorAll(".nbi").forEach(e=>k+=num(e.textContent)); t.textContent=`TOTAL${root.querySelector(".ccards.many")?" CATALUNYA":""}: ${fmtN(m+k)} RIDERS · ${fmtN(m)} MOTOS · ${fmtN(k)} BICIS`; }
+const fmtN=n=>String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,".");
 function openFinalPanel(){
-  const html=`${K("f.intro","Las mochilas se han rendido. Tenemos nuevas zonas para repartir en Catalunya:","p","intro")}
-   <div class="cities" id="cities">${["Girona","Tarragona","Terrassa","Mataró","Badalona","Manresa"].map((c,i)=>K(`f.c${i}`,c,"div","city-t")).join("")}</div>
-   <div class="retos-h">PRÓXIMOS RETOS 2027</div>
-   <ul class="retos">${["Llegar a 250 riders activos en Catalunya","Ampliar la flota de motos de empresa","Absentismo por debajo del 3%"].map((t,i)=>K(`f.a${i}`,t,"li")).join("")}</ul>
-   ${notes("f.notes","~1:30 min. Raül junta las tres monedas: el trabajo de Ivan, Gerard y Azlan. Presenta las ciudades nuevas (cámbialas por las reales) y los retos de 2027. Después, créditos y preguntas.")}`;
-  openPanel("FINAL · "+nm(1),"¡NUEVAS CIUDADES DESBLOQUEADAS!",html,"ENTER · VER CRÉDITOS",showCredits,b=>{ [...b.querySelector("#cities").children].forEach((t,k)=>setTimeout(()=>{ if(open>0){ t.classList.add("on"); sfx.coin(); } },500+k*380)); });
+  const html=`${K("f2.intro","Las mochilas se han rendido. Y llegan peticiones para abrir nuevas ciudades en Catalunya:","p","intro")}
+   <div class="cities req" id="cities">${["Girona","Tarragona","Terrassa","Mataró","Badalona","Manresa"].map((c,i)=>K(`f.c${i}`,c,"div","city-t")).join("")}</div>
+   <div class="retos-h">PRÓXIMOS RETOS</div>
+   <div class="goal"><div><span>REPARTIDORES ACTIVOS EN CATALUNYA HOY</span><b>1.020</b></div><div class="arr">→</div><div class="g"><span>OBJETIVO CON TODO CUMPLIDO</span>${K("f2.goal","¿?","b")}</div></div>
+   <ul class="retos">${["Tener 52 motos de empresa para cubrir los mínimos garantizados que nos piden (hoy 23 + 10 en camino: faltan 19)","100% de EPIs entregados a una semana vista de la contratación del rider (hoy, 89%)","Mejorar la eficiencia de la flota y reducir el absentismo"].map((t,i)=>K(`f2.a${i}`,t,"li")).join("")}</ul>
+   <div class="src">Riders activos: suma de las 9 ciudades de Catalunya en el Rider forecast (06/11/2026).</div>
+   ${notes("f2.notes","~1:30 min. Raül junta las tres monedas: el trabajo de Ivan, Gerard y Azlan. Presenta las peticiones de nuevas ciudades y los retos: de 1.020 riders activos al objetivo, 52 motos de empresa, EPIs al 100% a una semana de la contratación, más eficiencia de la flota y menos absentismo. Después, créditos y preguntas.")}`;
+  openPanel("FINAL · "+nm(1),"PETICIONES: NUEVAS CIUDADES",html,"ENTER · VER CRÉDITOS",showCredits,b=>{ [...b.querySelector("#cities").children].forEach((t,k)=>setTimeout(()=>{ if(open>0){ t.classList.add("on"); sfx.coin(); } },500+k*380)); });
 }
 
 /* ---------- edits ---------- */
@@ -3373,12 +3436,15 @@ function showCredits(){
   FIN[activeGameMode]=true;
   const who=[0,2,3,1], newRep=unlockRep();
   $("#roll").innerHTML=`<div class="big">¡GRACIAS<br>POR JUGAR!</div><div class="h">EQUIPO CATALUNYA</div><div class="crew" id="crewRoll"></div>
+   <div class="h">CON LA COLABORACIÓN ESPECIAL DE</div><div class="crew" id="collabRoll"></div>
    <div class="h">Y A TODOS NUESTROS RIDERS</div><div class="big" style="font-size:clamp(18px,3vw,34px)">¿PREGUNTAS?</div>
    <div class="h">PUNTUACIÓN ${String(score).padStart(6,"0")} · MONEDAS ${coins} · ORO ${gold()}/3</div>${newRep?`<div class="big" style="font-size:clamp(14px,2.6cqw,28px)">¡MODO REPARTIDOR<br>DESBLOQUEADO!</div><div class="h">YA APARECE EN EL SELECTOR DE JUGADORES</div>`:""}<div class="press">ESC · VOLVER</div>`;
   const cr=$("#crewRoll");
   who.forEach(i=>{ const d=document.createElement("div"); d.appendChild(themed(standCanvas(i))); d.insertAdjacentHTML("beforeend",`<span>${esc(nm(i))}</span>`); cr.appendChild(d); });
-  const m=document.createElement("div"); const mc=document.createElement("canvas"); mc.width=18; mc.height=28; drawPal(mc.getContext("2d"),MARTI,0,0,MPAL_I); m.appendChild(themed(mc)); m.insertAdjacentHTML("beforeend",`<span>${esc(saved["pl.m.n"]??"MARTÍ")}</span>`); cr.appendChild(m);
-  const fr=document.createElement("div"); const fc=document.createElement("canvas"); fc.width=16; fc.height=24; drawPal(fc.getContext("2d"),FRANCO,0,0,FPAL); fr.appendChild(themed(fc)); fr.insertAdjacentHTML("beforeend",`<span>FRANCO</span>`); cr.appendChild(fr);
+  const co=$("#collabRoll");
+  [[MARTI,18,28,MPAL_I,"MARTÍ PUJOL"],[MARTI_B,18,28,MPAL_A,"MARTÍ ESPRIU"],[FRANCO,16,24,FPAL,"FRANCO"]].forEach(([S,w,h,P,n],k)=>{
+    const d=document.createElement("div"), cv=document.createElement("canvas"); cv.width=w; cv.height=h; drawPal(cv.getContext("2d"),S,0,0,P); d.appendChild(themed(cv));
+    d.insertAdjacentHTML("beforeend",`<span>${esc(saved["cr.c"+k]??n)}</span>`); co.appendChild(d); });
   $("#credOv").hidden=false; sfx.win();
 }
 $("#credOv").addEventListener("click",()=>{ $("#credOv").hidden=true; showSelect(); });
