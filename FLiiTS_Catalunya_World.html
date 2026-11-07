@@ -3736,27 +3736,45 @@ updHud(); fit(); requestAnimationFrame(loop);
 #gate .g-skip{position:absolute;right:max(6px,env(safe-area-inset-right,0px));bottom:max(6px,env(safe-area-inset-bottom,0px));width:22px;height:22px;border:0;padding:0;background:transparent;cursor:default}
 #gate .g-skip::after{content:"";position:absolute;right:8px;bottom:8px;width:3px;height:3px;background:#2a1418}
 #gate.go{animation:gOut .6s steps(6) forwards}
+/* ARE YOU READY? (solo en la tele): 5 s en pantalla y se funde poco a poco en la pantalla inicial */
+#gate .g-ready{display:none}
+#gate.ready .g-main{display:none}
+#gate.ready .g-ready{display:block}
+#gate .g-ready b{display:block;font-weight:400;font-size:clamp(28px,7vw,84px);line-height:1.25;color:#ffd23f;text-shadow:4px 4px 0 #d0102c,8px 8px 0 #120b0c;animation:gPulse 1.2s steps(2) infinite}
+#gate .g-ready i{display:block;font-style:normal;font-size:clamp(9px,1.6vw,16px);color:#ffd3d9;letter-spacing:.3em;margin-top:28px}
+@keyframes gPulse{50%{transform:scale(1.04)}}
+#gate.fade{transition:opacity 3s ease-in,visibility 0s 3s;opacity:0;visibility:hidden;pointer-events:none}
 @keyframes gOut{to{opacity:0;visibility:hidden}}
 </style>
 <script>
 /* Cuenta atrás hasta la presentación: el juego no se ve hasta el 18/11/2026 a las 18:45 (hora de Barcelona).
+   Al acabar, en la tele (ordenador) sale una vez por dispositivo "ARE YOU READY?" 5 s y se funde en la pantalla
+   inicial; en el móvil se entra directo. Con ?ready en la dirección vuelve a salir.
    Salto oculto: 3 toques seguidos en el punto casi invisible de la esquina inferior derecha, o escribir "fliits"
    con el teclado. El salto se recuerda en ese dispositivo; con ?cuenta en la dirección vuelve a mostrarse. */
 (()=>{
  const TARGET=Date.parse("2026-11-18T18:45:00+01:00"), KEY="cw-gate-skip";
- let skipped=false; try{ if(/[?&#]cuenta/i.test(location.search+location.hash)) localStorage.removeItem(KEY); skipped=localStorage.getItem(KEY)==="1"; }catch(e){}
- if(skipped||Date.now()>=TARGET) return;
+ const RKEY="cw-ready-seen", q=location.search+location.hash, tv=!document.documentElement.classList.contains("frame-gb");
+ let skipped=false, seen=false; try{ if(/[?&#]cuenta/i.test(q)){ localStorage.removeItem(KEY); localStorage.removeItem(RKEY); } if(/[?&#]ready/i.test(q)) localStorage.removeItem(RKEY);
+   skipped=localStorage.getItem(KEY)==="1"; seen=localStorage.getItem(RKEY)==="1"; }catch(e){}
+ const past=Date.now()>=TARGET, wantReady=tv&&!seen;
+ if(past&&!wantReady) return;
+ if(!past&&skipped) return;
  const g=document.createElement("div"); g.id="gate"; g.setAttribute("role","dialog"); g.setAttribute("aria-label","Cuenta atrás");
- g.innerHTML=`<div><div class="g-logo">FL<span>ii</span>TS</div><div class="g-sub">CATALUNYA WORLD</div>
+ g.innerHTML=`<div class="g-main"><div class="g-logo">FL<span>ii</span>TS</div><div class="g-sub">CATALUNYA WORLD</div>
   <div class="g-msg">LA PARTIDA EMPIEZA EN<span class="g-blink">_</span></div>
   <div class="g-cd"><div><b id="gD">00</b><i>DIAS</i></div><div><b id="gH">00</b><i>HORAS</i></div><div><b id="gM">00</b><i>MIN</i></div><div><b id="gS">00</b><i>SEG</i></div></div>
-  <div class="g-date">18 NOVIEMBRE · 18:45</div></div><button class="g-skip" type="button" aria-hidden="true" tabindex="-1"></button>`;
+  <div class="g-date">18 NOVIEMBRE · 18:45</div></div>
+  <div class="g-ready"><b>ARE YOU<br>READY?</b><i>FLiiTS CATALUNYA WORLD</i></div><button class="g-skip" type="button" aria-hidden="true" tabindex="-1"></button>`;
  document.body.appendChild(g);
  const p2=n=>String(n).padStart(2,"0"), $g=id=>g.querySelector("#"+id);
  let tm=0;
  const open=remember=>{ if(!g.isConnected) return; clearInterval(tm); if(remember){ try{ localStorage.setItem(KEY,"1"); }catch(e){} }
    removeEventListener("keydown",block,true); g.classList.add("go"); setTimeout(()=>g.remove(),650); };
- const tick=()=>{ const ms=TARGET-Date.now(); if(ms<=0){ open(false); return; }
+ // ARE YOU READY?: se muestra 5 s y la pantalla inicial aparece poco a poco (se recuerda en el dispositivo)
+ const ready=()=>{ clearInterval(tm); try{ localStorage.setItem(RKEY,"1"); }catch(e){} g.classList.add("ready");
+   setTimeout(()=>{ removeEventListener("keydown",block,true); g.classList.add("fade"); setTimeout(()=>g.remove(),3100); },5000); };
+ const tick=()=>{ const ms=TARGET-Date.now(); if(ms<=0){ if(wantReady) ready(); else open(false); return; }
    const t=Math.floor(ms/1000); $g("gD").textContent=p2(Math.floor(t/86400)); $g("gH").textContent=p2(Math.floor(t/3600)%24); $g("gM").textContent=p2(Math.floor(t/60)%60); $g("gS").textContent=p2(t%60); };
  tick(); tm=setInterval(tick,1000);
  // Mientras está la cuenta atrás, el teclado no llega al juego (solo sirve para la palabra secreta)
