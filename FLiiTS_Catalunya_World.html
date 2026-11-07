@@ -3740,9 +3740,9 @@ updHud(); fit(); requestAnimationFrame(loop);
 #gate .g-ready{display:none}
 #gate.ready .g-main{display:none}
 #gate.ready .g-ready{display:block}
-#gate .g-ready b{display:block;font-weight:400;font-size:clamp(28px,7vw,84px);line-height:1.25;color:#ffd23f;text-shadow:4px 4px 0 #d0102c,8px 8px 0 #120b0c;animation:gPulse 1.2s steps(2) infinite}
+#gate .g-ready b{display:block;font-weight:400;font-size:clamp(28px,7vw,84px);line-height:1.25;color:#ffd23f;text-shadow:4px 4px 0 #d0102c,8px 8px 0 #120b0c;animation:gPulse 1.6s ease-in-out infinite alternate;will-change:transform;transform-origin:50% 55%}
 #gate .g-ready i{display:block;font-style:normal;font-size:clamp(9px,1.6vw,16px);color:#ffd3d9;letter-spacing:.3em;margin-top:28px}
-@keyframes gPulse{50%{transform:scale(1.04)}}
+@keyframes gPulse{from{transform:scale(.96)}to{transform:scale(1.06)}}
 #gate.fade{transition:opacity 3s ease-in,visibility 0s 3s;opacity:0;visibility:hidden;pointer-events:none}
 @keyframes gOut{to{opacity:0;visibility:hidden}}
 </style>
