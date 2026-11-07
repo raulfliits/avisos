@@ -3716,4 +3716,54 @@ updHud(); fit(); requestAnimationFrame(loop);
 </script>
 
 
+<style id="cuenta-atras">
+#gate{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;text-align:center;padding:24px;
+ padding-top:max(24px,env(safe-area-inset-top,0px));padding-bottom:max(24px,env(safe-area-inset-bottom,0px));
+ background:radial-gradient(ellipse at 50% 35%,#3a0a14,#120b0c 70%);color:#fff;font-family:var(--f-display);
+ user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;overflow:hidden}
+#gate .g-logo{font-size:clamp(26px,8vw,64px);line-height:1.1;text-shadow:3px 3px 0 #d0102c,6px 6px 0 #120b0c}
+#gate .g-logo span{color:#d0102c;text-shadow:3px 3px 0 #fff,6px 6px 0 #120b0c}
+#gate .g-sub{font-size:clamp(8px,2.4vw,14px);color:#ffd23f;letter-spacing:.3em;margin:10px 0 34px}
+#gate .g-msg{font-size:clamp(8px,2.2vw,13px);color:#ffd3d9;line-height:1.9;margin-bottom:18px}
+#gate .g-cd{display:flex;gap:clamp(6px,2vw,18px);justify-content:center}
+#gate .g-cd div{min-width:clamp(58px,18vw,120px);padding:clamp(10px,2.5vw,18px) 4px;border:4px solid #fff;background:rgba(18,11,12,.6);box-shadow:0 0 0 4px #120b0c,6px 6px 0 4px #d0102c}
+#gate .g-cd b{display:block;font-weight:400;font-size:clamp(22px,7vw,54px);color:#ffd23f;text-shadow:3px 3px 0 #120b0c}
+#gate .g-cd i{display:block;font-style:normal;font-size:clamp(6px,1.6vw,10px);color:#ffd3d9;margin-top:10px;letter-spacing:.1em}
+#gate .g-date{font-size:clamp(9px,2.6vw,15px);margin-top:30px;color:#fff}
+#gate .g-blink{animation:gBlink 1s steps(2) infinite}
+@keyframes gBlink{50%{opacity:0}}
+/* Salto discreto: un punto casi del color del fondo en la esquina inferior derecha (3 toques seguidos) */
+#gate .g-skip{position:absolute;right:max(6px,env(safe-area-inset-right,0px));bottom:max(6px,env(safe-area-inset-bottom,0px));width:22px;height:22px;border:0;padding:0;background:transparent;cursor:default}
+#gate .g-skip::after{content:"";position:absolute;right:8px;bottom:8px;width:3px;height:3px;background:#2a1418}
+#gate.go{animation:gOut .6s steps(6) forwards}
+@keyframes gOut{to{opacity:0;visibility:hidden}}
+</style>
+<script>
+/* Cuenta atrás hasta la presentación: el juego no se ve hasta el 18/11/2026 a las 18:45 (hora de Barcelona).
+   Salto oculto: 3 toques seguidos en el punto casi invisible de la esquina inferior derecha, o escribir "fliits"
+   con el teclado. El salto se recuerda en ese dispositivo; con ?cuenta en la dirección vuelve a mostrarse. */
+(()=>{
+ const TARGET=Date.parse("2026-11-18T18:45:00+01:00"), KEY="cw-gate-skip";
+ let skipped=false; try{ if(/[?&#]cuenta/i.test(location.search+location.hash)) localStorage.removeItem(KEY); skipped=localStorage.getItem(KEY)==="1"; }catch(e){}
+ if(skipped||Date.now()>=TARGET) return;
+ const g=document.createElement("div"); g.id="gate"; g.setAttribute("role","dialog"); g.setAttribute("aria-label","Cuenta atrás");
+ g.innerHTML=`<div><div class="g-logo">FL<span>ii</span>TS</div><div class="g-sub">CATALUNYA WORLD</div>
+  <div class="g-msg">LA PARTIDA EMPIEZA EN<span class="g-blink">_</span></div>
+  <div class="g-cd"><div><b id="gD">00</b><i>DIAS</i></div><div><b id="gH">00</b><i>HORAS</i></div><div><b id="gM">00</b><i>MIN</i></div><div><b id="gS">00</b><i>SEG</i></div></div>
+  <div class="g-date">18 NOVIEMBRE · 18:45</div></div><button class="g-skip" type="button" aria-hidden="true" tabindex="-1"></button>`;
+ document.body.appendChild(g);
+ const p2=n=>String(n).padStart(2,"0"), $g=id=>g.querySelector("#"+id);
+ let tm=0;
+ const open=remember=>{ if(!g.isConnected) return; clearInterval(tm); if(remember){ try{ localStorage.setItem(KEY,"1"); }catch(e){} }
+   removeEventListener("keydown",block,true); g.classList.add("go"); setTimeout(()=>g.remove(),650); };
+ const tick=()=>{ const ms=TARGET-Date.now(); if(ms<=0){ open(false); return; }
+   const t=Math.floor(ms/1000); $g("gD").textContent=p2(Math.floor(t/86400)); $g("gH").textContent=p2(Math.floor(t/3600)%24); $g("gM").textContent=p2(Math.floor(t/60)%60); $g("gS").textContent=p2(t%60); };
+ tick(); tm=setInterval(tick,1000);
+ // Mientras está la cuenta atrás, el teclado no llega al juego (solo sirve para la palabra secreta)
+ let typed="";
+ const block=e=>{ e.stopImmediatePropagation(); e.preventDefault(); if(e.key&&e.key.length===1){ typed=(typed+e.key.toLowerCase()).slice(-6); if(typed==="fliits") open(true); } };
+ addEventListener("keydown",block,true);
+ let taps=[]; g.querySelector(".g-skip").addEventListener("click",()=>{ const now=Date.now(); taps=taps.filter(t=>now-t<1500); taps.push(now); if(taps.length>=3) open(true); });
+})();
+</script>
 </body></html>
