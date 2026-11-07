@@ -3749,7 +3749,8 @@ updHud(); fit(); requestAnimationFrame(loop);
 <script>
 /* Cuenta atrás hasta la presentación: el juego no se ve hasta el 18/11/2026 a las 18:45 (hora de Barcelona).
    Al acabar, en la tele (ordenador) sale una vez por dispositivo "ARE YOU READY?" 5 s y se funde en la pantalla
-   inicial; en el móvil se entra directo. Con ?ready en la dirección vuelve a salir.
+   inicial; en el móvil se entra directo. Saltar la cuenta atrás en la tele también pasa por "ARE YOU READY?".
+   Con ?ready en la dirección vuelve a salir.
    Salto oculto: 3 toques seguidos en el punto casi invisible de la esquina inferior derecha, o escribir "fliits"
    con el teclado. El salto se recuerda en ese dispositivo; con ?cuenta en la dirección vuelve a mostrarse. */
 (()=>{
@@ -3769,11 +3770,15 @@ updHud(); fit(); requestAnimationFrame(loop);
  document.body.appendChild(g);
  const p2=n=>String(n).padStart(2,"0"), $g=id=>g.querySelector("#"+id);
  let tm=0;
- const open=remember=>{ if(!g.isConnected) return; clearInterval(tm); if(remember){ try{ localStorage.setItem(KEY,"1"); }catch(e){} }
+ const open=remember=>{ if(!g.isConnected||readyOn) return; clearInterval(tm); if(remember){ try{ localStorage.setItem(KEY,"1"); }catch(e){} if(tv){ ready(); return; } }
    removeEventListener("keydown",block,true); g.classList.add("go"); setTimeout(()=>g.remove(),650); };
  // ARE YOU READY?: se muestra 5 s y la pantalla inicial aparece poco a poco (se recuerda en el dispositivo)
- const ready=()=>{ clearInterval(tm); try{ localStorage.setItem(RKEY,"1"); }catch(e){} g.classList.add("ready");
-   setTimeout(()=>{ removeEventListener("keydown",block,true); g.classList.add("fade"); setTimeout(()=>g.remove(),3100); },5000); };
+ let readyOn=false;
+ const ready=()=>{ if(readyOn) return; readyOn=true; clearInterval(tm); try{ localStorage.setItem(RKEY,"1"); }catch(e){} g.classList.add("ready");
+   // Los 5 s empiezan cuando el texto ya se ve (fuente cargada y pantalla pintada), no antes
+   const fonts=(document.fonts&&document.fonts.ready)||Promise.resolve();
+   Promise.race([fonts,new Promise(r=>setTimeout(r,2000))]).then(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>
+     setTimeout(()=>{ removeEventListener("keydown",block,true); g.classList.add("fade"); setTimeout(()=>g.remove(),3100); },5000)))); };
  const tick=()=>{ const ms=TARGET-Date.now(); if(ms<=0){ if(wantReady) ready(); else open(false); return; }
    const t=Math.floor(ms/1000); $g("gD").textContent=p2(Math.floor(t/86400)); $g("gH").textContent=p2(Math.floor(t/3600)%24); $g("gM").textContent=p2(Math.floor(t/60)%60); $g("gS").textContent=p2(t%60); };
  tick(); tm=setInterval(tick,1000);
