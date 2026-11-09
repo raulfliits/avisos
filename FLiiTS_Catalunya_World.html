@@ -1087,6 +1087,14 @@ body.theme-gb .modegame.arc .mg-scene{border-color:var(--g3);background:var(--g3
 </div>
 
 <script>
+/* Combinación SELECT + START (móvil): mantener uno y pulsar el otro equivale a la tecla P del ordenador. */
+(()=>{ const held={}; let combo=false;
+ const fn=(b,name)=>{ b.addEventListener("pointerdown",()=>{ held[name]=true; if(held.select&&held.start&&!combo){ combo=true; document.dispatchEvent(new KeyboardEvent("keydown",{key:"p",bubbles:true})); } });
+  ["pointerup","pointercancel","pointerleave"].forEach(ev=>b.addEventListener(ev,()=>{ held[name]=false; })); };
+ fn.eat=()=>{ if(!combo) return false; if(!held.select&&!held.start) setTimeout(()=>{ if(!held.select&&!held.start) combo=false; },0); return true; };
+ window.sysCombo=fn; })();
+</script>
+<script>
 /* Marco (tele o consola): toda la página del juego pasa a #screen, que hace de "ventana". */
 (()=>{
  const h=document.documentElement; if(!h.classList.contains("framed")) return;
@@ -1124,7 +1132,9 @@ body.theme-gb .modegame.arc .mg-scene{border-color:var(--g3);background:var(--g3
   b.addEventListener("pointerdown",e=>{ e.preventDefault(); try{ b.setPointerCapture(e.pointerId); }catch(err){} b.classList.add("on"); fire(pad(`[data-key="${b.dataset.k}"]`),"pointerdown"); });
   ["pointerup","pointercancel","lostpointercapture"].forEach(ev=>b.addEventListener(ev,up)); });
  f.querySelectorAll("[data-a]").forEach(b=>b.addEventListener("pointerdown",e=>{ e.preventDefault(); fire(pad(`[data-action="${b.dataset.a}"]`),"pointerdown"); }));
- f.querySelectorAll("[data-s]").forEach(b=>b.addEventListener("click",e=>{ e.preventDefault(); const t=pad(`[data-system="${b.dataset.s}"]`); if(t) t.click(); }));
+ // SELECT + START a la vez = tecla P (activa / desactiva el modo repartidor en el selector de jugadores)
+ f.querySelectorAll("[data-s]").forEach(b=>{ window.sysCombo(b,b.dataset.s);
+  b.addEventListener("click",e=>{ e.preventDefault(); if(window.sysCombo.eat()) return; const t=pad(`[data-system="${b.dataset.s}"]`); if(t) t.click(); }); });
  f.querySelectorAll("[data-tv=snd]").forEach(b=>b.addEventListener("click",()=>{ const t=document.getElementById("snd"); if(t){ t.click(); b.classList.toggle("off",/OFF/.test(t.textContent)); } }));
  f.addEventListener("contextmenu",e=>e.preventDefault());
 })();
@@ -3798,11 +3808,11 @@ function pressStart(){
  }
  document.dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true}));
 }
-document.querySelectorAll("#mobilePad [data-system]").forEach(b=>b.addEventListener("click",e=>{
- e.preventDefault();
+document.querySelectorAll("#mobilePad [data-system]").forEach(b=>{ if(!document.documentElement.classList.contains("framed")) window.sysCombo(b,b.dataset.system); b.addEventListener("click",e=>{
+ e.preventDefault(); if(!document.documentElement.classList.contains("framed")&&window.sysCombo.eat()) return;
  if(b.dataset.system==="start") pressStart();
  else openQuickMenu();
-}));
+}); });
 
 /* Controles táctiles compartidos: mantener dirección, saltar y acción */
 document.querySelectorAll("#mobilePad [data-key]").forEach(b=>{
