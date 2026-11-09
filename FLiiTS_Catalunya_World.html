@@ -416,13 +416,13 @@ button{font:inherit;color:inherit}
 .lbl.cleared{border-color:var(--gold)}
 .lbl.cleared small::after{content:" ✓"}
 .place{position:absolute;transform:translateX(-50%);font-family:var(--f-body);font-size:clamp(14px,1.5cqw,22px);color:#fff;text-shadow:2px 2px 0 var(--edge);pointer-events:none;white-space:nowrap}
-.bubble{position:absolute;transform:translate(-50%,-100%);z-index:3;max-width:40%;width:max-content;font-family:var(--f-body);font-size:clamp(14px,1.7cqw,24px);line-height:1;padding:6px 9px;background:#fff;color:var(--edge);border:3px solid var(--edge);pointer-events:none;animation:pop .18s steps(3)}
+.bubble{position:absolute;transform:translate(-50%,-100%);z-index:3;max-width:30%;width:max-content;font-family:var(--f-body);font-size:clamp(13px,1.45cqw,20px);line-height:1;padding:4px 7px;background:#fff;color:var(--edge);border:3px solid var(--edge);pointer-events:none;animation:pop .18s steps(3)}
 .bubble::after{content:"";position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);border-left:7px solid transparent;border-right:7px solid transparent;border-top:8px solid var(--edge)}
-.bubble.ok{background:var(--green);font-family:var(--f-display);font-size:clamp(7px,.9cqw,12px);padding:7px 9px}
-.bubble.bad{background:var(--gold);font-family:var(--f-display);font-size:clamp(8px,1.05cqw,14px);padding:8px 10px}
+.bubble.ok{background:var(--green);font-family:var(--f-display);font-size:clamp(6px,.75cqw,10px);padding:5px 7px}
+.bubble.bad{background:var(--gold);font-family:var(--f-display);font-size:clamp(7px,.9cqw,12px);padding:6px 8px}
 .bubble.me{background:#fff0f2}
-.bubble.no{background:#e4002b;color:#fff;font-family:var(--f-display);font-size:clamp(7px,.9cqw,12px);padding:7px 9px}
-.bubble.plane{font-family:var(--f-display);font-size:clamp(8px,1.05cqw,14px);padding:8px 10px}
+.bubble.no{background:#e4002b;color:#fff;font-family:var(--f-display);font-size:clamp(6px,.75cqw,10px);padding:5px 7px}
+.bubble.plane{font-family:var(--f-display);font-size:clamp(6px,.8cqw,11px);padding:5px 7px}
 @keyframes pop{from{transform:translate(-50%,-80%) scale(.6)}}
 .cities{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
 .city-t{border:3px solid var(--mute);padding:14px 12px;font-size:clamp(22px,2.3cqw,30px);background:rgba(18,11,12,.4);opacity:.25;transition:opacity .2s steps(2)}
@@ -810,7 +810,7 @@ html.frame-gb #selectBack,html.frame-gb #vehBack,html.frame-gb #ridBack{font-siz
 </style>
 <style id="bocadillos-consola">
 /* Consola: bocadillos pequeños y translúcidos para que no tapen el juego */
-html.frame-gb .bubble{font-size:11px!important;line-height:1!important;padding:2px 4px!important;border-width:2px!important;max-width:44%!important;opacity:.9}
+html.frame-gb .bubble{font-size:10px!important;line-height:1!important;padding:2px 4px!important;border-width:2px!important;max-width:34%!important;opacity:.9}
 html.frame-gb .bubble::after{bottom:-6px;border-left-width:4px;border-right-width:4px;border-top-width:5px}
 html.frame-gb .bubble.ok,html.frame-gb .bubble.no,html.frame-gb .bubble.bad,html.frame-gb .bubble.plane,html.frame-gb .bubble.mail{font-size:6px!important;line-height:1.4!important;padding:3px 4px!important}
 html.frame-gb .place{font-size:9px!important}
@@ -1626,7 +1626,16 @@ const bossLbl=document.createElement("div"); bossLbl.className="lbl"; map.append
 const stampEl=document.createElement("div"); stampEl.className="stamp"; stampEl.textContent="ALL APPROVED"; stampEl.hidden=true; map.appendChild(stampEl);
 const scrEl=document.createElement("div"); scrEl.className="projtext"; scrEl.innerHTML=`<span data-k="epi.t1">CATALUNYA</span><b data-k="epi.t2">EPIs 100% ENTREGADOS</b><i></i>`; scrEl.hidden=true; map.appendChild(scrEl);
 
-function say(text,wx,wy,frames,cls=""){ if(document.documentElement.classList.contains("frame-gb")) while(bubbles.length>=3){ bubbles.shift().el.remove(); } const el=document.createElement("div"); el.className="bubble "+cls; el.textContent=text; map.appendChild(el); bubbles.push({el,wx,wy,until:frame+frames}); }
+// Bocadillos: pocos a la vez y breves para no tapar el juego. Si ya hay el máximo, el nuevo solo entra si es
+// más importante que alguno de los que hay (se quita el menos importante); si el mismo texto ya está, se alarga.
+const BUB_PRI={bad:4,plane:3,no:3,ok:2,mail:2,me:1,cand:0};
+const bubPri=cls=>{ const c=String(cls).split(" "); return Math.max(...c.map(x=>BUB_PRI[x]??1)); };
+function say(text,wx,wy,frames,cls=""){
+  const gb=document.documentElement.classList.contains("frame-gb"), max=gb?2:3, pri=bubPri(cls);
+  frames=Math.min(frames,pri>=4?120:pri>=2?85:60);
+  const same=bubbles.find(b=>b.text===text); if(same){ same.until=Math.max(same.until,frame+frames); return; }
+  if(bubbles.length>=max){ const low=bubbles.reduce((a,b)=>b.pri<a.pri?b:a); if(low.pri>pri) return; low.el.remove(); bubbles.splice(bubbles.indexOf(low),1); }
+  const el=document.createElement("div"); el.className="bubble "+cls; el.textContent=text; map.appendChild(el); bubbles.push({el,wx,wy,until:frame+frames,text,pri}); }
 function clearBubbles(){ bubbles.forEach(b=>b.el.remove()); bubbles=[]; }
 const plane={sx:150,sy:26};
 function planeSay(text,cls,frames=80){ say(text,()=>cam+plane.sx+4,()=>plane.sy-14,frames,"plane "+cls); }
