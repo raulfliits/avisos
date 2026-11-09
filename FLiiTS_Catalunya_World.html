@@ -237,6 +237,20 @@ html.frame-gb #screen .hud .snd{font-size:0!important;padding:2px 4px!important;
 html.frame-gb #screen .hud .snd::after{content:"♪";font-size:9px}
 html.frame-gb #screen .hud .ctr b{max-width:none!important}
 html.frame-gb #screen .hud .grp>div:has(#pname){display:none!important}
+/* QR de "juega en tu móvil" (portada y menús, tras los créditos) */
+#qrBadge{position:fixed;right:14px;bottom:14px;z-index:60;display:grid;justify-items:center;gap:6px;padding:8px 8px 7px;background:#fff;border:3px solid #120b0c}
+html.framed #qrBadge{position:absolute;right:10px;bottom:10px;padding:6px 6px 5px;gap:4px}
+html.framed #qrBadge img{width:clamp(70px,7vw,104px)}
+.qr-title{display:flex;justify-content:center;margin-top:clamp(14px,3cqh,30px)}
+#qrBadge.center{position:static!important;transform:none}
+.qr-row{display:flex;justify-content:center;align-items:center}
+/* Con el QR en pantalla, el botón de volver pasa a la esquina inferior izquierda y el QR queda solo en el centro */
+.qr-row.has-qr>button{position:absolute;left:4%;bottom:5%;margin:0}
+#qrBadge.inline{position:static!important;transform:none;margin-top:6px}
+#qrBadge.inline img{width:clamp(80px,7.5vw,112px)}
+#qrBadge.center img{width:clamp(96px,10vw,140px)}
+#qrBadge img{display:block;width:clamp(84px,9vw,140px);height:auto;image-rendering:pixelated}
+#qrBadge span{font-family:var(--f-display);font-size:clamp(6px,.7vw,9px);line-height:1.5;color:#120b0c;text-align:center}
 /* Sello ALL APPROVED: centrado y a tamaño de la pantalla de la consola */
 html.frame-gb .stamp{left:50%!important;font-size:12px;border-width:3px;padding:5px 8px}
 html.frame-gb #modeGameOv.arc{padding:0!important;align-items:stretch!important}
@@ -2554,6 +2568,21 @@ let repLook=0;
 const REP={on:false,done:false};
 const repUnlocked=()=>REP.on, repDone=()=>REP.done;
 function unlockRep(){ if(REP.on) return false; REP.on=true; return true; }
+// QR para jugar en el móvil: aparece abajo a la derecha en la portada y en los menús una vez se ha llegado a los
+// créditos (modo repartidor desbloqueado). Solo en la tele / ordenador: en el móvil ya se está jugando ahí.
+const qrBadge=document.createElement("div"); qrBadge.id="qrBadge"; qrBadge.hidden=true;
+qrBadge.innerHTML=`<img alt="Código QR para jugar en el móvil" src="data:image/png;base64,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"><span>JUEGA EN<br>TU MÓVIL</span>`;
+// En la portada va centrado debajo de "PULSA START"; en los menús, en el centro de abajo junto al botón de volver.
+const qrHome=document.createElement("div"); qrHome.className="qr-title"; $("#startBtn").insertAdjacentElement("afterend",qrHome); qrHome.appendChild(qrBadge);
+const QR_MENUS=[["#modeOv","#modeBack"],["#selOv","#selectBack"],["#ridOv","#ridBack"],["#vehOv","#vehBack"]].map(([ov,bt])=>{
+  const b=$(bt); if(!b) return null; const row=document.createElement("div"); row.className="qr-row"; b.parentNode.insertBefore(row,b); row.appendChild(b); return {ov,row}; }).filter(Boolean);
+setInterval(()=>{ const ok=REP.on&&!document.documentElement.classList.contains("frame-gb")&&$("#introOv").hidden;
+  const title=ok&&!$("#titleOv").hidden, menu=ok&&QR_MENUS.find(m=>!$(m.ov).hidden), show=!!(title||menu);
+  const where=title?qrHome:menu?menu.row:null;
+  if(where&&qrBadge.parentNode!==where) where.appendChild(qrBadge);
+  QR_MENUS.forEach(m=>m.row.classList.toggle("has-qr",!!menu&&m===menu));
+  qrBadge.classList.toggle("center",!!title); qrBadge.classList.toggle("inline",!title&&!!menu);
+  if(qrBadge.hidden===show) qrBadge.hidden=!show; },300);
 if(saved["rep.on"]||saved["rep.done"]){ delete saved["rep.on"]; delete saved["rep.done"]; persist(); }
 const FIN={platform:false,rpg:false,arcade:false}, finDone=()=>!!FIN[activeGameMode];
 function saveGame(){ saved["save.v1"]=JSON.stringify({prog:PROG,rep:REP,fin:FIN}); persist(); toast("PARTIDA GUARDADA"); sfx.coin(); }
@@ -3787,6 +3816,47 @@ updHud(); fit(); requestAnimationFrame(loop);
  const block=e=>{ e.stopImmediatePropagation(); e.preventDefault(); if(e.key&&e.key.length===1){ typed=(typed+e.key.toLowerCase()).slice(-6); if(typed==="fliits") open(true); } };
  addEventListener("keydown",block,true);
  let taps=[]; g.querySelector(".g-skip").addEventListener("click",()=>{ const now=Date.now(); taps=taps.filter(t=>now-t<1500); taps.push(now); if(taps.length>=3) open(true); });
+})();
+</script>
+<style id="instalar">
+#instHint{position:fixed;left:50%;bottom:max(12px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:2147482000;
+ width:min(360px,calc(100vw - 24px));box-sizing:border-box;padding:14px 14px 12px;background:#120b0c;color:#fff;border:4px solid #fff;
+ box-shadow:0 0 0 4px #120b0c,6px 6px 0 4px #d0102c;font-family:var(--f-body);font-size:18px;line-height:1.15;animation:instIn .35s steps(4)}
+@keyframes instIn{from{transform:translate(-50%,30px);opacity:0}}
+#instHint h3{margin:0 26px 8px 0;font-family:var(--f-display);font-weight:400;font-size:10px;line-height:1.5;color:#ffd23f}
+#instHint ol{margin:0;padding-left:22px} #instHint li{margin:0 0 5px} #instHint b{color:#ffd23f;font-weight:400}
+#instHint .ic{display:inline-block;min-width:18px;padding:0 3px;border:2px solid #fff;font-family:var(--f-display);font-size:8px;line-height:14px;text-align:center;vertical-align:1px}
+#instHint .row{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+#instHint button{font-family:var(--f-display);font-size:8px;padding:8px 10px;border:3px solid #fff;background:#d0102c;color:#fff;cursor:pointer}
+#instHint button.ghost{background:transparent}
+#instHint .x{position:absolute;top:6px;right:6px;padding:4px 7px;border:0;background:transparent;font-size:12px}
+</style>
+<script>
+/* Al abrir la web en el móvil (desde el QR) sale un mini aviso de cómo instalarla en la pantalla de inicio.
+   No sale si ya está instalada (abierta desde el icono), ni en el ordenador, ni mientras está la cuenta atrás.
+   "ENTENDIDO" lo oculta para siempre en ese dispositivo. */
+(()=>{
+ const KEY="cw-install-hint", ua=navigator.userAgent||"";
+ const standalone=matchMedia("(display-mode: standalone)").matches||matchMedia("(display-mode: fullscreen)").matches||navigator.standalone;
+ const ios=/iPhone|iPad|iPod/i.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1), android=/Android/i.test(ua);
+ try{ if(localStorage.getItem(KEY)==="1") return; }catch(e){}
+ if(standalone||!(ios||android)) return;
+ let deferred=null; addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); deferred=e; const b=document.querySelector("#instHint .inst"); if(b) b.hidden=false; });
+ const steps=ios?`<li>Abre esta página en <b>Safari</b>.</li><li>Pulsa <span class="ic">⇧</span> <b>Compartir</b> (abajo en la barra).</li><li>Elige <b>Añadir a pantalla de inicio</b> y pulsa <b>Añadir</b>.</li>`
+   :`<li>Pulsa el menú <span class="ic">⋮</span> arriba a la derecha.</li><li>Elige <b>Instalar aplicación</b> o <b>Añadir a pantalla de inicio</b>.</li><li>Confirma con <b>Instalar</b>.</li>`;
+ const show=()=>{ if(document.getElementById("instHint")) return;
+   const d=document.createElement("div"); d.id="instHint"; d.setAttribute("role","dialog"); d.setAttribute("aria-label","Instalar en el móvil");
+   d.innerHTML=`<button class="x ghost" type="button" aria-label="Cerrar">✕</button><h3>INSTÁLALO EN TU MÓVIL<br>Y JUEGA COMO UNA APP</h3><ol>${steps}</ol>
+    <div class="row"><button class="inst" type="button" ${deferred?"":"hidden"}>INSTALAR</button><button class="ok ghost" type="button">ENTENDIDO</button></div>`;
+   document.body.appendChild(d);
+   const close=forever=>{ if(forever){ try{ localStorage.setItem(KEY,"1"); }catch(e){} } d.remove(); };
+   d.querySelector(".x").addEventListener("click",()=>close(false));
+   d.querySelector(".ok").addEventListener("click",()=>close(true));
+   d.querySelector(".inst").addEventListener("click",async()=>{ if(!deferred) return; deferred.prompt(); try{ const r=await deferred.userChoice; if(r&&r.outcome==="accepted") close(true); }catch(e){} deferred=null; });
+   ["pointerdown","keydown"].forEach(ev=>d.addEventListener(ev,e=>e.stopPropagation()));
+ };
+ // Espera a que no haya cuenta atrás ni ARE YOU READY? en pantalla
+ const wait=setInterval(()=>{ if(document.getElementById("gate")) return; clearInterval(wait); setTimeout(show,1800); },500);
 })();
 </script>
 </body></html>
