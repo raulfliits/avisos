@@ -1734,7 +1734,11 @@ function epiTarget(){ return npcs.find(k=>k.state==="wait"&&k.need.length&&k.x>p
 function shoot(){
   const k=epiTarget(); if(!k || proj.some(p=>p.k===k)) return;
   const item=k.need[0];
-  if(items.epi[item]<=0){ if(!auto&&frame-lastWarn>70){ lastWarn=frame; sfx.back(); say(`¡No te quedan ${({casco:"cascos",chaqueta:"chaquetas",guantes:"guantes",mochila:"mochilas"})[item]}! Rompe cajas`,()=>pl.x,headY,80,"no"); } return; }
+  // Sin ese EPI: primer aviso para que rompa cajas; si vuelve a disparar, Raül se lo lanza desde la avioneta
+  // (así nadie se queda atascado delante de un rider si se ha dejado una caja atrás).
+  if(items.epi[item]<=0){
+    if(auto||k.warned===item){ items.epi[item]=1; k.warned=null; planeSay(`¡Toma, te lanzo ${INAME[item]}!`,"ok",90); sfx.power(); }
+    else { k.warned=item; lastWarn=frame; sfx.back(); say(`¡No te quedan ${({casco:"cascos",chaqueta:"chaquetas",guantes:"guantes",mochila:"mochilas"})[item]}! Rompe cajas o dispara otra vez`,()=>pl.x,headY,110,"no"); return; } }
   items.epi[item]--; proj.push({x:pl.x+12,y0:pl.y-18,y:pl.y-18,t:0,k,item}); lastShot=frame; slide(500,900,.12,.05);
   if(!bossS.epiTip){ bossS.epiTip=1; planeSay("¡DISPARA EPIs!","ok",90); }
 }
@@ -2617,7 +2621,7 @@ function repLight(I,t){ const k=(t+I.off)%420; return k<210?"G":k<260?"Y":"R"; }
 function repCurve(s){ return Math.sin(s/90)*.55+Math.sin(s/37)*.2; }
 ARC_GAMES[4]={
  init(){ return {W:224,H:160,order:0,phase:"order",t:0,done:0,estado:100,multas:0,choques:0,stars:0,s:0,v:0,lane:1,x:LANES[1],traffic:[],cross:[],inter:[],sky:0}; },
- startOrder(G){ keys={}; const O=REP_ORDERS[G.order]; Object.assign(G,{phase:"ride",s:0,v:0,lane:1,x:LANES[1],traffic:[],cross:[],inv:0,brake:0,horn:0,dest:O.dist,time:0,deliverT:0,
+ startOrder(G){ keys={}; const O=REP_ORDERS[G.order]; Object.assign(G,{phase:"ride",estado:100,s:0,v:0,lane:1,x:LANES[1],traffic:[],cross:[],inv:0,brake:0,horn:0,dest:O.dist,time:0,deliverT:0,
    inter:Array.from({length:Math.floor((O.dist-100)/150)},(_,i)=>({s:110+i*150,off:(i*130+G.order*70)%420,passed:false}))}); arcProgress(); },
  press(G,b){
   if(G.phase==="order"){ if(b==="A"){ sfx.open(); this.startOrder(G); } return; }
