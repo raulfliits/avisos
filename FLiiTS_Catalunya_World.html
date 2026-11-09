@@ -2203,6 +2203,7 @@ const ARC_INFO={
  0:{title:"PINBALL DE CONTRATACIÓN",w:204,h:368,help:"A: LANZAR LA BOLA · ← →: FLIPPERS · B: GOLPE DOBLE. ¡Dale a los aspirantes para contratarlos!"},
  2:{title:"GRÚA DE MOTOS",w:200,h:300,help:"← →: MOVER LA GRÚA · A: BAJAR. Solo cuentan las MOTOS: ¡saca 3!"},
  3:{title:"EPI SHOOTER",w:192,h:144,help:"↑ ↓: ANDAR · ← →: GIRAR · A: LANZAR EPI · B: CAMBIAR EPI. ¡Viste a 3 riders de FLiiTS!"},
+ 5:{title:"REPARTO EXPRÉS",w:168,h:134,help:"FLECHAS: MOVERTE. Recoge toda la comida del pedido y llévala a la casa del cliente. ¡Esquiva los coches! El semáforo los para un rato."},
  4:{title:"MODO REPARTIDOR",w:224,h:160,help:"MANTÉN ↑ PARA ACELERAR · ← →: CAMBIAR DE CARRIL · ↓/B: FRENAR · A: CLAXON / ENTREGAR. Para en los semáforos en rojo y entrega en el carril derecho, junto a la casa del cliente."},
  1:{title:"CONTROL DE CITAS",w:192,h:160,help:"FLECHAS: MOVER EL ESCÁNER · A: PASA A FORMACIÓN · B: NO PASA. Solo pasa quien tiene cita HOY."}
 };
@@ -2216,13 +2217,13 @@ function arcBubble(g,t,x,y,col="#fff",bg="#120b0c"){ g.font='8px "Press Start 2P
 function drawItem(g,it,x,y,sc=1){ g.save(); g.translate(Math.round(x),Math.round(y)); g.scale(sc,sc); drawPal(g,ITEM[it],0,0,IPAL); g.restore(); }
 function customStart(ci){ gamePaused=false; $("#pauseScreen").classList.remove("show"); if(activeGameMode==="rpg"&&ci!==4){ rpgStart(ci); return; } arcStart(ci); }
 function arcStart(ci){
- const I=ARC_INFO[ci], ov=$("#modeGameOv"); ov.classList.remove("rpg-classic"); ov.classList.add("arc"); ov.hidden=false;
+ const gk=(ci===4&&activeGameMode==="arcade")?5:ci, I=ARC_INFO[gk], ov=$("#modeGameOv"); ov.classList.remove("rpg-classic"); ov.classList.add("arc"); ov.hidden=false;
  $("#mgKick").textContent=ci===4?"MODO REPARTIDOR · "+repName():"MINI ARCADE · "+nm(ci); $("#mgTitle").textContent=I.title;
  $("#mgScene").innerHTML=`<div class="arc-wrap" style="--ar:${I.w}/${I.h}"><canvas id="arcCv" width="${I.w}" height="${I.h}"></canvas></div>`;
  $("#mgStatus").textContent=I.help; $("#mgActions").innerHTML=""; $("#mgTeam").textContent="";
- keys={}; mg={typ:"arcade",ci,hires:0,c1:0,c2:0,t:0,state:"play",ban:null,G:null}; mg.G=ARC_GAMES[ci].init(); arcProgress();
+ keys={}; mg={typ:"arcade",ci,gk,hires:0,c1:0,c2:0,t:0,state:"play",ban:null,G:null}; mg.G=ARC_GAMES[gk].init(); arcProgress();
 }
-function arcProgress(){ if(!mg) return; $("#mgProgress").textContent=mg.ci===4?`PEDIDOS ${mg.c1}/3 · ESTADO ${Math.max(0,Math.round(mg.G?mg.G.estado:100))}%`:mg.ci===1?`ACIERTOS ${mg.c1} · FALLOS ${mg.c2}/3`:`CONTRATADOS ${mg.hires}/3`; }
+function arcProgress(){ if(!mg) return; $("#mgProgress").textContent=mg.gk===5?`PEDIDOS ${mg.c1}/3 · CASCOS ${mg.G?mg.G.lives:3}`:mg.ci===4?`PEDIDOS ${mg.c1}/3 · ESTADO ${Math.max(0,Math.round(mg.G?mg.G.estado:100))}%`:mg.ci===1?`ACIERTOS ${mg.c1} · FALLOS ${mg.c2}/3`:`CONTRATADOS ${mg.hires}/3`; }
 function arcBanner(t,sub,n=90){ mg.ban={t,sub,n,t0:mg.t}; }
 function arcHire(name){ mg.hires++; sfx.power(); arcProgress(); if(mg.hires>=3) arcWin(); else arcBanner("¡CONTRATADO!",(name?name+" · ":"")+mg.hires+"/3",80); }
 function arcWin(){ mg.state="won"; arcBanner(mg.ci===4?"¡REPARTIDOR DEL MES!":mg.ci===1?"¡OFICINA EN ORDEN!":"¡3 CONTRATADOS!",mg.ci===4?"3 PEDIDOS ENTREGADOS":"¡MONEDA DE ORO!",180); setTimeout(()=>{ sfx.win(); sfx.coin(); },250); mg.endAt=mg.t+180; }
@@ -2232,7 +2233,7 @@ function arcDone(){ const ci=mg.ci, a=mg.c1, b=mg.c2, stars=ci===4?mg.G.stars:0;
  if(ci===1){ c1=a; c2=b; openRaulPanel(); return; } scr=SCREENS[SCREEN_OF[ci]]; c1=a; c2=b; openCityPanel(); }
 function arcTick(){
  if(!mg||mg.typ!=="arcade") return; const cv=$("#arcCv"); if(!cv) return; mg.t++;
- const g=cv.getContext("2d"), A=ARC_GAMES[mg.ci]; g.imageSmoothingEnabled=false;
+ const g=cv.getContext("2d"), A=ARC_GAMES[mg.gk??mg.ci]; g.imageSmoothingEnabled=false;
  if(mg.state==="play") A.update(mg.G);
  A.draw(g,mg.G); arcDrawBanner(g,cv.width,cv.height);
  // en el RPG, la máquina se ve en los 4 tonos de la paleta Game Boy
@@ -2241,8 +2242,8 @@ function arcTick(){
 }
 function arcPress(b){
  if(!mg||mg.typ!=="arcade") return;
- if(mg.state==="lost"){ if(b==="A"){ Object.assign(mg,{G:ARC_GAMES[mg.ci].init(),hires:0,c1:0,c2:0,state:"play",ban:null}); arcProgress(); sfx.select(); } else if(b==="B") leaveModeGame(); return; }
- if(mg.state==="play"&&ARC_GAMES[mg.ci].press) ARC_GAMES[mg.ci].press(mg.G,b);
+ if(mg.state==="lost"){ if(b==="A"){ Object.assign(mg,{G:ARC_GAMES[mg.gk??mg.ci].init(),hires:0,c1:0,c2:0,state:"play",ban:null}); arcProgress(); sfx.select(); } else if(b==="B") leaveModeGame(); return; }
+ if(mg.state==="play"&&ARC_GAMES[mg.gk??mg.ci].press) ARC_GAMES[mg.gk??mg.ci].press(mg.G,b);
 }
 function arcDrawBanner(g,W,H){
  const b=mg&&mg.ban; if(!b) return; if(mg.t-b.t0>b.n){ mg.ban=null; return; }
@@ -2628,6 +2629,96 @@ const CAR_COLS=["#2f6fe0","#e8e8e8","#62d26f","#c45a83","#ff8a5c","#8a94aa","#ff
 const VDIM={car:{w:.8,h:.62,len:1.8},taxi:{w:.8,h:.62,len:1.8},van:{w:.9,h:.95,len:2.2},bus:{w:1,h:1.45,len:4.5},moto:{w:.3,h:.8,len:.9}};
 function repLight(I,t){ const k=(t+I.off)%420; return k<210?"G":k<260?"Y":"R"; }
 function repCurve(s){ return Math.sin(s/90)*.55+Math.sin(s/37)*.2; }
+/* --- REPARTO EXPRÉS (modo repartidor en el ARCADE): laberinto de calles visto desde arriba.
+   Recoge la comida del pedido (hamburguesas, pizzas, patatas, refrescos) y llévala a la casa del cliente;
+   los coches patrullan las calles y van a por ti. El semáforo los deja parados unos segundos. 3 pedidos. --- */
+const MZ=[
+ ["#####################","#S......#.....F....E#","#.###.#.#.###.#.###.#","#.#F..#...#.....#F#.#","#.#.#####.#.#####.#.#","#.....T.........C...#","###.#.###.###.#.###.#","#F..#...#.F.#.#...#.#","#.###.#.#.#.#.###.#.#","#.....#...#.....#...#","#.###.#####.###.#.#.#","#...#.....C...#...#F#","#.#.#.###.###.#.###.#","#.F.#..F......#..C..#","#####################"],
+ ["#####################","#E..F#.......#....F.#","#.##.#.#####.#.###..#","#.#....#.F.....#..#.#","#.#.##.#.###.#.#.##.#","#...#..C...#.#...C..#","#.#.#.####.#.#####.##","#.#F..#..T.#.....#..#","#.###.#.####.###.#.##","#.....#....F.#...#..#","###.#####.##.#.#.##.#","#F..#...C..#...#..F.#","#.#.#.#.##.###.###..#","#.#...#.....F.....#S#","#####################"],
+ ["#####################","#....F..#.S.#..F....#","#.####.##...##.####.#","#.#..C.........C..#.#","#.#.###.#####.###.#.#","#F..#.....T.....#..F#","###.#.###.#.###.#.###","#...#...#.#.#...#...#","#.#####.#.#.#.#####.#","#...F...#...#...F...#","#.###.#####.#####.#.#","#.#...#...C...#...#.#","#.#.###.#.#.#.###.#.#","#.F.....#.E.#.....F.#","#####################"]];
+const MZ_DIR={UP:[0,-1],DOWN:[0,1],LEFT:[-1,0],RIGHT:[1,0]}, MZ_OPP={UP:"DOWN",DOWN:"UP",LEFT:"RIGHT",RIGHT:"LEFT"};
+const MZ_FOOD=[[".bbbb.","bbbbbb","gggggg","mmmmmm","bbbbbb",".bbbb."],["yyyyyy","yryyry",".yyyy.",".yryy.","..yy..","..y..."],
+ ["y.yy.y","yyyyyy","rrrrrr","rwrrwr","rrrrrr",".rrrr."],[".wwww.","rrrrrr","rwwwwr","rrrrrr","rrrrrr",".rrrr."]];
+const MZ_FPAL={b:"#e09a3c",g:"#62d26f",m:"#6b3a1f",y:"#ffd23f",r:"#d0102c",w:"#ffffff"};
+ARC_GAMES[5]={
+ init(){ const G={W:168,H:134,lvl:0,lives:3,stars:0,t:0}; this.load(G); return G; },
+ load(G){ const M=MZ[G.lvl]; G.grid=M.map(r=>r.split("")); G.food=[]; G.cars=[]; G.light=null; G.house=null; let k=0;
+  M.forEach((row,y)=>[...row].forEach((ch,x)=>{ if(ch==="S") G.start=[x,y]; else if(ch==="E") G.house=[x,y]; else if(ch==="F") G.food.push({x,y,k:k++%4}); else if(ch==="C") G.cars.push({sx:x,sy:y}); else if(ch==="T") G.light={x,y}; }));
+  Object.assign(G,{phase:"order",time:0,hits:0,frozen:0,inv:0,total:G.food.length});
+  this.reset(G); },
+ reset(G){ G.p={x:G.start[0],y:G.start[1],dir:null,pr:0,want:null,face:"RIGHT"};
+  G.cars.forEach((c,i)=>Object.assign(c,{x:c.sx,y:c.sy,dir:null,pr:0,col:CAR_COLS[(i*2+G.lvl)%CAR_COLS.length],face:"LEFT"})); G.wait=90; },
+ open(G,x,y,car){ const ch=(G.grid[y]||[])[x]; if(!ch||ch==="#") return false; if(car&&ch==="E") return false; if(ch==="E"&&G.food.length) return true; return true; },
+ step(G,e,sp,choose){ // movimiento casilla a casilla: e.pr es lo recorrido hacia la casilla siguiente
+  if(e.dir&&e.want===MZ_OPP[e.dir]&&e.pr>0){ const [dx,dy]=MZ_DIR[e.dir]; e.x+=dx; e.y+=dy; e.pr=1-e.pr; e.dir=e.want; }
+  if(!e.dir||e.pr===0){ const d=choose(e); e.dir=d&&this.open(G,e.x+MZ_DIR[d][0],e.y+MZ_DIR[d][1],e.car)?d:null; if(e.dir) e.face=e.dir; }
+  if(!e.dir) return; e.pr+=sp;
+  if(e.pr>=1){ const [dx,dy]=MZ_DIR[e.dir]; e.x+=dx; e.y+=dy; e.pr=0; this.arrive&&this.arrive(G,e); }
+ },
+ pos(e){ const [dx,dy]=e.dir?MZ_DIR[e.dir]:[0,0]; return [e.x+dx*e.pr,e.y+dy*e.pr]; },
+ press(G,b){
+  if(G.phase==="order"){ if(b==="A"){ G.phase="ride"; sfx.open(); } return; }
+  if(G.phase==="delivered"){ if(b==="A"&&G.t>G.doneAt+30) this.next(G); return; }
+  if(MZ_DIR[b]) G.p.want=b;
+ },
+ next(G){ G.lvl++; if(G.lvl>=MZ.length){ arcWin(); return; } this.load(G); sfx.select(); arcProgress(); },
+ update(G){
+  G.t++; if(G.phase!=="ride") return; G.time++;
+  const held=(keys.ArrowUp||keys.w)?"UP":(keys.ArrowDown||keys.s)?"DOWN":(keys.ArrowLeft||keys.a)?"LEFT":(keys.ArrowRight||keys.d)?"RIGHT":null; if(held) G.p.want=held;
+  const P=G.p, psp=[.115,.09,.1][veh]||.1;
+  this.step(G,P,psp,e=>{ if(e.want&&this.open(G,e.x+MZ_DIR[e.want][0],e.y+MZ_DIR[e.want][1])) return e.want; return e.dir; });
+  // comida, semáforo y cliente
+  const fi=G.food.findIndex(f=>f.x===P.x&&f.y===P.y&&P.pr<.5); if(fi>=0){ G.food.splice(fi,1); sfx.coin(); if(!G.food.length){ arcBanner("¡PEDIDO LISTO!","LLÉVALO A LA CASA DEL CLIENTE",90); sfx.power(); } }
+  if(G.light&&P.x===G.light.x&&P.y===G.light.y){ G.light=null; G.frozen=300; sfx.power(); arcBanner("¡SEMÁFORO EN ROJO!","LOS COCHES SE PARAN",70); }
+  if(G.house&&P.x===G.house[0]&&P.y===G.house[1]&&P.pr===0){
+   if(G.food.length){ if(!G.warned){ G.warned=true; arcBanner("¡FALTA COMIDA!",`QUEDAN ${G.food.length} PRODUCTOS`,70); sfx.back(); } }
+   else return this.deliver(G); } else G.warned=false;
+  // coches: salen tras una pausa; en cada cruce, a veces van a por ti
+  if(G.wait>0) G.wait--; else if(G.frozen>0) G.frozen--; else {
+   const csp=[.062,.07,.078][G.lvl], chase=.35+G.lvl*.15;
+   G.cars.forEach(c=>{ c.car=true; this.step(G,c,csp,e=>{ const opts=Object.keys(MZ_DIR).filter(d=>d!==MZ_OPP[e.dir]&&this.open(G,e.x+MZ_DIR[d][0],e.y+MZ_DIR[d][1],true));
+     const all=opts.length?opts:(e.dir?[MZ_OPP[e.dir]]:[]); if(!all.length) return null;
+     if(Math.random()<chase) return all.slice().sort((a,b)=>{ const da=Math.abs(e.x+MZ_DIR[a][0]-P.x)+Math.abs(e.y+MZ_DIR[a][1]-P.y), db=Math.abs(e.x+MZ_DIR[b][0]-P.x)+Math.abs(e.y+MZ_DIR[b][1]-P.y); return da-db; })[0];
+     return all[(Math.random()*all.length)|0]; }); }); }
+  // atropello
+  if(G.inv>0) G.inv--; else { const [px,py]=this.pos(P);
+   if(G.cars.some(c=>{ const [cx,cy]=this.pos(c); return Math.abs(cx-px)+Math.abs(cy-py)<.7; })){ G.lives--; G.hits++; G.inv=100; sfx.hit(); arcProgress();
+    if(G.lives<=0) return arcLose("¡TE HAN ATROPELLADO!"); arcBanner("¡CUIDADO!","PIERDES UN CASCO",70); this.reset(G); } }
+ },
+ deliver(G){ const sec=G.time/60, tgt=[50,55,60][G.lvl]; G.phase="delivered"; G.doneAt=G.t;
+  G.last=G.hits===0&&sec<=tgt?3:G.hits<=1?2:1; G.stars+=G.last; mg.c1=G.lvl+1; sfx.win(); arcProgress(); },
+ draw(g,G){
+  const W=G.W,H=G.H,K="#1b1212",T=8,OY=14,R=(x,y,w,h,c)=>{ g.fillStyle=c; g.fillRect(x,y,w,h); };
+  R(0,0,W,H,"#2c2c36");
+  G.grid.forEach((row,y)=>row.forEach((ch,x)=>{ const X=x*T,Y=OY+y*T;
+   if(ch==="#"){ const edge=y===0||y===14||x===0||x===20; R(X,Y,T,T,edge?"#8c7a5e":"#d9c9a8"); if(!edge){ R(X,Y+7,T,1,"#b5a283"); R(X+1,Y+1,2,2,"#7fa6c9"); R(X+5,Y+1,2,2,"#7fa6c9"); R(X+1,Y+4,2,2,"#7fa6c9"); R(X+5,Y+4,2,2,"#7fa6c9"); } }
+   else { R(X,Y,T,T,"#3a3a46"); if((x+y)%2===0) R(X+3,Y+3,2,2,"#4a4a58"); } }));
+  // casa del cliente
+  if(G.house){ const [hx,hy]=G.house, X=hx*T, Y=OY+hy*T, ok=!G.food.length; R(X,Y+3,T,5,"#ffe08a"); R(X+1,Y,6,3,"#d0102c"); R(X+3,Y+5,2,3,K);
+   if(ok&&(G.t>>4)&1) { g.strokeStyle="#62d26f"; g.lineWidth=1; g.strokeRect(X-.5,Y-.5,T+1,T+1); } }
+  if(G.light){ const X=G.light.x*T+2,Y=OY+G.light.y*T; R(X,Y,4,8,K); R(X+1,Y+1,2,2,"#ff3a3a"); R(X+1,Y+5,2,2,"#62d26f"); }
+  G.food.forEach(f=>{ const X=f.x*T+1,Y=OY+f.y*T+1+((G.t>>3)+f.x)%2; drawPal(g,MZ_FOOD[f.k],X,Y,MZ_FPAL); });
+  // coches
+  G.cars.forEach(c=>{ const [x,y]=this.pos(c), X=Math.round(x*T), Y=Math.round(OY+y*T), h=c.face==="LEFT"||c.face==="RIGHT";
+   const w=h?8:6, l=h?6:8, ox=X+(T-w)/2, oy=Y+(T-l)/2; R(ox,oy,w,l,K); R(ox+1,oy+1,w-2,l-2,G.frozen>0&&(G.t>>3)&1?"#8a94aa":c.col);
+   const f=c.face; R(f==="LEFT"?ox+1:f==="RIGHT"?ox+w-3:ox+1, f==="UP"?oy+1:f==="DOWN"?oy+l-3:oy+1, h?2:w-2, h?l-2:2,"#2a3550");
+   if(f==="RIGHT"){ R(ox+w-1,oy+1,1,1,"#ffe08a"); R(ox+w-1,oy+l-2,1,1,"#ffe08a"); } if(f==="LEFT"){ R(ox,oy+1,1,1,"#ffe08a"); R(ox,oy+l-2,1,1,"#ffe08a"); }
+   if(f==="UP"){ R(ox+1,oy,1,1,"#ffe08a"); R(ox+w-2,oy,1,1,"#ffe08a"); } if(f==="DOWN"){ R(ox+1,oy+l-1,1,1,"#ffe08a"); R(ox+w-2,oy+l-1,1,1,"#ffe08a"); } });
+  // repartidor (visto desde arriba): vehículo, mochila FLiiTS y casco
+  { const P=G.p, [x,y]=this.pos(P), X=Math.round(x*T), Y=Math.round(OY+y*T), h=P.face==="LEFT"||P.face==="RIGHT";
+   if(!(G.inv>0&&(G.t>>2)&1)){ if(h) R(X,Y+3,8,2,K); else R(X+3,Y,2,8,K); R(X+2,Y+2,4,4,K); R(X+2,Y+2,4,3,"#d0102c"); R(X+3,Y+3,2,1,"#fff");
+    const hx=P.face==="LEFT"?X+1:P.face==="RIGHT"?X+5:X+3, hy=P.face==="UP"?Y+1:P.face==="DOWN"?Y+5:Y+3; R(hx,hy,2,2,"#ffffff"); } }
+  // marcador
+  R(0,0,W,OY,"#120b0c"); arcText(g,`PEDIDO ${Math.min(G.lvl+1,3)}/3`,3,3,"#ffd23f","left",6);
+  const n=G.total-G.food.length; drawPal(g,MZ_FOOD[0],66,3,MZ_FPAL); arcText(g,`${n}/${G.total}`,74,3,"#fff","left",6);
+  for(let i=0;i<3;i++){ const c=i<G.lives?"#d0102c":"#4a3a3e", X=106+i*9; R(X+1,3,5,1,c); R(X,4,7,4,c); R(X+4,5,2,2,i<G.lives?"#ffffff":"#5a4a4e"); R(X,8,7,1,K); }
+  arcText(g,String(Math.floor(G.time/60)).padStart(2,"0")+"s",W-3,3,"#fff","right",6);
+  // pantallas de pedido
+  if(G.phase==="order"||G.phase==="delivered"){ R(10,34,W-20,70,"rgba(18,11,12,.92)"); g.strokeStyle="#ffd23f"; g.lineWidth=2; g.strokeRect(11,35,W-22,68);
+   if(G.phase==="order"){ arcText(g,`PEDIDO ${G.lvl+1}/3`,W/2,42,"#ffd23f"); arcText(g,"RECOGE TODA LA COMIDA",W/2,58,"#fff","center",6); arcText(g,"Y LLÉVALA AL CLIENTE",W/2,68,"#fff","center",6); arcText(g,"¡OJO CON LOS COCHES!",W/2,80,"#ff8a92","center",6); if((G.t>>4)&1) arcText(g,"A: EMPEZAR",W/2,92,"#62d26f","center",6); }
+   else { arcText(g,"¡ENTREGADO!",W/2,42,"#62d26f"); arcText(g,"★".repeat(G.last)+"☆".repeat(3-G.last),W/2,58,"#ffd23f"); arcText(g,`${Math.floor(G.time/60)} s · ${G.hits} ${G.hits===1?"golpe":"golpes"}`,W/2,74,"#fff","center",6); if(G.t>G.doneAt+30&&(G.t>>4)&1) arcText(g,G.lvl<2?"A: SIGUIENTE PEDIDO":"A: TERMINAR",W/2,90,"#62d26f","center",6); } }
+ }
+};
 ARC_GAMES[4]={
  init(){ return {W:224,H:160,order:0,phase:"order",t:0,done:0,estado:100,multas:0,choques:0,stars:0,s:0,v:0,lane:1,x:LANES[1],traffic:[],cross:[],inter:[],sky:0}; },
  startOrder(G){ keys={}; const O=REP_ORDERS[G.order]; Object.assign(G,{phase:"ride",estado:100,s:0,v:0,lane:1,x:LANES[1],traffic:[],cross:[],inv:0,brake:0,horn:0,dest:O.dist,time:0,deliverT:0,
