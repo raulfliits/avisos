@@ -12,6 +12,7 @@
     --spec: #E4F1E4; --spec-t: #1F5F2A; --man: #FBE3E3; --man-t: #A80404;
   }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   html, body { margin: 0; min-height: 100%; background: var(--crema); color: var(--negro); font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
   .marca { background: var(--negro); color: #fff; padding: 14px 16px; font-family: Unbounded, "Arial Black", sans-serif; font-weight: 800; font-size: 20px; }
   .marca span { color: var(--rojo); }
@@ -65,6 +66,18 @@
   .sin-acceso { max-width: 440px; margin: 40px auto; text-align: center; }
   .sin-acceso h1 { margin-bottom: 10px; }
   .sin-acceso p { color: var(--gris); line-height: 1.5; }
+  .feedback { margin-top: 18px; background: var(--blanco); border: 1px solid var(--linea); border-radius: 14px; padding: 14px 16px; }
+  .fb-pregunta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-weight: 600; font-size: 14px; }
+  .fb-pregunta span { margin-right: 4px; }
+  .fb-btn, .fb-enviar { border: 2px solid var(--negro); background: var(--blanco); color: var(--negro); border-radius: 999px; padding: 7px 18px; font: 600 13px Inter, system-ui, sans-serif; cursor: pointer; }
+  .fb-btn:hover { background: var(--negro); color: #fff; }
+  .fb-enviar { background: var(--rojo); border-color: var(--rojo); color: #fff; margin-top: 8px; }
+  .fb-enviar:disabled { opacity: .5; cursor: default; }
+  .fb-no { margin-top: 12px; }
+  .fb-no label { display: block; font-size: 13px; color: var(--gris); margin-bottom: 6px; }
+  .fb-no textarea { width: 100%; font: 14px Inter, system-ui, sans-serif; padding: 10px 12px; border: 1px solid var(--linea); border-radius: 12px; resize: vertical; outline: none; }
+  .fb-no textarea:focus { border-color: var(--rojo); box-shadow: 0 0 0 3px var(--rojo-suave); }
+  .fb-gracias { margin: 0; font-size: 14px; color: var(--spec-t); font-weight: 600; }
   mark { background: var(--rojo-suave); color: var(--rojo-osc); padding: 0 2px; border-radius: 3px; }
 </style>
 </head>
@@ -85,6 +98,19 @@
   <div class="wrap">
     <p class="meta"><span id="count">Cargando…</span><button id="refresh" type="button">Actualizar</button></p>
     <div id="results"><div class="carga"><div class="puntos" aria-hidden="true"><i></i><i></i><i></i></div>Cargando el catálogo…</div></div>
+    <div id="feedback" class="feedback" hidden>
+      <div class="fb-pregunta">
+        <span>¿Te ha resultado útil?</span>
+        <button type="button" class="fb-btn" data-util="1">Sí</button>
+        <button type="button" class="fb-btn" data-util="0">No</button>
+      </div>
+      <div class="fb-no" hidden>
+        <label for="fb-texto">¿Qué buscabas o por qué no te sirve? Lo usamos para mejorar el buscador.</label>
+        <textarea id="fb-texto" rows="3" maxlength="1000" placeholder="Ej.: buscaba cómo pedir una moto de sustitución y no sale nada"></textarea>
+        <button type="button" class="fb-enviar">Enviar</button>
+      </div>
+      <p class="fb-gracias" hidden></p>
+    </div>
   </div>
 </main>
 
@@ -93,6 +119,8 @@
   let rol = 'Todos';
   let cat = 'Todas';
   let USUARIO = null;
+  let ULTIMA = { q: '', resultados: [] };
+  let fbTimer;
 
   const STOP = new Set('a al como cómo con de del donde dónde el en es esta este hay la las lo los me mi para por que qué se si sobre su un una uno y o tengo quiero necesito puedo hacer hago saber ver busco algo cual cuál cuando cuándo'.split(' ').map(n));
   // Palabras que aparecen en casi todo: cuentan poco.
@@ -186,6 +214,8 @@
         <div class="tags">${Array.from(new Set(bloqueados.map(x => x.i.categoria).filter(Boolean))).map(c => `<span class="tag">${esc(c)}</span>`).join('')}</div>
       </div>` : '';
 
+    prepararFeedback(raw.trim(), terms.length ? list.slice().sort((a, b) => b.s - a.s).map(x => x.i.nombre).concat(bloqueados.length ? ['[Aviso: consultar manager]'] : []) : null);
+
     const box = document.getElementById('results');
     const visibles = ITEMS.filter(i => !i.restringido).length;
     document.getElementById('count').textContent = terms.length
@@ -232,6 +262,42 @@
       ).join('');
     }
   }
+
+  // Enseña "¿Te ha resultado útil?" cuando la persona deja de escribir.
+  function prepararFeedback(q, resultados) {
+    const fb = document.getElementById('feedback');
+    clearTimeout(fbTimer);
+    if (!resultados || !q) { fb.hidden = true; return; }
+    if (q === ULTIMA.q && !fb.hidden) return;
+    fb.hidden = true;
+    fbTimer = setTimeout(() => {
+      ULTIMA = { q: q, resultados: resultados.slice(0, 10) };
+      fb.querySelector('.fb-pregunta').hidden = false;
+      fb.querySelector('.fb-no').hidden = true;
+      fb.querySelector('.fb-gracias').hidden = true;
+      document.getElementById('fb-texto').value = '';
+      fb.hidden = false;
+    }, 1200);
+  }
+
+  function enviarFeedback(util, comentario) {
+    const fb = document.getElementById('feedback');
+    const gracias = fb.querySelector('.fb-gracias');
+    fb.querySelector('.fb-pregunta').hidden = true;
+    fb.querySelector('.fb-no').hidden = true;
+    gracias.hidden = false;
+    gracias.textContent = util ? '¡Gracias! Nos alegra que te haya servido.' : '¡Gracias! Lo revisaremos para que la próxima vez salga lo que necesitas.';
+    google.script.run.withFailureHandler(() => { gracias.textContent = 'No se pudo enviar. Inténtalo de nuevo más tarde.'; })
+      .enviarFeedback({ busqueda: ULTIMA.q, util: util, comentario: comentario || '', resultados: ULTIMA.resultados });
+  }
+
+  document.querySelectorAll('.fb-btn').forEach(b => b.onclick = () => {
+    if (b.dataset.util === '1') return enviarFeedback(true, '');
+    document.querySelector('#feedback .fb-pregunta').hidden = true;
+    document.querySelector('#feedback .fb-no').hidden = false;
+    document.getElementById('fb-texto').focus();
+  });
+  document.querySelector('.fb-enviar').onclick = () => enviarFeedback(false, document.getElementById('fb-texto').value.trim());
 
   function chips(id, values, current, onPick) {
     const el = document.getElementById(id);

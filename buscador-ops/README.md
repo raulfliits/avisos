@@ -32,6 +32,21 @@ Los cambios en la hoja se aplican en 5 minutos como mucho (o al pulsar "Actualiz
 Para que un archivo lo vea un specialist, ponlo en el índice de Ops Specialist (o deja el
 archivo/acceso directo en esa carpeta).
 
+## "¿Te ha resultado útil?" y cómo aprende
+
+Tras cada búsqueda sale "¿Te ha resultado útil? Sí / No". Con "No" la persona puede explicar qué
+buscaba. Todo se guarda en **`Q&A FLiiTS OPS / Feedback Buscador Ops`** (se crea con el primer voto):
+Fecha, Email, Rol, Búsqueda, ¿Útil?, Comentario, Resultados mostrados, Archivo que debía salir, Estado, Notas.
+
+Para que la próxima vez salga bien:
+1. Filtra Estado = **Pendiente**.
+2. En **Archivo que debía salir** escribe el nombre exacto (o el enlace) del archivo del índice.
+3. En la siguiente sincronización (cada hora, o al pulsar "Actualizar") las palabras de esa
+   búsqueda se añaden a las palabras clave del archivo y el Estado pasa a **Aplicado**.
+
+Si lo que buscaban no existe, añade el archivo al índice (o déjalo en la carpeta) con su
+descripción, y luego márcalo como en el paso 2. Usa **Descartado** para lo que no haya que tocar.
+
 ## Publicarla (una sola vez, ~5 min)
 
 1. Entra en https://script.google.com con la cuenta de FLiiTS → **Nuevo proyecto**. Nómbralo "Buscador Ops FLiiTS".
