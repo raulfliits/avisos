@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #ffffff; --text: #1d2330; --muted: #5d6677; --line: #e3e6ec;
+    --accent: #1f6feb; --accent-soft: #e8f0fe; --spec: #e3f4e1; --spec-t: #23652b; --man: #fdeedd; --man-t: #8a4b0f;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); }
+  header { background: var(--card); border-bottom: 1px solid var(--line); padding: 20px 16px 16px; position: sticky; top: 0; z-index: 2; }
+  .wrap { max-width: 860px; margin: 0 auto; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .sub { color: var(--muted); font-size: 14px; margin: 0 0 14px; }
+  .search { display: flex; gap: 8px; }
+  input[type=search] { flex: 1; font-size: 16px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; outline: none; }
+  input[type=search]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .filters { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .chip { border: 1px solid var(--line); background: var(--card); border-radius: 999px; padding: 6px 12px; font-size: 13px; cursor: pointer; color: var(--text); }
+  .chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  main { padding: 16px; }
+  .meta { color: var(--muted); font-size: 13px; margin: 0 0 10px; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+  .meta button { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 13px; padding: 0; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .card a.title { font-weight: 600; font-size: 16px; color: var(--accent); text-decoration: none; word-break: break-word; }
+  .card a.title:hover { text-decoration: underline; }
+  .desc { margin: 6px 0 8px; font-size: 14px; line-height: 1.45; }
+  .desc.empty { color: var(--muted); font-style: italic; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px; }
+  .tag { padding: 2px 8px; border-radius: 6px; background: #eef0f4; color: var(--muted); }
+  .tag.spec { background: var(--spec); color: var(--spec-t); }
+  .tag.man { background: var(--man); color: var(--man-t); }
+  .group h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 18px 0 8px; }
+  .empty-state { text-align: center; color: var(--muted); padding: 40px 10px; }
+  mark { background: #fff2a8; padding: 0 1px; border-radius: 2px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Buscador Ops FLiiTS</h1>
+    <p class="sub">Escribe lo que necesitas gestionar y te digo qué archivo o herramienta usar.</p>
+    <div class="search">
+      <input id="q" type="search" placeholder="Ej.: entregar una chaqueta, ver vacaciones, cambio de vehículo…" autocomplete="off" autofocus>
+    </div>
+    <div class="filters" id="roles"></div>
+    <div class="filters" id="cats"></div>
+  </div>
+</header>
+<main>
+  <div class="wrap">
+    <p class="meta"><span id="count">Cargando…</span><button id="refresh" type="button">Actualizar</button></p>
+    <div id="results"></div>
+  </div>
+</main>
+
+<script>
+  let ITEMS = [];
+  let rol = 'Todos';
+  let cat = 'Todas';
+
+  const STOP = new Set('a al como cómo con de del donde dónde el en es esta este hay la las lo los me mi para por que qué se si sobre su un una uno y o tengo quiero necesito puedo hacer hago saber ver busco algo cual cuál cuando cuándo'.split(' ').map(n));
+  // Sinónimos: cualquier palabra de un grupo encuentra también las demás.
+  const SYN = [
+    ['chaqueta', 'chaquetas', 'epi', 'epis', 'ppi', 'ppis', 'uniforme', 'ropa', 'material', 'equipacion'],
+    ['mochila', 'mochilas', 'caja', 'bolsa'],
+    ['vacaciones', 'ausencias', 'dias libres', 'permiso', 'libranza'],
+    ['rider', 'riders', 'courier', 'couriers', 'repartidor', 'repartidores', 'trabajador', 'empleado'],
+    ['moto', 'motos', 'vehiculo', 'vehiculos', 'bici', 'coche', 'zoomo'],
+    ['kpi', 'kpis', 'metricas', 'indicadores', 'rendimiento', 'dashboard', 'informe', 'report'],
+    ['forecast', 'prevision', 'planificacion', 'horas', 'turnos', 'scheduling'],
+    ['onboarding', 'alta', 'altas', 'formacion', 'formaciones', 'incorporacion', 'nuevo'],
+    ['incentivo', 'incentivos', 'bonus', 'pago', 'pagos', 'plus', 'ajuste', 'ajustes', 'nomina'],
+    ['despido', 'despidos', 'baja', 'bajas', 'sancion', 'disciplinario'],
+    ['comunicacion', 'comunicaciones', 'aviso', 'avisos', 'sms', 'email', 'mail', 'envio', 'masivo', 'mensaje'],
+    ['stock', 'inventario', 'almacen'],
+    ['cita', 'citas', 'reunion', 'reuniones', 'calendario', 'agenda'],
+    ['oficina', 'oficinas', 'atencion', 'rto', 'ticket', 'tickets', 'chat', 'chats'],
+    ['uber', 'ubereats'], ['glovo'], ['burger', 'bk', 'burgerking'],
+    ['fraude', 'fraud', 'incidencia', 'incidencias'],
+    ['fichar', 'fichaje', 'sesame', 'horario'],
+    ['referido', 'referidos', 'captacion', 'reclutamiento', 'contratar', 'jobtoday'],
+    ['convenio', 'contrato', 'jornada', 'sindical', 'sindicales'],
+  ].map(g => g.map(n));
+
+  function n(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+  function esc(s) { return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+  function expand(term) {
+    const out = new Set([term]);
+    SYN.forEach(g => { if (g.some(w => w === term || (term.length > 3 && w.startsWith(term)))) g.forEach(w => out.add(w)); });
+    return Array.from(out);
+  }
+
+  function score(item, terms) {
+    if (!terms.length) return 1;
+    const f = item._f;
+    let total = 0, hit = 0;
+    terms.forEach(t => {
+      let best = 0;
+      expand(t).forEach(w => {
+        const exact = w === t;
+        const k = exact ? 1 : 0.6;
+        if (f.nombre.includes(w)) best = Math.max(best, 5 * k);
+        if (f.kw.includes(w)) best = Math.max(best, 4 * k);
+        if (f.cat.includes(w)) best = Math.max(best, 3 * k);
+        if (f.desc.includes(w)) best = Math.max(best, 2 * k);
+      });
+      if (best) hit++;
+      total += best;
+    });
+    if (!hit) return 0;
+    return total * (hit / terms.length);
+  }
+
+  function render() {
+    const raw = document.getElementById('q').value;
+    const terms = n(raw).split(/[^a-z0-9ñ]+/).filter(t => t.length > 1 && !STOP.has(t));
+    let list = ITEMS
+      .filter(i => rol === 'Todos' || i.roles.indexOf(rol) !== -1)
+      .filter(i => cat === 'Todas' || i.categoria === cat)
+      .map(i => ({ i, s: score(i, terms) }))
+      .filter(x => x.s > 0);
+
+    const box = document.getElementById('results');
+    document.getElementById('count').textContent = terms.length
+      ? list.length + (list.length === 1 ? ' resultado' : ' resultados')
+      : ITEMS.length + ' archivos y herramientas';
+
+    if (!list.length) {
+      box.innerHTML = '<div class="empty-state">No encuentro nada para esa búsqueda. Prueba con otras palabras (por ejemplo "chaqueta", "vacaciones", "incentivos") o pregunta a tu Ops Manager.</div>';
+      return;
+    }
+
+    const hl = s => {
+      let out = esc(s);
+      if (!terms.length) return out;
+      const words = Array.from(new Set(terms.flatMap(expand))).filter(w => w.length > 2).sort((a, b) => b.length - a.length);
+      words.forEach(w => {
+        const re = new RegExp('(' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+        out = out.replace(/(^|>)([^<]+)/g, (m, p, txt) => p + txt.replace(re, '<mark>$1</mark>'));
+      });
+      return out;
+    };
+
+    const card = ({ i }) => `
+      <div class="card">
+        <a class="title" href="${esc(i.enlace)}" target="_blank" rel="noopener">${hl(i.nombre)}</a>
+        <p class="desc ${i.descripcion ? '' : 'empty'}">${i.descripcion ? hl(i.descripcion) : 'Sin descripción todavía. Añádela en el índice de la carpeta.'}</p>
+        <div class="tags">
+          ${i.roles.map(r => `<span class="tag ${r === 'Ops Specialist' ? 'spec' : 'man'}">${esc(r)}</span>`).join('')}
+          ${i.tipo ? `<span class="tag">${esc(i.tipo)}</span>` : ''}
+          ${i.categoria ? `<span class="tag">${esc(i.categoria)}</span>` : ''}
+        </div>
+      </div>`;
+
+    if (terms.length) {
+      list.sort((a, b) => b.s - a.s);
+      box.innerHTML = list.map(card).join('');
+    } else {
+      const groups = {};
+      list.forEach(x => (groups[x.i.categoria || 'Sin categoría'] = groups[x.i.categoria || 'Sin categoría'] || []).push(x));
+      box.innerHTML = Object.keys(groups).sort((a, b) => a.localeCompare(b, 'es')).map(g =>
+        `<section class="group"><h2>${esc(g)}</h2>${groups[g].sort((a, b) => a.i.nombre.localeCompare(b.i.nombre, 'es')).map(card).join('')}</section>`
+      ).join('');
+    }
+  }
+
+  function chips(id, values, current, onPick) {
+    const el = document.getElementById(id);
+    el.innerHTML = values.map(v => `<button type="button" class="chip ${v === current ? 'on' : ''}" data-v="${esc(v)}">${esc(v)}</button>`).join('');
+    el.querySelectorAll('.chip').forEach(b => b.onclick = () => onPick(b.dataset.v));
+  }
+
+  function drawFilters() {
+    chips('roles', ['Todos', 'Ops Specialist', 'Ops Manager'], rol, v => { rol = v; drawFilters(); render(); });
+    const cats = Array.from(new Set(ITEMS.map(i => i.categoria).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'es'));
+    chips('cats', ['Todas'].concat(cats), cat, v => { cat = v; drawFilters(); render(); });
+  }
+
+  function load(data) {
+    ITEMS = (data.items || []).map(i => Object.assign(i, {
+      _f: { nombre: n(i.nombre), kw: n(i.keywords), cat: n(i.categoria), desc: n(i.descripcion) },
+    }));
+    drawFilters();
+    render();
+  }
+
+  function fail(err) {
+    document.getElementById('count').textContent = 'No se pudo cargar el catálogo: ' + (err && err.message ? err.message : err);
+  }
+
+  let t;
+  document.getElementById('q').addEventListener('input', () => { clearTimeout(t); t = setTimeout(render, 120); });
+  document.getElementById('refresh').onclick = () => {
+    document.getElementById('count').textContent = 'Actualizando…';
+    google.script.run.withSuccessHandler(load).withFailureHandler(fail).refrescarCatalogo();
+  };
+  google.script.run.withSuccessHandler(load).withFailureHandler(fail).getCatalogo();
+</script>
+</body>
+</html>
