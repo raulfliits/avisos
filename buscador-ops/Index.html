@@ -62,11 +62,13 @@
   let cat = 'Todas';
 
   const STOP = new Set('a al como cómo con de del donde dónde el en es esta este hay la las lo los me mi para por que qué se si sobre su un una uno y o tengo quiero necesito puedo hacer hago saber ver busco algo cual cuál cuando cuándo'.split(' ').map(n));
+  // Palabras que aparecen en casi todo: cuentan poco.
+  const WEAK = new Set(['rider', 'riders', 'fliits', 'courier', 'couriers', 'repartidor', 'repartidores']);
   // Sinónimos: cualquier palabra de un grupo encuentra también las demás.
   const SYN = [
     ['chaqueta', 'chaquetas', 'epi', 'epis', 'ppi', 'ppis', 'uniforme', 'ropa', 'material', 'equipacion'],
     ['mochila', 'mochilas', 'caja', 'bolsa'],
-    ['vacaciones', 'ausencias', 'dias libres', 'permiso', 'libranza'],
+    ['vacaciones', 'ausencias', 'dias libres', 'libranza', 'festivos'],
     ['rider', 'riders', 'courier', 'couriers', 'repartidor', 'repartidores', 'trabajador', 'empleado'],
     ['moto', 'motos', 'vehiculo', 'vehiculos', 'bici', 'coche', 'zoomo'],
     ['kpi', 'kpis', 'metricas', 'indicadores', 'rendimiento', 'dashboard', 'informe', 'report'],
@@ -108,11 +110,13 @@
         if (f.cat.includes(w)) best = Math.max(best, 3 * k);
         if (f.desc.includes(w)) best = Math.max(best, 2 * k);
       });
-      if (best) hit++;
-      total += best;
+      const w = WEAK.has(t) ? 0.25 : 1;
+      if (best) hit += w;
+      total += best * w;
     });
     if (!hit) return 0;
-    return total * (hit / terms.length);
+    const peso = terms.reduce((a, t) => a + (WEAK.has(t) ? 0.25 : 1), 0);
+    return total * (hit / peso);
   }
 
   function render() {
@@ -123,6 +127,11 @@
       .filter(i => cat === 'Todas' || i.categoria === cat)
       .map(i => ({ i, s: score(i, terms) }))
       .filter(x => x.s > 0);
+    // Quita resultados muy por debajo del mejor para no listar medio catálogo.
+    if (terms.length && list.length) {
+      const top = Math.max.apply(null, list.map(x => x.s));
+      list = list.filter(x => x.s >= top * 0.35);
+    }
 
     const box = document.getElementById('results');
     document.getElementById('count').textContent = terms.length
