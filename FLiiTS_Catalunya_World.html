@@ -3639,6 +3639,7 @@ function openMotoPanel(i){
    <div class="mrows m4">
      <div class="mrow hl"><span>En uso con rider asignado</span>${K("mo3.e","22","b")}</div>
      <div class="mrow nx"><span>En taller · pendientes de confirmar</span>${K("mo3.n","3","b")}</div>
+     <div class="mrow nx"><span>En camino · no se cuentan hasta recibirlas</span>${K("mo3.c","+10","b")}</div>
      <div class="mrow"><span>Lista de espera · riders pidiendo moto</span>${K("mo3.w","29","b")}</div>
      <div class="mrow need"><span>Faltan para cubrir los mínimos (${FA} − las del taller)</span><b id="moNeed">0</b></div>
    </div>
@@ -3656,7 +3657,7 @@ function openMotoPanel(i){
       ["Permisos","Solo Gerard, Azlan, Ivan y Raül modifican; el resto de @fliits.com, solo lectura.","Cualquiera con acceso editaba"]]
      .map((f,i)=>`<div class="vf">${K(`me.f${i}.t`,f[0],"b")}${K(`me.f${i}.d`,f[1],"span")}</div><div class="vno">✗ ${K(`me.f${i}.c`,f[2],"span")}</div><div class="vok">✓</div>`).join("")}</div>
    <div class="src">${K("me.src","raulfliits.github.io/motos-empresa · acceso con cuenta @fliits.com","span")}</div>
-   ${notes("mo3.notes",`~2 min. Gerard valida la documentación (NIE, carnets, permisos). Luego las motos: 163 hoy en Catalunya, por ciudad y, en Barcelona y Sabadell, por Glovo y Uber Eats. Para cumplir el % que piden harían falta ${NE} motos: faltan ${FA}. Las motos de empresa (solo en Barcelona) salen ya de la app Motos de empresa: 22 en uso y 3 en taller, con 29 riders en lista de espera. Con las 3 del taller faltan ${FA-3} (flota de ${22+FA} en uso). Termina con la app: un solo sitio para Escalaciones, Zoomo y Vehículos, detecta errores y conecta la lista de espera.`)}`;
+   ${notes("mo3.notes",`~2 min. Gerard valida la documentación (NIE, carnets, permisos). Luego las motos: 163 hoy en Catalunya, por ciudad y, en Barcelona y Sabadell, por Glovo y Uber Eats. Para cumplir el % que piden harían falta ${NE} motos: faltan ${FA}. Las motos de empresa (solo en Barcelona) salen ya de la app Motos de empresa: 22 en uso y 3 en taller, con 29 riders en lista de espera. Con las 3 del taller faltan ${FA-3} (flota de ${22+FA} en uso). Hay 10 más en camino, pero no las contamos hasta recibirlas. Termina con la app: un solo sitio para Escalaciones, Zoomo y Vehículos, detecta errores y conecta la lista de espera.`)}`;
   openPanel(`MUNDO ${i+1} · ${nm(scr.who)}`,"¡PANTALLA SUPERADA!",html,"ENTER · GUARDAR MONEDA DE ORO",()=>finishScreen(i),b=>{ updMotos(b,true); b.querySelectorAll("#meVs .vok").forEach((v,k)=>setTimeout(()=>{ if(open>0){ v.classList.add("on"); sfx.coin(); } },2600+k*400)); });
 }
 function updMotos(b,anim){
@@ -3674,7 +3675,7 @@ function openFinalPanel(){
    <div class="cities req" id="cities">${["Girona","Tarragona","Terrassa","Mataró","Badalona","Manresa"].map((c,i)=>K(`f.c${i}`,c,"div","city-t")).join("")}</div>
    <div class="retos-h">PRÓXIMOS RETOS</div>
    <div class="goal"><div><span>REPARTIDORES ACTIVOS EN CATALUNYA HOY</span><b>1.020</b></div><div class="arr">→</div><div class="g"><span>OBJETIVO CON TODO CUMPLIDO</span>${K("f2.goal","¿?","b")}</div></div>
-   <ul class="retos">${["Llegar a 51 motos de empresa en uso para cubrir los mínimos garantizados que nos piden (hoy 22 en uso + 3 en taller: faltan 26)","100% de EPIs entregados a una semana vista de la contratación del rider (hoy, 89%)","Mejorar la eficiencia de la flota y reducir el absentismo"].map((t,i)=>K(i?`f2.a${i}`:"f3.a0",t,"li")).join("")}</ul>
+   <ul class="retos">${["Llegar a 51 motos de empresa en uso para cubrir los mínimos garantizados que nos piden (hoy 22 en uso + 3 en taller: faltan 26; 10 en camino, que contaremos al recibirlas)","100% de EPIs entregados a una semana vista de la contratación del rider (hoy, 89%)","Mejorar la eficiencia de la flota y reducir el absentismo"].map((t,i)=>K(i?`f2.a${i}`:"f3.a0",t,"li")).join("")}</ul>
    <div class="src">Riders activos: suma de las 9 ciudades de Catalunya en el Rider forecast (06/11/2026).</div>
    ${notes("f2.notes","~1:30 min. Raül junta las tres monedas: el trabajo de Ivan, Gerard y Azlan. Presenta las peticiones de nuevas ciudades y los retos: de 1.020 riders activos al objetivo, 51 motos de empresa en uso, EPIs al 100% a una semana de la contratación, más eficiencia de la flota y menos absentismo. Después, créditos y preguntas.")}`;
   openPanel("FINAL · "+nm(1),"PETICIONES: NUEVAS CIUDADES",html,"ENTER · VER CRÉDITOS",showCredits,b=>{ [...b.querySelector("#cities").children].forEach((t,k)=>setTimeout(()=>{ if(open>0){ t.classList.add("on"); sfx.coin(); } },500+k*380)); });
