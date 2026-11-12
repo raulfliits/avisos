@@ -510,6 +510,7 @@ button{font:inherit;color:inherit}
 .ep b{font-family:var(--f-display);font-weight:400;font-size:11px;text-align:right}
 .ep em{font-style:normal;color:var(--dim);text-align:right}
 .cal{border:3px dashed var(--gold);padding:10px 12px;margin-top:12px;font-size:21px;line-height:1.15}
+.cal.alert::before{content:"AVISO DEL SISTEMA"}
 .cal::before{content:"CALENDARIO DE VISITAS";display:block;font-family:var(--f-display);font-size:8px;color:var(--gold);margin-bottom:6px}
 .cities.req .city-t::before{content:"PETICIÓN"}
 .goal{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:12px;align-items:center;margin-bottom:14px}
@@ -3530,7 +3531,7 @@ function openPanel(kick,title,html,btn,onDone,after){
 function closePanel(){ if(open<0) return; open=-1; $("#lvlOv").hidden=true; const f=panelDone; panelDone=null; if(f) f(); }
 $("#clearBtn").addEventListener("click",closePanel);
 // EPIs entregados por ciudad: riders con el documento de EPIs firmado (Control de stock FLiiTS, solo totales por ciudad).
-const EPIS=[["Barcelona",716,686],["Sabadell",130,88],["Parets del Vallès",36,34],["Martorell",30,25],["Gavà",22,15],["Mataró",22,11],["Lleida",21,16],["Sant Cugat",17,10],["Molins de Rei",16,13]];
+const EPIS=[["Barcelona",730,689],["Sabadell",129,91],["Parets del Vallès",33,32],["Martorell",27,24],["Gavà",21,15],["Mataró",21,12],["Lleida",21,16],["Sant Cugat",15,11],["Molins de Rei",16,14]];
 function episHTML(){
   let T=0,D=0;
   const rows=EPIS.map(([n,t,d])=>{ T+=t; D+=d; const p=Math.round(100*d/t);
@@ -3540,21 +3541,33 @@ function episHTML(){
    <div class="eps" id="eps">${rows}</div>
    <div class="ctot">TOTAL CATALUNYA: ${Math.round(100*D/T)}% ENTREGADO · ${fmtN(D)} DE ${fmtN(T)} RIDERS · ${T-D} POR ENTREGAR</div>
    <div class="cal">${K("ep.cal","Tenemos un calendario de visitas a las ciudades para dejarlo todo entregado.","span")}</div>
-   <div class="src">${K("ep.src","Control de stock FLiiTS · riders con el documento de EPIs firmado, 06/11/2026","span")}</div>`;
+   <div class="src">${K("ep2.src","Control de stock FLiiTS · riders con el documento de EPIs firmado, 12/11/2026","span")}</div>`;
 }
 function animEpis(b){ const e=b.querySelector("#eps"); if(e) setTimeout(()=>{ if(open>0){ e.classList.add("on"); sfx.tick(); } },500); }
 // Novedades del nuevo sistema de control de stock (se muestran en el panel de Azlan).
 function stockHTML(){
-  const F=[["Stock calculado solo","El stock de cada oficina se calcula con cada entrega, envío y recuento. En rojo lo que baja del punto de reposición.","Se apuntaba a mano en el Tracker EPIs"],
-           ["Envíos caja a caja","Se prepara y se recibe caja a caja; si no cuadra, se avisa. Lo que falta queda EN CAMINO.","No sabíamos qué faltaba al llegar"],
-           ["Pendientes de entrega","Lo que no hay en stock queda pendiente para ese rider y se entrega al volver a escanearlo.","Lo que faltaba se perdía de vista"],
-           ["Devoluciones y PPIs Returned","Devolución completa o incompleta, por producto. Si trae todo lo obligatorio, va solo a PPIs Returned.","Devoluciones sin registrar"],
-           ["Permisos y trazabilidad","Solo cuentas @fliits.com; cada oficina ve lo suyo y queda guardado quién registra cada cosa.","Cualquiera podía tocar el tracker"]];
-  return `${K("st.intro","Del tracker a mano a una app de escaneo: así controlamos ahora los EPIs y las mochilas.","p","intro")}
+  const F=[["Stock calculado solo","Cada entrega, envío y devolución suma o resta al momento; en rojo lo que baja del punto de reposición y aviso diario.","Se apuntaba a mano en el Tracker EPIs"],
+           ["Firma en el momento","Al entregar, el rider firma en el móvil de la oficina o con QR, y la firma se enlaza con su entrega.","Entrega y firma iban por separado"],
+           ["Pendientes por rider","Lo que no hay queda pendiente para ese rider y se le entrega al volver a escanearlo.","Lo que faltaba se perdía de vista"],
+           ["Envíos caja a caja","Se prepara y se recibe caja a caja; si no cuadra, se avisa y lo que falta queda EN CAMINO.","No sabíamos qué faltaba al llegar"],
+           ["Devoluciones y extras","Devolución por producto y entregas extra con motivo; si trae todo, va solo a PPIs Returned.","Devoluciones y extras sin registrar"],
+           ["Estadísticas al instante","% firmado y pendiente por oficina y ciudad, y lista de riders a los que llamar.","Contar a mano en el tracker"],
+           ["Permisos y trazabilidad","Cada oficina solo toca su stock y queda guardado quién registra cada cosa.","Cualquiera podía tocar el tracker"]];
+  return `${K("st2.intro","Del tracker a mano a una app de escaneo: así controlamos ahora los EPIs y las mochilas en Catalunya.","p","intro")}
    <div class="quest" id="stQuest">${K("st.q0","Escaneo el QR del rider","div","qs")}${K("st.q1","Kit según su vehículo","div","qs")}${K("st.q2","Firma en el móvil o con QR","div","qs")}${K("st.q3","Stock descontado al momento","div","qs")}</div>
-   <div class="vsc"><div class="vh"></div><div class="vh">ANTES</div><div class="vh us">SISTEMA FLiiTS</div>
-   ${F.map((f,i)=>`<div class="vf">${K(`st.f${i}.t`,f[0],"b")}${K(`st.f${i}.d`,f[1],"span")}</div><div class="vno">✗ ${K(`st.f${i}.c`,f[2],"span")}</div><div class="vok">✓</div>`).join("")}</div>
-   <div class="src">${K("st.src","Control de stock FLiiTS · app web con cuenta @fliits.com · se sincroniza con los trackers cada 15 minutos","span")}</div>`;
+   <div class="retos-h" style="margin-top:18px">CATALUNYA · PRIMERAS DOS SEMANAS (2–12 NOV)</div>
+   <div class="mrows m4">
+     <div class="mrow hl"><span>Entregas registradas (kits y mochilas)</span>${K("st2.n0","113","b")}</div>
+     <div class="mrow hl"><span>Hechas con la app de escaneo</span>${K("st2.n1","81%","b")}</div>
+     <div class="mrow"><span>Productos devueltos registrados</span>${K("st2.n2","26","b")}</div>
+     <div class="mrow"><span>Entregas extra controladas</span>${K("st2.n3","8","b")}</div>
+     <div class="mrow nx"><span>Pendientes de entregar (Sabadell)</span>${K("st2.n4","4","b")}</div>
+   </div>
+   <div class="cal alert">${K("st2.alert","Barcelona: solo 8 cascos de moto y 0 chaquetas de moto. Sabadell: por debajo del punto de reposición (13 chalecos).","span")}</div>
+   <div class="retos-h" style="margin-top:18px">TRACKERS DE ANTES vs SISTEMA FLiiTS</div>
+   <div class="vsc"><div class="vh"></div><div class="vh">TRACKERS</div><div class="vh us">SISTEMA FLiiTS</div>
+   ${F.map((f,i)=>`<div class="vf">${K(`st2.f${i}.t`,f[0],"b")}${K(`st2.f${i}.d`,f[1],"span")}</div><div class="vno">✗ ${K(`st2.f${i}.c`,f[2],"span")}</div><div class="vok">✓</div>`).join("")}</div>
+   <div class="src">${K("st2.src","Control de stock FLiiTS, 12/11/2026 · app web con cuenta @fliits.com · se sincroniza con los trackers cada 15 minutos","span")}</div>`;
 }
 function animStock(b){ const q=b.querySelector("#stQuest"); if(!q) return;
   [...q.children].forEach((x,k)=>setTimeout(()=>{ if(open>0){ x.classList.add("on"); sfx.tick(); } },900+k*450));
@@ -3622,24 +3635,35 @@ function openMotoPanel(i){
    <div class="mt"><span class="th">CIUDAD</span><span class="th">RIDERS</span><span class="th">MOTOS HOY</span><span class="th">% PEDIDO</span><span class="th">HACEN FALTA</span><span class="th">FALTAN</span>
      ${rows}<span class="tt">TOTAL</span><b class="tt"></b><b class="tt">163</b><b class="tt"></b><b class="tt">${NE}</b><b class="tt miss">+${FA}</b></div>
    <div class="src">Las ciudades que van sobradas (Lleida, Mataró) no compensan a las que no llegan: faltan ${FA} motos para garantizar el % que pide cada plataforma.</div>
-   <div class="retos-h" style="margin-top:18px">FLOTA DE MOTOS DE EMPRESA</div>
+   <div class="retos-h" style="margin-top:18px">FLOTA DE MOTOS DE EMPRESA · BARCELONA</div>
    <div class="mrows m4">
-     <div class="mrow hl"><span>Motos de empresa · incorporadas desde septiembre</span>${K("mo2.e","23","b")}</div>
-     <div class="mrow nx"><span>Pendientes de recibir</span>${K("mo2.n","+10","b")}</div>
-     <div class="mrow"><span>Lista de espera · riders pidiendo moto</span>${K("mo2.w","20","b")}</div>
-     <div class="mrow need"><span>Faltan de empresa para cubrir los mínimos (${FA} − las que llegan)</span><b id="moNeed">0</b></div>
+     <div class="mrow hl"><span>En uso con rider asignado</span>${K("mo3.e","22","b")}</div>
+     <div class="mrow nx"><span>En taller · pendientes de confirmar</span>${K("mo3.n","3","b")}</div>
+     <div class="mrow"><span>Lista de espera · riders pidiendo moto</span>${K("mo3.w","29","b")}</div>
+     <div class="mrow need"><span>Faltan para cubrir los mínimos (${FA} − las del taller)</span><b id="moNeed">0</b></div>
    </div>
    <div class="mfleet" id="mfleet"></div>
-   <div class="mtl"><span>SEPTIEMBRE · 0</span><span>HOY · <b id="mtlNow">23</b></span><span>EN BREVE · <b id="mtlNext">33</b></span><span>OBJETIVO · <b id="mtlGoal">52</b></span></div>
-   <div class="src">Motos y riders: Rider forecast (06/11/2026), pestaña motos (% por ciudad y plataforma). Motos de empresa y lista de espera: dato actual.</div>
-   ${notes("mo2.notes",`~2 min. Gerard valida la documentación (NIE, carnets, permisos). Luego las motos: ${163} hoy en Catalunya, por ciudad y, en Barcelona y Sabadell, por Glovo y Uber Eats. Para cumplir el % que piden harían falta ${NE} motos y faltan ${FA} en las ciudades que no llegan. Tenemos 23 de empresa desde septiembre y 10 en camino: faltan ${FA-10} más (flota de ${23+FA}) y hay 20 riders en lista de espera pidiendo moto.`)}`;
-  openPanel(`MUNDO ${i+1} · ${nm(scr.who)}`,"¡PANTALLA SUPERADA!",html,"ENTER · GUARDAR MONEDA DE ORO",()=>finishScreen(i),b=>updMotos(b,true));
+   <div class="mtl"><span>AGOSTO · 0</span><span>EN USO · <b id="mtlNow">22</b></span><span>CON TALLER · <b id="mtlNext">25</b></span><span>OBJETIVO · <b id="mtlGoal">51</b></span></div>
+   <div class="src">Motos y riders: Rider forecast (06/11/2026). Motos de empresa (solo en Barcelona) y lista de espera: app Motos de empresa, 12/11/2026.</div>
+   <div class="retos-h" style="margin-top:22px">APP MOTOS DE EMPRESA</div>
+   ${K("me.intro","Hemos creado una web para gestionar la flota: una sola pantalla que mantiene al día los 3 archivos donde consta cada moto.","p","intro")}
+   <div class="vsc" id="meVs"><div class="vh"></div><div class="vh">ANTES</div><div class="vh us">APP FLiiTS</div>
+   ${[["Un solo sitio para los 3 archivos","Escalaciones, Zoomo y Vehículos se actualizan a la vez; la matrícula lo une todo.","3 hojas a mano que no siempre cuadraban"],
+      ["Detecta diferencias y duplicados","Avisa si una moto falta en un archivo o si un rider tiene dos motos, y lo resuelve en un clic.","Errores que nadie veía"],
+      ["Lista de espera conectada","Asignas una moto libre a un rider de la lista y sale de la lista solo.","Lista aparte, a mano"],
+      ["Estados coherentes","Al marcar OK, taller o desaparecida, cada archivo queda con el estado que le corresponde.","Cada archivo con su propio estado"],
+      ["Rider por su ID","Escribes el ID y trae el nombre de fliiters admin.","Copiar y pegar nombres"],
+      ["Permisos","Solo Gerard, Azlan, Ivan y Raül modifican; el resto de @fliits.com, solo lectura.","Cualquiera con acceso editaba"]]
+     .map((f,i)=>`<div class="vf">${K(`me.f${i}.t`,f[0],"b")}${K(`me.f${i}.d`,f[1],"span")}</div><div class="vno">✗ ${K(`me.f${i}.c`,f[2],"span")}</div><div class="vok">✓</div>`).join("")}</div>
+   <div class="src">${K("me.src","raulfliits.github.io/motos-empresa · acceso con cuenta @fliits.com","span")}</div>
+   ${notes("mo3.notes",`~2 min. Gerard valida la documentación (NIE, carnets, permisos). Luego las motos: 163 hoy en Catalunya, por ciudad y, en Barcelona y Sabadell, por Glovo y Uber Eats. Para cumplir el % que piden harían falta ${NE} motos: faltan ${FA}. Las motos de empresa (solo en Barcelona) salen ya de la app Motos de empresa: 22 en uso y 3 en taller, con 29 riders en lista de espera. Con las 3 del taller faltan ${FA-3} (flota de ${22+FA} en uso). Termina con la app: un solo sitio para Escalaciones, Zoomo y Vehículos, detecta errores y conecta la lista de espera.`)}`;
+  openPanel(`MUNDO ${i+1} · ${nm(scr.who)}`,"¡PANTALLA SUPERADA!",html,"ENTER · GUARDAR MONEDA DE ORO",()=>finishScreen(i),b=>{ updMotos(b,true); b.querySelectorAll("#meVs .vok").forEach((v,k)=>setTimeout(()=>{ if(open>0){ v.classList.add("on"); sfx.coin(); } },2600+k*400)); });
 }
 function updMotos(b,anim){
   b=b||$("#lvlBody"); const f=b.querySelector("#mfleet"); if(!f) return;
   let tot=0; b.querySelectorAll(".mv").forEach(e=>tot+=num(e.textContent)); b.querySelector("#moTotal").textContent=tot;
   const FA=MOTOREQ.reduce((a,r)=>a+Math.max(0,r[4]-r[2]),0);
-  const e=Math.max(0,Math.min(200,num(b.querySelector('[data-k="mo2.e"]').textContent))), n=Math.max(0,Math.min(200,num(b.querySelector('[data-k="mo2.n"]').textContent))), x=Math.max(0,FA-n);
+  const e=Math.max(0,Math.min(200,num(b.querySelector('[data-k="mo3.e"]').textContent))), n=Math.max(0,Math.min(200,num(b.querySelector('[data-k="mo3.n"]').textContent))), x=Math.max(0,FA-n);
   b.querySelector("#mtlNow").textContent=e; b.querySelector("#mtlNext").textContent=e+n; b.querySelector("#mtlGoal").textContent=e+n+x; b.querySelector("#moNeed").textContent=x;
   f.innerHTML=Array.from({length:e+n+x},(_,k)=>`<img src="${motoURL}" alt="" class="${k>=e+n?"need":k>=e?"fut":""}" style="${anim?`animation-delay:${(k*.05).toFixed(2)}s`:"animation:none"}">`).join("");
 }
@@ -3650,9 +3674,9 @@ function openFinalPanel(){
    <div class="cities req" id="cities">${["Girona","Tarragona","Terrassa","Mataró","Badalona","Manresa"].map((c,i)=>K(`f.c${i}`,c,"div","city-t")).join("")}</div>
    <div class="retos-h">PRÓXIMOS RETOS</div>
    <div class="goal"><div><span>REPARTIDORES ACTIVOS EN CATALUNYA HOY</span><b>1.020</b></div><div class="arr">→</div><div class="g"><span>OBJETIVO CON TODO CUMPLIDO</span>${K("f2.goal","¿?","b")}</div></div>
-   <ul class="retos">${["Tener 52 motos de empresa para cubrir los mínimos garantizados que nos piden (hoy 23 + 10 en camino: faltan 19)","100% de EPIs entregados a una semana vista de la contratación del rider (hoy, 89%)","Mejorar la eficiencia de la flota y reducir el absentismo"].map((t,i)=>K(`f2.a${i}`,t,"li")).join("")}</ul>
+   <ul class="retos">${["Llegar a 51 motos de empresa en uso para cubrir los mínimos garantizados que nos piden (hoy 22 en uso + 3 en taller: faltan 26)","100% de EPIs entregados a una semana vista de la contratación del rider (hoy, 89%)","Mejorar la eficiencia de la flota y reducir el absentismo"].map((t,i)=>K(i?`f2.a${i}`:"f3.a0",t,"li")).join("")}</ul>
    <div class="src">Riders activos: suma de las 9 ciudades de Catalunya en el Rider forecast (06/11/2026).</div>
-   ${notes("f2.notes","~1:30 min. Raül junta las tres monedas: el trabajo de Ivan, Gerard y Azlan. Presenta las peticiones de nuevas ciudades y los retos: de 1.020 riders activos al objetivo, 52 motos de empresa, EPIs al 100% a una semana de la contratación, más eficiencia de la flota y menos absentismo. Después, créditos y preguntas.")}`;
+   ${notes("f2.notes","~1:30 min. Raül junta las tres monedas: el trabajo de Ivan, Gerard y Azlan. Presenta las peticiones de nuevas ciudades y los retos: de 1.020 riders activos al objetivo, 51 motos de empresa en uso, EPIs al 100% a una semana de la contratación, más eficiencia de la flota y menos absentismo. Después, créditos y preguntas.")}`;
   openPanel("FINAL · "+nm(1),"PETICIONES: NUEVAS CIUDADES",html,"ENTER · VER CRÉDITOS",showCredits,b=>{ [...b.querySelector("#cities").children].forEach((t,k)=>setTimeout(()=>{ if(open>0){ t.classList.add("on"); sfx.coin(); } },500+k*380)); });
 }
 
