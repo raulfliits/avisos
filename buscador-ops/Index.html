@@ -3,45 +3,69 @@
 <head>
 <base target="_top">
 <meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f6f7f9; --card: #ffffff; --text: #1d2330; --muted: #5d6677; --line: #e3e6ec;
-    --accent: #1f6feb; --accent-soft: #e8f0fe; --spec: #e3f4e1; --spec-t: #23652b; --man: #fdeedd; --man-t: #8a4b0f;
+    --rojo: #D60505; --rojo-osc: #A80404; --rojo-suave: #FBE3E3;
+    --negro: #0A0A0A; --crema: #F2F1EC; --gris: #6B6B6B; --linea: #E2E0D8; --blanco: #FFFFFF;
+    --spec: #E4F1E4; --spec-t: #1F5F2A; --man: #FBE3E3; --man-t: #A80404;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); }
-  header { background: var(--card); border-bottom: 1px solid var(--line); padding: 20px 16px 16px; position: sticky; top: 0; z-index: 2; }
+  html, body { margin: 0; min-height: 100%; background: var(--crema); color: var(--negro); font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+  .marca { background: var(--negro); color: #fff; padding: 14px 16px; font-family: Unbounded, "Arial Black", sans-serif; font-weight: 800; font-size: 20px; }
+  .marca span { color: var(--rojo); }
+  .marca small { font-size: 11px; font-weight: 500; opacity: .7; margin-left: 6px; letter-spacing: .12em; }
+  header.busca { background: var(--crema); border-bottom: 1px solid var(--linea); padding: 22px 16px 14px; position: sticky; top: 0; z-index: 2; }
   .wrap { max-width: 860px; margin: 0 auto; }
-  h1 { font-size: 20px; margin: 0 0 4px; }
-  .sub { color: var(--muted); font-size: 14px; margin: 0 0 14px; }
+  h1 { font-family: Unbounded, "Arial Black", sans-serif; font-weight: 800; font-size: 22px; margin: 0 0 6px; }
+  .sub { color: var(--gris); font-size: 15px; line-height: 1.5; margin: 0 0 16px; }
   .search { display: flex; gap: 8px; }
-  input[type=search] { flex: 1; font-size: 16px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; outline: none; }
-  input[type=search]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  input[type=search] { flex: 1; min-width: 0; font: 500 16px Inter, system-ui, sans-serif; padding: 14px 20px; border: 2px solid var(--negro); border-radius: 999px; background: var(--blanco); color: var(--negro); outline: none; }
+  input[type=search]::placeholder { color: #9a9890; }
+  input[type=search]:focus { border-color: var(--rojo); box-shadow: 0 0 0 4px var(--rojo-suave); }
   .filters { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-  .chip { border: 1px solid var(--line); background: var(--card); border-radius: 999px; padding: 6px 12px; font-size: 13px; cursor: pointer; color: var(--text); }
-  .chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
-  main { padding: 16px; }
-  .meta { color: var(--muted); font-size: 13px; margin: 0 0 10px; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
-  .meta button { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 13px; padding: 0; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
-  .card a.title { font-weight: 600; font-size: 16px; color: var(--accent); text-decoration: none; word-break: break-word; }
-  .card a.title:hover { text-decoration: underline; }
-  .desc { margin: 6px 0 8px; font-size: 14px; line-height: 1.45; }
-  .desc.empty { color: var(--muted); font-style: italic; }
+  .chip { border: 1px solid var(--linea); background: var(--blanco); border-radius: 999px; padding: 7px 14px; font: 500 13px Inter, system-ui, sans-serif; cursor: pointer; color: var(--negro); }
+  .chip:hover { border-color: var(--negro); }
+  .chip.on { background: var(--negro); border-color: var(--negro); color: #fff; }
+  #roles .chip.on { background: var(--rojo); border-color: var(--rojo); }
+  main { padding: 16px 16px 48px; }
+  .meta { color: var(--gris); font-size: 13px; margin: 0 0 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .meta button { background: var(--negro); color: #fff; border: none; border-radius: 999px; padding: 7px 14px; cursor: pointer; font: 600 11px Inter, system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+  .meta button:active { background: var(--rojo); }
+  .card { background: var(--blanco); border: 1px solid var(--linea); border-left: 4px solid var(--rojo); border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; }
+  .card a.title { font-weight: 600; font-size: 16px; color: var(--negro); text-decoration: none; word-break: break-word; }
+  .card a.title::after { content: " ↗"; color: var(--rojo); font-weight: 600; }
+  .card a.title:hover { color: var(--rojo); }
+  .desc { margin: 6px 0 10px; font-size: 14px; line-height: 1.5; color: #2a2a2a; }
+  .desc.empty { color: var(--gris); font-style: italic; }
   .tags { display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px; }
-  .tag { padding: 2px 8px; border-radius: 6px; background: #eef0f4; color: var(--muted); }
+  .tag { padding: 3px 9px; border-radius: 999px; background: var(--crema); color: var(--gris); font-weight: 500; }
   .tag.spec { background: var(--spec); color: var(--spec-t); }
   .tag.man { background: var(--man); color: var(--man-t); }
-  .group h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 18px 0 8px; }
-  .empty-state { text-align: center; color: var(--muted); padding: 40px 10px; }
-  mark { background: #fff2a8; padding: 0 1px; border-radius: 2px; }
+  .group h2 { font-family: Unbounded, "Arial Black", sans-serif; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--negro); margin: 22px 0 10px; }
+  .empty-state { text-align: center; color: var(--gris); padding: 40px 10px; line-height: 1.5; }
+  .carga { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 48px 0; color: var(--gris); font-size: 14px; }
+  .puntos { display: flex; gap: 8px; }
+  .puntos i { width: 8px; height: 8px; border-radius: 50%; background: var(--rojo); opacity: .25; animation: p 1s infinite ease-in-out; }
+  .puntos i:nth-child(2) { animation-delay: .15s; }
+  .puntos i:nth-child(3) { animation-delay: .3s; }
+  @keyframes p { 0%, 100% { opacity: .25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-4px); } }
+  @media (prefers-reduced-motion: reduce) { .puntos i { animation: none; opacity: .6; } }
+  @media (max-width: 600px) {
+    header.busca { position: static; }
+    #cats { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+    #cats .chip { flex: none; }
+  }
+  mark { background: var(--rojo-suave); color: var(--rojo-osc); padding: 0 2px; border-radius: 3px; }
 </style>
 </head>
 <body>
-<header>
+<div class="marca">FL<span>ii</span>TS<small>BUSCADOR OPS</small></div>
+<header class="busca">
   <div class="wrap">
-    <h1>Buscador Ops FLiiTS</h1>
-    <p class="sub">Escribe lo que necesitas gestionar y te digo qué archivo o herramienta usar.</p>
+    <h1>¿Qué necesitas gestionar?</h1>
+    <p class="sub">Escríbelo como lo preguntarías y te enseño los archivos y herramientas que te sirven, con para qué es cada uno.</p>
     <div class="search">
       <input id="q" type="search" placeholder="Ej.: entregar una chaqueta, ver vacaciones, cambio de vehículo…" autocomplete="off" autofocus>
     </div>
@@ -52,7 +76,7 @@
 <main>
   <div class="wrap">
     <p class="meta"><span id="count">Cargando…</span><button id="refresh" type="button">Actualizar</button></p>
-    <div id="results"></div>
+    <div id="results"><div class="carga"><div class="puntos" aria-hidden="true"><i></i><i></i><i></i></div>Cargando el catálogo…</div></div>
   </div>
 </main>
 
@@ -195,6 +219,7 @@
     }));
     drawFilters();
     render();
+    try { window.top.postMessage({ fliitsBuscador: 1, tipo: 'listo', titulo: 'Buscador Ops · FLiiTS' }, '*'); } catch (e) {}
   }
 
   function fail(err) {

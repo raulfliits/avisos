@@ -27,7 +27,10 @@ Para añadir una web que no está en Drive (Metabase, portales…), se añade un
 6. **Implementar → Nueva implementación → Aplicación web**:
    - Ejecutar como: **Yo**
    - Quién tiene acceso: **Cualquier usuario de fliits.com**
-7. Copia la URL `/exec` y compártela con el equipo (o añádela como favorito).
+7. Copia la URL `/exec`.
+8. **Página con el estilo FLiiTS (GitHub Pages)**, igual que *Panel Citas* y *Stock FLiiTS*: copia `web/index.html`
+   a una carpeta `buscador/` del repo de `opsfliits.github.io`, pega la URL `/exec` en la variable `APP` y súbelo.
+   Quedará en `https://opsfliits.github.io/buscador/` con la pantalla de carga negra y el logo, y dentro el buscador.
 
 Para publicar cambios del código: **Implementar → Gestionar implementaciones → editar → Nueva versión**.
 
