@@ -57,11 +57,19 @@
     #cats { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
     #cats .chip { flex: none; }
   }
+  .marca { display: flex; align-items: baseline; }
+  .marca em { margin-left: auto; font: 600 10px Inter, system-ui, sans-serif; letter-spacing: .12em; font-style: normal; color: #fff; opacity: .75; }
+  .card.manager { border-left-color: var(--negro); background: var(--rojo-suave); border-color: #F3C9C9; }
+  .card.manager .titulo-aviso { margin: 0; font-family: Unbounded, "Arial Black", sans-serif; font-weight: 700; font-size: 15px; color: var(--rojo-osc); }
+  .card.manager .tag { background: var(--blanco); }
+  .sin-acceso { max-width: 440px; margin: 40px auto; text-align: center; }
+  .sin-acceso h1 { margin-bottom: 10px; }
+  .sin-acceso p { color: var(--gris); line-height: 1.5; }
   mark { background: var(--rojo-suave); color: var(--rojo-osc); padding: 0 2px; border-radius: 3px; }
 </style>
 </head>
 <body>
-<div class="marca">FL<span>ii</span>TS<small>BUSCADOR OPS</small></div>
+<div class="marca">FL<span>ii</span>TS<small>BUSCADOR OPS</small><em id="rol-usuario"></em></div>
 <header class="busca">
   <div class="wrap">
     <h1>¿Qué necesitas gestionar?</h1>
@@ -84,6 +92,7 @@
   let ITEMS = [];
   let rol = 'Todos';
   let cat = 'Todas';
+  let USUARIO = null;
 
   const STOP = new Set('a al como cómo con de del donde dónde el en es esta este hay la las lo los me mi para por que qué se si sobre su un una uno y o tengo quiero necesito puedo hacer hago saber ver busco algo cual cuál cuando cuándo'.split(' ').map(n));
   // Palabras que aparecen en casi todo: cuentan poco.
@@ -99,7 +108,7 @@
     ['forecast', 'prevision', 'planificacion', 'horas', 'turnos', 'scheduling'],
     ['onboarding', 'alta', 'altas', 'formacion', 'formaciones', 'incorporacion', 'nuevo'],
     ['incentivo', 'incentivos', 'bonus', 'pago', 'pagos', 'plus', 'ajuste', 'ajustes', 'nomina'],
-    ['despido', 'despidos', 'baja', 'bajas', 'sancion', 'disciplinario'],
+    ['despido', 'despidos', 'despedir', 'despedido', 'echar', 'baja', 'bajas', 'sancion', 'sancionar', 'suspension', 'disciplinario', 'carta'],
     ['comunicacion', 'comunicaciones', 'aviso', 'avisos', 'sms', 'email', 'mail', 'envio', 'masivo', 'mensaje'],
     ['stock', 'inventario', 'almacen'],
     ['cita', 'citas', 'reunion', 'reuniones', 'calendario', 'agenda'],
@@ -123,11 +132,15 @@
   function score(item, terms) {
     if (!terms.length) return 1;
     const f = item._f;
-    let total = 0, hit = 0;
+    let total = 0, hit = 0, fuerte = 0;
+    const hayFuertes = terms.some(t => !WEAK.has(t));
     terms.forEach(t => {
       let best = 0;
-      expand(t).forEach(w => {
+      const cands = expand(t);
+      if (t.length >= 6) cands.push(t.slice(0, t.length - 2));
+      cands.forEach(w => {
         const exact = w === t;
+        if (!exact && w.length < 4) return;
         const k = exact ? 1 : 0.6;
         if (f.nombre.includes(w)) best = Math.max(best, 5 * k);
         if (f.kw.includes(w)) best = Math.max(best, 4 * k);
@@ -136,9 +149,12 @@
       });
       const w = WEAK.has(t) ? 0.25 : 1;
       if (best) hit += w;
+      if (best && w === 1) fuerte++;
       total += best * w;
     });
     if (!hit) return 0;
+    // Si la búsqueda tiene palabras con contenido, al menos una tiene que coincidir.
+    if (hayFuertes && !fuerte) return 0;
     const peso = terms.reduce((a, t) => a + (WEAK.has(t) ? 0.25 : 1), 0);
     return total * (hit / peso);
   }
@@ -157,11 +173,26 @@
       list = list.filter(x => x.s >= top * 0.35);
     }
 
+    // Lo que no puede ver este usuario: sin búsqueda no se enseña; con búsqueda se agrupa
+    // en un único aviso de "consulta con tu manager".
+    const bloqueados = list.filter(x => x.i.restringido);
+    list = list.filter(x => !x.i.restringido);
+    const topVisible = list.length ? Math.max.apply(null, list.map(x => x.s)) : 0;
+    const topBloq = bloqueados.length ? Math.max.apply(null, bloqueados.map(x => x.s)) : 0;
+    const aviso = terms.length && bloqueados.length ? `
+      <div class="card manager">
+        <p class="titulo-aviso">Esto lo gestiona tu Ops Manager</p>
+        <p class="desc">Para ${bloqueados.length === 1 ? 'esta consulta hay un recurso' : 'esta consulta hay ' + bloqueados.length + ' recursos'} que solo puede usar un Ops Manager. <b>Consulta con tu manager</b> y él o ella te ayudará a gestionarlo.</p>
+        <div class="tags">${Array.from(new Set(bloqueados.map(x => x.i.categoria).filter(Boolean))).map(c => `<span class="tag">${esc(c)}</span>`).join('')}</div>
+      </div>` : '';
+
     const box = document.getElementById('results');
+    const visibles = ITEMS.filter(i => !i.restringido).length;
     document.getElementById('count').textContent = terms.length
       ? list.length + (list.length === 1 ? ' resultado' : ' resultados')
-      : ITEMS.length + ' archivos y herramientas';
+      : visibles + ' archivos y herramientas';
 
+    if (!list.length && aviso) { box.innerHTML = aviso; return; }
     if (!list.length) {
       box.innerHTML = '<div class="empty-state">No encuentro nada para esa búsqueda. Prueba con otras palabras (por ejemplo "chaqueta", "vacaciones", "incentivos") o pregunta a tu Ops Manager.</div>';
       return;
@@ -191,7 +222,8 @@
 
     if (terms.length) {
       list.sort((a, b) => b.s - a.s);
-      box.innerHTML = list.map(card).join('');
+      const html = list.map(card).join('');
+      box.innerHTML = topBloq > topVisible ? aviso + html : html + aviso;
     } else {
       const groups = {};
       list.forEach(x => (groups[x.i.categoria || 'Sin categoría'] = groups[x.i.categoria || 'Sin categoría'] || []).push(x));
@@ -208,12 +240,27 @@
   }
 
   function drawFilters() {
-    chips('roles', ['Todos', 'Ops Specialist', 'Ops Manager'], rol, v => { rol = v; drawFilters(); render(); });
-    const cats = Array.from(new Set(ITEMS.map(i => i.categoria).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'es'));
+    if (USUARIO && USUARIO.rol === 'Ops Manager') {
+      chips('roles', ['Todos', 'Ops Specialist', 'Ops Manager'], rol, v => { rol = v; drawFilters(); render(); });
+    } else {
+      document.getElementById('roles').innerHTML = '';
+    }
+    const cats = Array.from(new Set(ITEMS.filter(i => !i.restringido).map(i => i.categoria).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'es'));
     chips('cats', ['Todas'].concat(cats), cat, v => { cat = v; drawFilters(); render(); });
   }
 
   function load(data) {
+    if (data.sinAcceso) {
+      document.querySelector('header.busca').style.display = 'none';
+      document.getElementById('count').textContent = '';
+      document.getElementById('refresh').style.display = 'none';
+      document.getElementById('results').innerHTML = `<div class="sin-acceso"><h1>Todavía no tienes acceso</h1>
+        <p>Tu cuenta${data.email ? ' <b>' + esc(data.email) + '</b>' : ''} no está dada de alta en el buscador. Pide a tu Ops Manager que te añada.</p></div>`;
+      try { window.top.postMessage({ fliitsBuscador: 1, tipo: 'listo', titulo: 'Buscador Ops · FLiiTS' }, '*'); } catch (e) {}
+      return;
+    }
+    USUARIO = data.usuario || null;
+    if (USUARIO && USUARIO.rol) document.getElementById('rol-usuario').textContent = USUARIO.rol.toUpperCase();
     ITEMS = (data.items || []).map(i => Object.assign(i, {
       _f: { nombre: n(i.nombre), kw: n(i.keywords), cat: n(i.categoria), desc: n(i.descripcion) },
     }));

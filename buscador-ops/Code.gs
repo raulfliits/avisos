@@ -17,6 +17,9 @@ const CONFIG = {
     { rol: 'Ops Manager',    folderId: '1VtM3-SP6E_Vh2lCYyA4q_UYPAlV8OxZN' },
   ],
   indexPrefix: 'Índice',
+  // Hoja con quién puede entrar y con qué rol (columnas: Email | Rol | Nombre).
+  // Está en la carpeta raíz Q&A FLiiTS OPS. Quien no aparezca no puede usar el buscador.
+  accesos: { folderId: '1FrYt1cad6b7wp7MzBNhcpjdCkKcyhYsS', nombre: 'Accesos Buscador Ops' },
   headers: ['Nombre', 'Enlace', 'Tipo', 'Categoría', 'Descripción', 'Palabras clave', 'Origen', 'Añadido'],
   cacheKey: 'catalogo_v1',
   cacheSeconds: 600,
@@ -32,23 +35,89 @@ function doGet() {
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
-/** Lo llama la página. Devuelve el catálogo de los dos roles, unificado. */
+/** Lo llama la página. Devuelve solo lo que el usuario puede ver según su rol. */
 function getCatalogo() {
-  const cache = CacheService.getScriptCache();
-  const hit = cache.get(CONFIG.cacheKey);
-  if (hit) return JSON.parse(hit);
-
-  sincronizar_();
-  const items = leerCatalogo_();
-  const payload = { items: items, actualizado: new Date().toISOString() };
-  try { cache.put(CONFIG.cacheKey, JSON.stringify(payload), CONFIG.cacheSeconds); } catch (e) { /* >100KB: sin caché */ }
-  return payload;
+  const usuario = usuarioActual_();
+  if (!usuario.rol) return { sinAcceso: true, email: usuario.email };
+  return filtrarPorRol_(catalogoCompleto_(), usuario);
 }
 
 /** Fuerza recarga desde la página (botón "Actualizar"). */
 function refrescarCatalogo() {
-  CacheService.getScriptCache().remove(CONFIG.cacheKey);
+  const cache = CacheService.getScriptCache();
+  cache.remove(CONFIG.cacheKey);
+  cache.remove('accesos_v1');
   return getCatalogo();
+}
+
+function catalogoCompleto_() {
+  const cache = CacheService.getScriptCache();
+  const hit = cache.get(CONFIG.cacheKey);
+  if (hit) return JSON.parse(hit);
+  sincronizar_();
+  const payload = { items: leerCatalogo_(), actualizado: new Date().toISOString() };
+  try { cache.put(CONFIG.cacheKey, JSON.stringify(payload), CONFIG.cacheSeconds); } catch (e) { /* >100KB: sin caché */ }
+  return payload;
+}
+
+/* ---------- Accesos por rol ---------- */
+
+/**
+ * Un Ops Manager ve todo. Un Ops Specialist ve completo lo que está en el índice de
+ * Ops Specialist; de lo que es solo de manager recibe únicamente la categoría y las
+ * palabras clave (para poder decirle "consulta con tu manager"), nunca el nombre,
+ * el enlace ni la descripción.
+ */
+function filtrarPorRol_(payload, usuario) {
+  const esManager = usuario.rol === 'Ops Manager';
+  const items = payload.items.map(i => {
+    if (esManager || i.roles.indexOf('Ops Specialist') !== -1) return i;
+    return { restringido: true, categoria: i.categoria, keywords: i.keywords, roles: i.roles };
+  });
+  return { items: items, actualizado: payload.actualizado, usuario: usuario };
+}
+
+function usuarioActual_() {
+  const email = String(Session.getActiveUser().getEmail() || '').trim().toLowerCase();
+  const tabla = leerAccesos_();
+  const fila = tabla[email];
+  return { email: email, rol: fila ? fila.rol : '', nombre: fila ? fila.nombre : '' };
+}
+
+function leerAccesos_() {
+  const cache = CacheService.getScriptCache();
+  const hit = cache.get('accesos_v1');
+  if (hit) return JSON.parse(hit);
+  const sheet = obtenerHojaAccesos_();
+  const rows = sheet.getDataRange().getValues();
+  const tabla = {};
+  for (let i = 1; i < rows.length; i++) {
+    const email = String(rows[i][0] || '').trim().toLowerCase();
+    const rol = normalizarRol_(rows[i][1]);
+    if (email && rol) tabla[email] = { rol: rol, nombre: String(rows[i][2] || '') };
+  }
+  cache.put('accesos_v1', JSON.stringify(tabla), 300);
+  return tabla;
+}
+
+function normalizarRol_(v) {
+  const t = String(v || '').toLowerCase();
+  if (t.indexOf('manager') !== -1) return 'Ops Manager';
+  if (t.indexOf('specialist') !== -1) return 'Ops Specialist';
+  return '';
+}
+
+function obtenerHojaAccesos_() {
+  const folder = DriveApp.getFolderById(CONFIG.accesos.folderId);
+  const it = folder.getFilesByName(CONFIG.accesos.nombre);
+  if (it.hasNext()) return SpreadsheetApp.openById(it.next().getId()).getSheets()[0];
+  const ss = SpreadsheetApp.create(CONFIG.accesos.nombre);
+  DriveApp.getFileById(ss.getId()).moveTo(folder);
+  const sh = ss.getSheets()[0];
+  sh.getRange(1, 1, 2, 3).setValues([['Email', 'Rol', 'Nombre'], [Session.getEffectiveUser().getEmail(), 'Ops Manager', '']]);
+  sh.getRange(1, 1, 1, 3).setFontWeight('bold');
+  sh.setFrozenRows(1);
+  return sh;
 }
 
 /* ---------- Sincronización carpetas -> índices ---------- */

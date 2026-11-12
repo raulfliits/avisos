@@ -17,6 +17,21 @@ dos carpetas (o en subcarpetas), la sincronización lo añade al índice de esa 
 Origen "Carpeta (auto)". Solo hay que rellenarle la descripción y las palabras clave.
 Para añadir una web que no está en Drive (Metabase, portales…), se añade una fila a mano.
 
+## Quién ve qué
+
+La hoja **`Q&A FLiiTS OPS / Accesos Buscador Ops`** tiene una fila por persona: Email | Rol | Nombre.
+
+- **Ops Manager**: ve todo (lo de los dos índices) y puede filtrar por rol.
+- **Ops Specialist**: ve completo solo lo que está en el índice de Ops Specialist. Si busca algo
+  que solo es de manager, le sale el aviso *"Esto lo gestiona tu Ops Manager. Consulta con tu
+  manager"*, sin nombre, enlace ni descripción del archivo. El filtrado se hace en el servidor:
+  los datos de manager no llegan nunca a su navegador.
+- **Quien no esté en la hoja** ve "Todavía no tienes acceso".
+
+Los cambios en la hoja se aplican en 5 minutos como mucho (o al pulsar "Actualizar").
+Para que un archivo lo vea un specialist, ponlo en el índice de Ops Specialist (o deja el
+archivo/acceso directo en esa carpeta).
+
 ## Publicarla (una sola vez, ~5 min)
 
 1. Entra en https://script.google.com con la cuenta de FLiiTS → **Nuevo proyecto**. Nómbralo "Buscador Ops FLiiTS".
