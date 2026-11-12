@@ -37,6 +37,7 @@ function doGet() {
 
 /** Lo llama la página. Devuelve solo lo que el usuario puede ver según su rol. */
 function getCatalogo() {
+  asegurarActivador_();
   const usuario = usuarioActual_();
   if (!usuario.rol) return { sinAcceso: true, email: usuario.email };
   return filtrarPorRol_(catalogoCompleto_(), usuario);
@@ -134,6 +135,17 @@ function instalarActivador() {
     .filter(t => t.getHandlerFunction() === 'sincronizar')
     .forEach(t => ScriptApp.deleteTrigger(t));
   ScriptApp.newTrigger('sincronizar').timeBased().everyHours(1).create();
+}
+
+/** La webapp se ejecuta con la cuenta del dueño: la primera visita deja instalado el activador horario. */
+function asegurarActivador_() {
+  const props = PropertiesService.getScriptProperties();
+  if (props.getProperty('activador') === 'ok') return;
+  try {
+    const existe = ScriptApp.getProjectTriggers().some(t => t.getHandlerFunction() === 'sincronizar');
+    if (!existe) ScriptApp.newTrigger('sincronizar').timeBased().everyHours(1).create();
+    props.setProperty('activador', 'ok');
+  } catch (e) { /* se reintenta en la siguiente visita */ }
 }
 
 function sincronizar_() {
