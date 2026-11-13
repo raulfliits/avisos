@@ -1,85 +1,51 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Buscador Ops · FLiiTS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buscador Ops FLiiTS</title>
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#0A0A0A">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Buscador Ops">
-<link rel="icon" type="image/png" href="../favicon.png">
-<link rel="apple-touch-icon" href="../icono-180.png">
-<link rel="preconnect" href="https://script.google.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@900&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="apple-touch-icon.png" sizes="180x180">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  html, body { margin: 0; height: 100%; background: #0A0A0A; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
-  #app { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; display: block; background: #F2F1EC; }
-  .carga { position: fixed; inset: 0; z-index: 2; background: #0A0A0A; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding: 24px; text-align: center; transition: opacity .25s; }
-  .carga.oculta { opacity: 0; pointer-events: none; }
-  .logo { font-family: "Unbounded", "Arial Black", Impact, sans-serif; font-weight: 900; font-size: 34px; letter-spacing: .01em; color: #D60505; line-height: 1; }
-  .logo span { display: block; margin-top: 10px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; font-size: 11px; font-weight: 500; letter-spacing: .18em; color: rgba(255,255,255,.62); }
-  .puntos { display: flex; gap: 8px; }
-  .puntos i { width: 8px; height: 8px; border-radius: 50%; background: #fff; opacity: .25; animation: p 1s infinite ease-in-out; }
-  .puntos i:nth-child(2) { animation-delay: .15s; }
-  .puntos i:nth-child(3) { animation-delay: .3s; }
-  @keyframes p { 0%, 100% { opacity: .25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-4px); } }
-  .ayuda { display: none; max-width: 320px; color: rgba(255,255,255,.72); font-size: 14px; line-height: 1.5; }
-  .ayuda.ver { display: block; }
-  .ayuda a { display: inline-block; margin-top: 12px; color: #fff; background: #D60505; border-radius: 999px; padding: 12px 22px; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; }
-  @media (prefers-reduced-motion: reduce) { .puntos i { animation: none; opacity: .6; } }
+  :root { --rojo: #D60505; --negro: #0A0A0A; --crema: #F2F1EC; --gris: #6B6B6B; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: var(--crema); color: var(--negro); font-family: Inter, system-ui, sans-serif; }
+  header { background: var(--negro); color: #fff; padding: 16px; font-family: Unbounded, "Arial Black", sans-serif; font-weight: 800; font-size: 20px; }
+  header span { color: var(--rojo); }
+  header small { font-size: 11px; font-weight: 500; opacity: .7; margin-left: 6px; }
+  main { max-width: 440px; margin: 0 auto; padding: 48px 16px; text-align: center; }
+  h1 { font-family: Unbounded, "Arial Black", sans-serif; font-size: 24px; margin: 0 0 10px; }
+  p { color: var(--gris); font-size: 15px; line-height: 1.5; margin: 0 0 24px; }
+  .btn { display: block; width: 100%; padding: 18px; border-radius: 999px; background: var(--rojo); color: #fff;
+    font-family: Unbounded, "Arial Black", sans-serif; font-weight: 700; font-size: 15px; text-decoration: none; }
+  .btn:active { background: #A80404; }
+  .nota { font-size: 13px; margin-top: 28px; }
 </style>
 </head>
 <body>
-<div class="carga" id="carga" role="status" aria-live="polite">
-  <div class="logo">FLiiTS<span>BUSCADOR · OPS</span></div>
-  <div class="puntos" aria-hidden="true"><i></i><i></i><i></i></div>
-  <div class="ayuda" id="ayuda">¿No se carga el buscador?<br><a id="directo" href="#" target="_top">Abrir el buscador</a></div>
-</div>
-<iframe id="app" title="Buscador Ops · FLiiTS"></iframe>
-<noscript><p style="color:#fff;text-align:center;padding:40px">Activa JavaScript para abrir el buscador.</p></noscript>
+<header>FL<span>ii</span>TS<small>BUSCADOR OPS</small></header>
+<main>
+  <h1>¿Qué necesitas gestionar?</h1>
+  <p>Encuentra el archivo o la herramienta que te hace falta y para qué sirve cada uno.</p>
+  <a class="btn" id="entrar" href="#">Entrar con mi cuenta @fliits.com</a>
+  <p class="nota">Google te pedirá iniciar sesión con tu email de la empresa.<br>
+    Consejo: en el móvil, usa <b>Compartir &gt; Añadir a pantalla de inicio</b> para tenerla como una app.</p>
+</main>
 <script>
-(function () {
-  /* Buscador Ops (app de Apps Script, solo cuentas @fliits.com).
-     Pega aquí la URL de la implementación: Implementar > Gestionar implementaciones > URL que termina en /exec */
-  var APP = 'https://script.google.com/a/macros/fliits.com/s/AKfycby40yk2hycdAI5y7ZSLP9bTJqfL8Tpa7WqhH2fZUt71avSZiwvMZzSvikCxXGhVtN9a/exec';
+  // URL de la aplicación web de Apps Script (Implementar > Gestionar implementaciones > URL que termina en /exec)
+  const URL_APP = 'https://script.google.com/a/macros/fliits.com/s/AKfycby40yk2hycdAI5y7ZSLP9bTJqfL8Tpa7WqhH2fZUt71avSZiwvMZzSvikCxXGhVtN9a/exec';
 
-  var carga = document.getElementById('carga');
-  var ayuda = document.getElementById('ayuda');
-  if (!/^https:\/\/script\.google\.com\/.+\/exec$/.test(APP)) {
-    ayuda.innerHTML = 'Falta configurar la URL de la app en index.html (APP).';
-    ayuda.className = 'ayuda ver';
-    return;
-  }
-  var ORIGEN_APP = new URL(APP).origin;
-  var marco = document.getElementById('app');
-  document.getElementById('directo').href = APP;
-  marco.src = APP;
-
-  var listo = false;
-  function ocultarCarga() {
-    if (listo) return;
-    listo = true;
-    carga.className = 'carga oculta';
-    setTimeout(function () { carga.style.display = 'none'; }, 300);
-  }
-  marco.addEventListener('load', function () { setTimeout(ocultarCarga, 3000); });
-  setTimeout(function () { if (!listo) ayuda.className = 'ayuda ver'; }, 15000);
-
-  function origenValido(o) {
-    return o === ORIGEN_APP || /^https:\/\/[a-z0-9-]+-script\.googleusercontent\.com$/.test(o);
-  }
-  window.addEventListener('message', function (ev) {
-    var d = ev.data;
-    if (!origenValido(ev.origin) || !d || d.fliitsBuscador !== 1) return;
-    if (d.tipo === 'listo') {
-      ocultarCarga();
-      if (typeof d.titulo === 'string' && d.titulo) document.title = d.titulo.slice(0, 120);
-    }
-  });
-})();
+  const btn = document.getElementById('entrar');
+  btn.href = URL_APP;
+  // Si se abre desde el icono de la pantalla de inicio, entra directo
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  if (standalone || new URLSearchParams(location.search).has('auto')) location.replace(URL_APP);
 </script>
 </body>
 </html>
