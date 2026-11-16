@@ -3893,7 +3893,8 @@ document.querySelectorAll("#mobilePad [data-action]").forEach(b=>{
 applySaved();
 if(DEMO_ONLY){ document.querySelectorAll('.mode-card:not(.demo-card)').forEach(e=>e.remove()); const d=document.querySelector('.demo-card b'); if(d) d.textContent="▶ PLAY";
   const q=document.querySelector('#qrBadge span'); if(q) q.innerHTML="DESCARGA<br>EL JUEGO";
-  document.querySelectorAll('#modeOv p').forEach(e=>{ if(/tres formas/.test(e.textContent)) e.textContent="La Catalunya de FLiiTS, pantalla a pantalla"; }); }
+  document.querySelectorAll('#modeOv p').forEach(e=>{ if(/tres formas/.test(e.textContent)) e.textContent="La Catalunya de FLiiTS, pantalla a pantalla"; });
+  document.querySelectorAll('#modeOv h2').forEach(e=>{ if(/aventura/i.test(e.textContent)) e.textContent="EMPIEZA LA AVENTURA"; }); }
 if(GAME_ONLY){ document.querySelectorAll('.demo-card').forEach(e=>e.remove()); document.querySelectorAll('#demoMode,#demoBadge').forEach(e=>e.style.setProperty('display','none','important'));
   document.querySelectorAll('.hint span').forEach(e=>{ if(/Notas|Editar/.test(e.textContent)) e.remove(); });
   const w=document.querySelector('[data-k="title.who"]'); if(w){ w.removeAttribute("data-k"); w.textContent="Un juego de FLiiTS Catalunya · Noviembre 2026"; } }
