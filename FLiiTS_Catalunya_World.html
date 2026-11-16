@@ -1144,6 +1144,8 @@ body.theme-gb .modegame.arc .mg-scene{border-color:var(--g3);background:var(--g3
 (() => {
 "use strict";
 const $ = s => document.querySelector(s);
+// Versión solo juego (copia publicada en /juego/): sin los paneles de datos de la presentación, sin modo DEMO ni notas.
+const GAME_ONLY = document.documentElement.dataset.gameOnly==="1";
 const STORE = "fliits-cat-v1";
 let saved = {};
 try { saved = JSON.parse(localStorage.getItem(STORE) || "{}") || {}; } catch (e) { saved = {}; }
@@ -2051,6 +2053,7 @@ function updateStats(root,animate){
     const pct=Math.round((b-a)/Math.abs(a)*100), good=row.dataset.dir==="up"?b>=a:b<=a; dl.textContent=(pct>0?"+":"")+pct+"%"; dl.className="delta "+(good?"good":"bad"); });
 }
 function openRaulPanel(){
+  if(GAME_ONLY){ const go=gold()>=3||forceFinal; hideRaulUI(); if(!go) showSelect(); else if(activeGameMode==="rpg") rpgStartFinal(); else startFinal(); return; }
   const F=[["Validación de cita","Cada candidato solo puede tener una cita. Nadie acapara huecos.","Permite reservar varias veces"],
            ["Validación en oficina","En la puerta se comprueba el código: nadie entra sin cita.","Cualquiera se presenta en la oficina"],
            ["Autorrelleno de cancelaciones","Cuando alguien cancela, el hueco se rellena solo: máxima afluencia y adelantamos a quien tenía cita lejana.","El hueco se queda vacío"],
@@ -2596,7 +2599,7 @@ function unlockRep(){ if(REP.on) return false; REP.on=true; return true; }
 // QR para jugar en el móvil: aparece abajo a la derecha en la portada y en los menús una vez se ha llegado a los
 // créditos (modo repartidor desbloqueado). Solo en la tele / ordenador: en el móvil ya se está jugando ahí.
 const qrBadge=document.createElement("div"); qrBadge.id="qrBadge"; qrBadge.hidden=true;
-qrBadge.innerHTML=`<img alt="Código QR para jugar en el móvil" src="data:image/png;base64,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"><span>JUEGA EN<br>TU MÓVIL</span>`;
+qrBadge.innerHTML=`<img alt="Código QR para jugar en el móvil" src="data:image/png;base64,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"><span>JUEGA EN<br>TU MÓVIL</span>`;
 // Solo en la portada (debajo de "PULSA START") y en "Elige tu aventura" (centrado, con el botón de volver a un lado).
 const qrHome=document.createElement("div"); qrHome.className="qr-title"; $("#startBtn").insertAdjacentElement("afterend",qrHome); qrHome.appendChild(qrBadge);
 const QR_MENUS=[["#modeOv","#modeBack"]].map(([ov,bt])=>{
@@ -3574,6 +3577,7 @@ function animStock(b){ const q=b.querySelector("#stQuest"); if(!q) return;
   b.querySelectorAll(".vok").forEach((v,k)=>setTimeout(()=>{ if(open>0){ v.classList.add("on"); sfx.coin(); } },2800+k*450)); }
 function openCityPanel(){
   const i=SCREENS.indexOf(scr), S=scr;
+  if(GAME_ONLY){ finishScreen(i); return; }
   if(S.type==="docs") return openMotoPanel(i);
   const many=S.cities.length>5;
   const cards=S.cities.map((c,j)=>{ const id=`c4.${i}.${j}`;
@@ -3671,6 +3675,7 @@ function updMotos(b,anim){
 function updTotals(root){ root=root||$("#lvlBody"); const t=root.querySelector("#ctot"); if(!t) return; let m=0,k=0; root.querySelectorAll(".nmo").forEach(e=>m+=num(e.textContent)); root.querySelectorAll(".nbi").forEach(e=>k+=num(e.textContent)); t.textContent=`TOTAL${root.querySelector(".ccards.many")?" CATALUNYA":""}: ${fmtN(m+k)} RIDERS · ${fmtN(m)} MOTOS · ${fmtN(k)} BICIS`; }
 const fmtN=n=>String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,".");
 function openFinalPanel(){
+  if(GAME_ONLY){ showCredits(); return; }
   const html=`${K("f2.intro","Las mochilas se han rendido. Y llegan peticiones para abrir nuevas ciudades en Catalunya:","p","intro")}
    <div class="cities req" id="cities">${["Girona","Tarragona","Terrassa","Mataró","Badalona","Manresa"].map((c,i)=>K(`f.c${i}`,c,"div","city-t")).join("")}</div>
    <div class="retos-h">PRÓXIMOS RETOS</div>
@@ -3705,7 +3710,7 @@ function showCredits(){
   const who=[0,2,3,1], newRep=unlockRep();
   $("#roll").innerHTML=`<div class="big">¡GRACIAS<br>POR JUGAR!</div><div class="h">EQUIPO CATALUNYA</div><div class="crew" id="crewRoll"></div>
    <div class="h">CON LA COLABORACIÓN ESPECIAL DE</div><div class="crew" id="collabRoll"></div>
-   <div class="h">Y A TODOS NUESTROS RIDERS</div><div class="big" style="font-size:clamp(18px,3vw,34px)">¿PREGUNTAS?</div>
+   <div class="h">Y A TODOS NUESTROS RIDERS</div>${GAME_ONLY?"":`<div class="big" style="font-size:clamp(18px,3vw,34px)">¿PREGUNTAS?</div>`}
    <div class="h">PUNTUACIÓN ${String(score).padStart(6,"0")} · MONEDAS ${coins} · ORO ${gold()}/3</div>${newRep?`<div class="big" style="font-size:clamp(14px,2.6cqw,28px)">¡MODO REPARTIDOR<br>DESBLOQUEADO!</div><div class="h">YA APARECE EN EL SELECTOR DE JUGADORES</div>`:""}<div class="press">ESC · VOLVER</div>`;
   const cr=$("#crewRoll");
   who.forEach(i=>{ const d=document.createElement("div"); d.appendChild(themed(standCanvas(i))); d.insertAdjacentHTML("beforeend",CREW[i]&&CREW[i].dog?`<span class="duo"><em>${esc(nm(i))}</em><em>${esc(saved["cr.dog"]??"OREO")}</em></span>`:`<span>${esc(nm(i))}</span>`); cr.appendChild(d); });
@@ -3730,7 +3735,7 @@ document.addEventListener("keydown",e=>{
   if(t&&t.isContentEditable){ if(e.key==="Escape") t.blur(); return; }
   audio();
   const k=e.key.length===1?e.key.toLowerCase():e.key;
-  if(k==="e"){ setEdit(!editing); return; }
+  if(k==="e"&&!GAME_ONLY){ setEdit(!editing); return; }
   if(k==="m"){ toggleMute(); return; }
   if(gamePaused){ if(k==="Escape"){ restorePauseLabels(); setGamePaused(false); } return; }
   if(k==="f"){ try{ document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{}); }catch(err){} return; }
@@ -3741,7 +3746,7 @@ document.addEventListener("keydown",e=>{
    if(["ArrowRight","ArrowDown","d","s"].includes(k)){modeCursor=(modeCursor+1)%cards.length;cards[modeCursor]?.focus();e.preventDefault();}
    else if(["ArrowLeft","ArrowUp","a","w"].includes(k)){modeCursor=(modeCursor+cards.length-1)%cards.length;cards[modeCursor]?.focus();e.preventDefault();}
    else if(["Enter"," ","x","z","b"].includes(k)){e.preventDefault();chooseMode(cards[modeCursor]?.dataset.mode||"platform");}
-   else if(k==="1"||k==="2"||k==="3"||k==="4")chooseMode(k==="1"?"platform":k==="2"?"rpg":k==="3"?"arcade":"demo");
+   else if(k==="1"||k==="2"||k==="3"||(k==="4"&&!GAME_ONLY))chooseMode(k==="1"?"platform":k==="2"?"rpg":k==="3"?"arcade":"demo");
    else if(k==="Escape"){ $("#modeOv").hidden=true; $("#titleOv").hidden=false; }
    return; }
   if(!$("#modeGameOv").hidden){
@@ -3879,6 +3884,9 @@ document.querySelectorAll("#mobilePad [data-action]").forEach(b=>{
 });
 
 applySaved();
+if(GAME_ONLY){ document.querySelectorAll('.demo-card').forEach(e=>e.remove()); document.querySelectorAll('#demoMode,#demoBadge').forEach(e=>e.style.setProperty('display','none','important'));
+  document.querySelectorAll('.hint span').forEach(e=>{ if(/Notas|Editar/.test(e.textContent)) e.remove(); });
+  const w=document.querySelector('[data-k="title.who"]'); if(w){ w.removeAttribute("data-k"); w.textContent="Un juego de FLiiTS Catalunya · Noviembre 2026"; } }
 updHud(); fit(); requestAnimationFrame(loop);
 })();
 </script>
@@ -3926,7 +3934,7 @@ updHud(); fit(); requestAnimationFrame(loop);
  const RKEY="cw-ready-seen", q=location.search+location.hash, tv=!document.documentElement.classList.contains("frame-gb");
  let skipped=false, seen=false; try{ if(/[?&#]cuenta/i.test(q)){ localStorage.removeItem(KEY); localStorage.removeItem(RKEY); } if(/[?&#]ready/i.test(q)) localStorage.removeItem(RKEY);
    skipped=localStorage.getItem(KEY)==="1"; seen=localStorage.getItem(RKEY)==="1"; }catch(e){}
- const past=Date.now()>=TARGET, wantReady=tv&&!seen;
+ const past=Date.now()>=TARGET, wantReady=tv&&!seen&&document.documentElement.dataset.gameOnly!=="1";
  if(past&&!wantReady) return;
  if(!past&&skipped) return;
  const g=document.createElement("div"); g.id="gate"; g.setAttribute("role","dialog"); g.setAttribute("aria-label","Cuenta atrás");
