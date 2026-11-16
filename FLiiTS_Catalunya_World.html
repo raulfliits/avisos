@@ -807,6 +807,8 @@ html.frame-gb #selectBack,html.frame-gb #vehBack,html.frame-gb #ridBack{font-siz
 </style>
 <style id="plataforma-extra">
 .mode-ov .mode-grid .demo-card{grid-column:1/-1;min-height:0!important;padding:10px!important;background:#120b0c;border-color:#ffd23f}
+html:not([data-game-only]) .mode-ov .mode-grid .demo-card{padding:clamp(18px,4cqh,34px)!important;max-width:520px;width:100%;justify-self:center}
+html:not([data-game-only]) .mode-ov .mode-grid .demo-card b{font-size:clamp(16px,2.6cqw,30px)!important}
 .mode-ov .mode-grid .demo-card b{font-size:clamp(10px,1.5cqw,16px)!important;color:#ffd23f}
 </style>
 <style id="bocadillos-consola">
@@ -1146,6 +1148,9 @@ body.theme-gb .modegame.arc .mg-scene{border-color:var(--g3);background:var(--g3
 const $ = s => document.querySelector(s);
 // Versión solo juego (copia publicada en /juego/): sin los paneles de datos de la presentación, sin modo DEMO ni notas.
 const GAME_ONLY = document.documentElement.dataset.gameOnly==="1";
+// Versión principal (presentación): un solo PLAY que lanza la DEMO con las pantallas de datos; tras los créditos,
+// la portada muestra el QR para descargar la versión solo juego.
+const DEMO_ONLY = !GAME_ONLY;
 const STORE = "fliits-cat-v1";
 let saved = {};
 try { saved = JSON.parse(localStorage.getItem(STORE) || "{}") || {}; } catch (e) { saved = {}; }
@@ -2203,7 +2208,7 @@ function paintIntroSprites(){
 }
 function showIntro(){ $("#introOv").hidden=false; $("#titleOv").hidden=true; paintIntroSprites(); }
 function continueIntro(){ const sc=$("#introScene"); sc.classList.add("disperse"); $("#introLine").textContent="¡REUNIÓN TERMINADA! CADA UNO A SU MISIÓN."; setTimeout(()=>{sc.classList.remove("disperse");$("#introOv").hidden=true;$("#modeOv").hidden=false;sfx.open();},650); }
-function chooseMode(m){ demo=m==="demo"; if(demo) m="platform"; activeGameMode=m; if(m==="rpg") GP=GB_PALS[(+saved["rpg.pal"]||0)%GB_PALS.length].c; $("#modeOv").hidden=true; showSelect(); }
+function chooseMode(m){ if(DEMO_ONLY) m="demo"; demo=m==="demo"; if(demo) m="platform"; activeGameMode=m; if(m==="rpg") GP=GB_PALS[(+saved["rpg.pal"]||0)%GB_PALS.length].c; $("#modeOv").hidden=true; showSelect(); }
 document.querySelectorAll(".mode-card").forEach(b=>b.addEventListener("click",()=>chooseMode(b.dataset.mode)));
 $("#modeBack").addEventListener("click",()=>{ $("#modeOv").hidden=true; $("#titleOv").hidden=false; });
 $("#selectBack").addEventListener("click",()=>{ $("#selOv").hidden=true; setTheme(false); $("#modeOv").hidden=false; });
@@ -2594,8 +2599,8 @@ const REP_RIDERS=[{name:"AAMIR",look:0},{name:"SAIRA",look:4},{name:"NIL",look:3
 let repLook=0;
 // El repartidor solo dura la sesión; se guarda únicamente con "GUARDAR PARTIDA" (pausa/SELECT o tecla G en el selector).
 const REP={on:false,done:false};
-const repUnlocked=()=>REP.on, repDone=()=>REP.done;
-function unlockRep(){ if(REP.on) return false; REP.on=true; return true; }
+const repUnlocked=()=>!DEMO_ONLY&&REP.on, repDone=()=>REP.done;
+function unlockRep(){ if(DEMO_ONLY||REP.on) return false; REP.on=true; return true; }
 // QR para jugar en el móvil: aparece abajo a la derecha en la portada y en los menús una vez se ha llegado a los
 // créditos (modo repartidor desbloqueado). Solo en la tele / ordenador: en el móvil ya se está jugando ahí.
 const qrBadge=document.createElement("div"); qrBadge.id="qrBadge"; qrBadge.hidden=true;
@@ -2604,7 +2609,8 @@ qrBadge.innerHTML=`<img alt="Código QR para jugar en el móvil" src="data:image
 const qrHome=document.createElement("div"); qrHome.className="qr-title"; $("#startBtn").insertAdjacentElement("afterend",qrHome); qrHome.appendChild(qrBadge);
 const QR_MENUS=[["#modeOv","#modeBack"]].map(([ov,bt])=>{
   const b=$(bt); if(!b) return null; const row=document.createElement("div"); row.className="qr-row"; b.parentNode.insertBefore(row,b); row.appendChild(b); return {ov,row}; }).filter(Boolean);
-setInterval(()=>{ const ok=REP.on&&!document.documentElement.classList.contains("frame-gb")&&$("#introOv").hidden;
+let demoCreditsSeen=false;
+setInterval(()=>{ const ok=(DEMO_ONLY?demoCreditsSeen:REP.on)&&!document.documentElement.classList.contains("frame-gb")&&$("#introOv").hidden;
   const title=ok&&!$("#titleOv").hidden, menu=ok&&QR_MENUS.find(m=>!$(m.ov).hidden), show=!!(title||menu);
   const where=title?qrHome:menu?menu.row:null;
   if(where&&qrBadge.parentNode!==where) where.appendChild(qrBadge);
@@ -3720,7 +3726,8 @@ function showCredits(){
     d.insertAdjacentHTML("beforeend",`<span>${esc(saved["cr.c"+k]??n)}</span>`); co.appendChild(d); });
   $("#credOv").hidden=false; sfx.win();
 }
-$("#credOv").addEventListener("click",()=>{ $("#credOv").hidden=true; showSelect(); });
+function afterCredits(){ $("#credOv").hidden=true; demoCreditsSeen=true; if(DEMO_ONLY){ document.querySelectorAll(".ov").forEach(o=>{ if(o.id!=="titleOv") o.hidden=true; }); setTheme(false); $("#titleOv").hidden=false; } else showSelect(); }
+$("#credOv").addEventListener("click",afterCredits);
 
 /* ---------- title, timer, keys ---------- */
 let t0=null;
@@ -3779,7 +3786,7 @@ document.addEventListener("keydown",e=>{
     else if(k==="Enter"||k===" "||k==="x"||k==="z"||k==="b"){ e.preventDefault(); confirmVeh(); }
     return; }
   if(!$("#winOv").hidden){ if(["Enter"," ","x","z","b","Escape"].includes(k)){ e.preventDefault(); closeWin(); } return; }
-  if(!$("#credOv").hidden){ if(k==="Escape"||k==="Enter"){ $("#credOv").hidden=true; showSelect(); } return; }
+  if(!$("#credOv").hidden){ if(k==="Escape"||k==="Enter"){ afterCredits(); } return; }
   if(k==="Escape"){ if(open<0&&(mode==="play"||mode==="final"||mode==="raul")){ restorePauseLabels(); setGamePaused(true); } return; }
   if(k==="n"){ showNotes=!showNotes; document.querySelectorAll("#lvlBody .notes").forEach(n=>n.hidden=!showNotes); return; }
   if(open>=0){ if((k==="Enter"||k===" ")&&t.tagName!=="BUTTON"){ e.preventDefault(); closePanel(); } return; }
@@ -3884,6 +3891,9 @@ document.querySelectorAll("#mobilePad [data-action]").forEach(b=>{
 });
 
 applySaved();
+if(DEMO_ONLY){ document.querySelectorAll('.mode-card:not(.demo-card)').forEach(e=>e.remove()); const d=document.querySelector('.demo-card b'); if(d) d.textContent="▶ PLAY";
+  const q=document.querySelector('#qrBadge span'); if(q) q.innerHTML="DESCARGA<br>EL JUEGO";
+  document.querySelectorAll('#modeOv p').forEach(e=>{ if(/tres formas/.test(e.textContent)) e.textContent="La Catalunya de FLiiTS, pantalla a pantalla"; }); }
 if(GAME_ONLY){ document.querySelectorAll('.demo-card').forEach(e=>e.remove()); document.querySelectorAll('#demoMode,#demoBadge').forEach(e=>e.style.setProperty('display','none','important'));
   document.querySelectorAll('.hint span').forEach(e=>{ if(/Notas|Editar/.test(e.textContent)) e.remove(); });
   const w=document.querySelector('[data-k="title.who"]'); if(w){ w.removeAttribute("data-k"); w.textContent="Un juego de FLiiTS Catalunya · Noviembre 2026"; } }
