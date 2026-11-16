@@ -3767,7 +3767,7 @@ document.addEventListener("keydown",e=>{
     const Lst=selList(), p=Math.max(0,Lst.indexOf(pick)), n=Lst.length;
     if(k==="ArrowRight"||k==="ArrowDown"||k==="d"||k==="s"){ pick=Lst[(p+1)%n]; buildRoster(); sfx.select(); }
     else if(k==="ArrowLeft"||k==="ArrowUp"||k==="a"||k==="w"){ pick=Lst[(p+n-1)%n]; buildRoster(); sfx.select(); }
-    else if(k==="p"){ REP.on=!REP.on; if(!REP.on&&pick===4) pick=0; toast(REP.on?"MODO REPARTIDOR: SÍ":"MODO REPARTIDOR: NO"); REP.on?sfx.power():sfx.back(); buildRoster(); }
+    else if(k==="p"&&!DEMO_ONLY){ REP.on=!REP.on; if(!REP.on&&pick===4) pick=0; toast(REP.on?"MODO REPARTIDOR: SÍ":"MODO REPARTIDOR: NO"); REP.on?sfx.power():sfx.back(); buildRoster(); }
     else if(k==="g"){ saveGame(); }
     else if(k==="r"){ pick=1; confirmPick(true); }
     else if(k==="Enter"||k===" "||k==="x"||k==="z"||k==="b"){ e.preventDefault(); confirmPick(); }
