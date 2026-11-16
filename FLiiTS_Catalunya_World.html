@@ -500,7 +500,8 @@ button{font:inherit;color:inherit}
 .shot img{width:100%;height:auto;display:block;border:3px solid var(--ink);box-shadow:0 0 0 3px var(--edge);background:#fff}
 .shot figcaption{font-size:18px;color:var(--dim);line-height:1.1}
 .shots.phones{grid-template-columns:repeat(3,minmax(0,1fr))}
-@media (max-width:700px){.shots.phones{grid-template-columns:1fr 1fr}}
+.shots.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:700px){.shots.phones{grid-template-columns:1fr 1fr}.shots.two{grid-template-columns:1fr}}
 .mfleet img.need{opacity:.5;filter:grayscale(1) brightness(2.2);outline:2px dashed var(--gold);outline-offset:1px}
 .mrows.m4{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-bottom:10px}
 .mrow.need{border-color:var(--gold);border-style:dashed} .mrow.need b{color:var(--gold)}
@@ -3559,7 +3560,19 @@ function openPanel(kick,title,html,btn,onDone,after){
   body.querySelectorAll(".notes").forEach(n=>n.hidden=!showNotes);
   $("#clearBtn").textContent=btn; panelDone=onDone; $("#lvlOv").classList.toggle("solid",activeGameMode!=="platform"); $("#lvlOv").hidden=false; sfx.open();
   if(after) after(body); $("#clearBtn").focus({preventScroll:true});
+  fitPanel(); body.querySelectorAll("img").forEach(im=>{ if(!im.complete) im.addEventListener("load",fitPanel,{once:true}); });
 }
+// Que cada panel se vea entero sin hacer scroll (en la consola del móvil se mantiene el scroll: la pantalla es pequeña).
+function fitPanel(){
+  const ov=$("#lvlOv"), w=ov&&ov.querySelector(".win"); if(!w||ov.hidden) return;
+  w.style.zoom=""; w.style.width=""; w.style.maxWidth=""; if(document.documentElement.classList.contains("frame-gb")) return;
+  const cs=getComputedStyle(ov), availH=ov.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom)-6, availW=ov.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)-6;
+  if(w.getBoundingClientRect().height<=availH+1&&w.scrollHeight<=w.clientHeight+1) return;
+  // Se reduce poco a poco y, al reducir, el panel se ensancha para aprovechar el ancho de la pantalla
+  for(let z=.96;z>=.4;z-=.03){ w.style.zoom=z; w.style.maxWidth="none"; w.style.width=Math.min(availW/z,1500)+"px";
+    if(w.getBoundingClientRect().height<=availH+1&&w.scrollHeight<=w.clientHeight+1) return; }
+}
+addEventListener("resize",()=>{ if(open>0) fitPanel(); });
 function closePanel(){ if(open<0) return; open=-1; $("#lvlOv").hidden=true; const f=panelDone; panelDone=null; if(f) f(); }
 $("#clearBtn").addEventListener("click",closePanel);
 // EPIs entregados por ciudad: riders con el documento de EPIs firmado (Control de stock FLiiTS, solo totales por ciudad).
@@ -3693,9 +3706,6 @@ function openMotoPanel(i){
      <div class="mrow"><span>Lista de espera · riders pidiendo moto</span>${K("mo6.b4","26","b")}</div>
      <div class="mrow"><span>En camino · no se cuentan hasta recibirlas</span>${K("mo6.b5","+8","b")}</div>
    </div>
-   <div class="retos-h" style="margin-top:18px">ASÍ ES LA WEB MOTOS DE EMPRESA</div>
-   ${shotsHTML([["m1","Panel con el estado de la flota: avisos, riders en espera y diferencias entre archivos","wide"],["m2","Ficha de una moto: detecta errores y guarda en los 3 archivos a la vez","wide"]])}
-   <div class="src">Pantallazos con datos de ejemplo · raulfliits.github.io/motos-empresa · acceso con cuenta @fliits.com</div>
    <div class="vsc" id="meVs"><div class="vh"></div><div class="vh">ANTES</div><div class="vh us">WEB FLiiTS</div>
    ${[["Un solo sitio para los 3 archivos","Escalaciones, Zoomo y Vehículos se actualizan a la vez; la matrícula lo une todo.","3 hojas a mano que no siempre cuadraban"],
       ["Avisos al momento","Motos en taller, riders de baja con moto, diferencias entre archivos y cuántas pedir a Zoomo.","Errores que nadie veía"],
@@ -3703,7 +3713,10 @@ function openMotoPanel(i){
       ["Permisos","Solo Gerard, Azlan, Ivan y Raül modifican; el resto de @fliits.com, solo lectura.","Cualquiera con acceso editaba"]]
      .map((f,k)=>`<div class="vf">${K(`me2.f${k}.t`,f[0],"b")}${K(`me2.f${k}.d`,f[1],"span")}</div><div class="vno">✗ ${K(`me2.f${k}.c`,f[2],"span")}</div><div class="vok">✓</div>`).join("")}</div>
    ${notes("mo6.bnotes","~1 min. Estado de la flota sacado de la web Motos de empresa: 27 motos, 20 en uso, 5 en taller y 2 por recuperar de riders de baja; 26 riders en lista de espera y 8 motos en camino. Enseña la web: avisos, lista de espera y la ficha que guarda en los 3 archivos a la vez.")}`;
-  openPanel(kick,"¡PANTALLA SUPERADA!",html,"ENTER · VER FLOTA DE EMPRESA",()=>openPanel(kick,"FLOTA DE EMPRESA",htmlB,"ENTER · GUARDAR MONEDA DE ORO",()=>finishScreen(i),
+  const htmlC=`${K("mo6.cintro","Así es la web que hemos creado para gestionar las motos de empresa:","p","intro")}
+   ${shotsHTML([["m1","Estado de la flota: avisos, riders en espera y diferencias entre archivos"],["m2","Ficha de una moto: detecta errores y guarda en los 3 archivos a la vez"]]).replace('class="shots"','class="shots two"')}
+   <div class="src">Pantallazos con datos de ejemplo · raulfliits.github.io/motos-empresa · acceso con cuenta @fliits.com</div>`;
+  openPanel(kick,"¡PANTALLA SUPERADA!",html,"ENTER · VER FLOTA DE EMPRESA",()=>openPanel(kick,"FLOTA DE EMPRESA",htmlB,"ENTER · VER LA WEB",()=>openPanel(kick,"ASÍ ES LA WEB MOTOS DE EMPRESA",htmlC,"ENTER · GUARDAR MONEDA DE ORO",()=>finishScreen(i)),
     b=>b.querySelectorAll("#meVs .vok").forEach((v,k)=>setTimeout(()=>{ if(open>0){ v.classList.add("on"); sfx.coin(); } },1200+k*400))),b=>updMotos(b,true));
 }
 function updMotos(b,anim){
