@@ -16,6 +16,7 @@
 #define PALRAM ((volatile u16 *)0x05000000)
 
 volatile u32 vbl_count;
+volatile u16 key_irq_prev, key_irq_hit;
 u16 key_held, key_hit;
 u32 frame_no;
 u8 LUT_DARK[256], LUT_LIGHT[256];
@@ -413,7 +414,8 @@ int frame_end(void) {
     DISPCNT ^= 0x10;
     tgt_screen();
     u16 k = (~KEYINPUT) & 0x3FF;
-    key_hit = k & ~key_held; key_held = k;
+    IME = 0; u16 h = key_irq_hit; key_irq_hit = 0; IME = 1;
+    key_hit = (k & ~key_held) | h; key_held = k;
     int n = (int)(vbl_count - last_vbl); last_vbl = vbl_count;
     if (n < 1) n = 1; if (n > 3) n = 3;
     frame_no += n;

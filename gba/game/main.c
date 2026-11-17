@@ -23,6 +23,7 @@ static const char *const ROLE[4] = {"Barcelona (Glovo) · Sabadell", "Citas y tu
 typedef struct { const char *name; u8 look; } rider_def;
 static const rider_def REP_RIDERS[4] = {{"AAMIR", 0}, {"SAIRA", 4}, {"NIL", 3}, {"AYESHA", 1}};
 static int mode, pick, veh, rep_look, just_unlocked;
+volatile int UI_SCREEN; /* para los bots: 1 portada 2 intro 3 modos 4 jugador 5 vehículo 6 tarjeta 7 créditos 8 repartidor 0 jugando */
 static u32 base_mark;
 static char toast_s[48]; static int toast_t;
 
@@ -54,6 +55,7 @@ static void stars(int x, int y, int n) { for (int i = 0; i < 3; i++) text_small(
 
 /* ---------------------------------------------------------------- portada */
 static void title_screen(void) {
+    UI_SCREEN = 1;
     menu_reset();
     for (;;) {
         bg_night();
@@ -71,6 +73,7 @@ static void title_screen(void) {
     }
 }
 static void intro_screen(void) {
+    UI_SCREEN = 2;
     int t = 0, stage = 0;
     for (;;) {
         int n = frame_end(); t += n;
@@ -98,6 +101,7 @@ static void intro_screen(void) {
 
 /* ---------------------------------------------------------------- elegir modo */
 static int mode_screen(void) {
+    UI_SCREEN = 3;
     static const char *const SUB[3] = {"Salta, reparte y contrata", "Misiones por turnos", "Una máquina por jugador"};
     int c = mode;
     menu_reset();
@@ -131,6 +135,7 @@ static int mode_screen(void) {
 static void draw_rep_stand(int L, int x, int y) { draw_spr(rep_crew(L)->spr, 24, x, y, 0, 0); }
 /* devuelve: 0..3 personaje, 4 repartidor, -1 volver */
 static int roster_screen(void) {
+    UI_SCREEN = 4;
     int list[5] = {0, 2, 3, 1, 4}, n = REP_ON ? 5 : 4, c = 0;
     for (int i = 0; i < n; i++) if (list[i] == pick) c = i;
     if (mode != 2 && pick != 1 && pick != 4 && SCREEN_OF[pick] >= 0 && PROG[mode][SCREEN_OF[pick]]) {
@@ -191,6 +196,7 @@ static int roster_screen(void) {
 
 /* ---------------------------------------------------------------- repartidor y vehículo */
 static int rider_screen(void) {
+    UI_SCREEN = 8;
     int c = rep_look;
     for (;;) {
         bg_night();
@@ -212,6 +218,7 @@ static int rider_screen(void) {
     }
 }
 static int veh_screen(int who_rep) {
+    UI_SCREEN = 5;
     static const char *const ST[3] = {"VELOCIDAD", "CARGA", "ECO"};
     int c = veh;
     for (;;) {
@@ -237,6 +244,7 @@ static int veh_screen(int who_rep) {
 
 /* ---------------------------------------------------------------- tarjeta de moneda (showWin / showRepWin) */
 static void win_card(int who, int screen, int rep) {
+    UI_SCREEN = 6;
     menu_reset();
     char kick[48], msg[80], *p;
     if (rep) { str_cat(str_cat(kick, "MODO REPARTIDOR · "), REP_RIDERS[rep_look].name); p = str_cat(msg, "¡Repartidor del mes! 3 pedidos · "); p = str_num(p, mode == 2 ? MZ_STARS : REP_STARS); str_cat(p, "/9 ★"); }
@@ -272,6 +280,7 @@ static void win_card(int who, int screen, int rep) {
 
 /* ---------------------------------------------------------------- créditos */
 static void credits(int new_rep) {
+    UI_SCREEN = 7;
     static const int WHO[4] = {0, 2, 3, 1};
     menu_reset();
     sfx_win();
@@ -315,12 +324,14 @@ static void play_pick(int id) {
     if (id == 4) {
         if (!rider_screen()) return;
         if (!veh_screen(1)) return;
+        menu_reset(); UI_SCREEN = 0;
         int gk = mode == 2 ? 5 : 4;
         if (arcade_play(gk, 4, veh, REP_RIDERS[rep_look].look)) { REP_DONE = 1; win_card(0, 0, 1); }
         return;
     }
     RES_L1 = RES_L2 = 0;
     int won = 0;
+    menu_reset(); UI_SCREEN = 0;
     if (id == 1) {
         if (mode == 0) won = (ov_load(OV_PLAT), platform_play(1, 0)) && (ov_load(OV_PLAT), final_play());
         else if (mode == 1) { ov_load(OV_RPG); won = rpg_play(1); }
@@ -328,7 +339,7 @@ static void play_pick(int id) {
         if (won) do_credits();
         return;
     }
-    if (mode == 0) { if (!veh_screen(0)) return; ov_load(OV_PLAT); won = platform_play(id, veh); }
+    if (mode == 0) { if (!veh_screen(0)) return; menu_reset(); UI_SCREEN = 0; ov_load(OV_PLAT); won = platform_play(id, veh); }
     else if (mode == 1) { ov_load(OV_RPG); won = rpg_play(id); }
     else won = arcade_play(id, id, 0, 0);
     if (won) {

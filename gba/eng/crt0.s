@@ -57,5 +57,19 @@ irq_handler:
     ldr r3, [r2]
     add r3, r3, #1
     str r3, [r2]
+    @ botones: acumula pulsaciones nuevas entre frames (para no perder toques cortos)
+    ldr r2, =0x04000130
+    ldrh r3, [r2]
+    mvn r3, r3
+    ldr r0, =0x3FF
+    and r3, r3, r0
+    ldr r2, =key_irq_prev
+    ldrh r1, [r2]
+    strh r3, [r2]
+    bic r3, r3, r1
+    ldr r2, =key_irq_hit
+    ldrh r1, [r2]
+    orr r1, r1, r3
+    strh r1, [r2]
     bx lr
     .pool
