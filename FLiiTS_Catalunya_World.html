@@ -196,7 +196,7 @@ if("serviceWorker" in navigator && (location.protocol==="https:"||location.hostn
    · "frame-gb" → móvil o tablet (táctil): consola FLiiTS & Watch.
    · "full"     → sin marco (añade #sinconsola a la dirección). #tele y #gameboy fuerzan un marco. */
 (function(){var h=document.documentElement,u=location.hash+location.search,
- m=/sinconsola/i.test(u)?"full":/gameboy/i.test(u)?"frame-gb":/tele/i.test(u)?"frame-tv":matchMedia("(pointer:coarse)").matches?"frame-gb":"frame-tv";
+ m=h.dataset.frame||(/sinconsola/i.test(u)?"full":/gameboy/i.test(u)?"frame-gb":/tele/i.test(u)?"frame-tv":matchMedia("(pointer:coarse)").matches?"frame-gb":"frame-tv");
  h.classList.add(m); if(m!=="full") h.classList.add("framed");})();
 </script>
 <style id="marcos">
@@ -206,6 +206,11 @@ html.framed body{padding:0!important;background:radial-gradient(ellipse at 50% 3
 html.framed #screen{position:relative;width:100%;height:100%;overflow:hidden;transform:translateZ(0);container-type:size;background:var(--night);color:var(--ink);font-family:var(--f-body);font-size:22px}
 html.framed{--watch-pad-height:0px}
 html.framed .mobile-pad{display:none!important}
+/* Portátil con mando (o versión /portatil/): sin controles táctiles ni margen para ellos */
+html.gamepad .mobile-pad,html[data-portatil] .mobile-pad{display:none!important}
+html.gamepad .app,html[data-portatil] .app{padding-bottom:0!important}
+html.gamepad .hint,html[data-portatil] .hint{display:none!important}
+html.gamepad .app,html[data-portatil] .app{grid-template-rows:auto minmax(0,1fr)!important;height:100dvh!important;min-height:0!important}
 html.framed .app{height:100%!important;min-height:0!important;padding-bottom:0!important}
 html.framed .modegame{padding-bottom:6px!important}
 html.framed .mg-panel{max-height:calc(100% - 12px)!important}
@@ -4065,6 +4070,33 @@ updHud(); fit(); requestAnimationFrame(loop);
  };
  // Espera a que no haya cuenta atrás ni ARE YOU READY? en pantalla
  const wait=setInterval(()=>{ if(document.getElementById("gate")) return; clearInterval(wait); setTimeout(show,1800); },500);
+})();
+</script>
+<script>
+/* Mando / botones físicos (consolas portátiles con Android, mandos USB o Bluetooth).
+   Cruceta y stick → flechas · A (derecha) → espacio · B (abajo) → X · START → Escape · SELECT → J
+   SELECT + START → P (modo repartidor en el selector). Se envían como teclas al juego. */
+(()=>{
+ if(!navigator.getGamepads) return;
+ const MAP={12:"ArrowUp",13:"ArrowDown",14:"ArrowLeft",15:"ArrowRight",1:" ",0:"x",3:" ",2:"x",9:"Escape",8:"j"};
+ const held={};
+ const send=(key,type)=>{ const t=document.activeElement&&document.activeElement!==document.body?document.activeElement:document;
+   (t.dispatchEvent?t:document).dispatchEvent(new KeyboardEvent(type,{key,bubbles:true,cancelable:true})); };
+ const set=(id,key,on)=>{ if(!!held[id]===on) return; held[id]=on; send(key,on?"keydown":"keyup"); };
+ let raf=0;
+ const poll=()=>{ raf=requestAnimationFrame(poll);
+  const pads=[...navigator.getGamepads()].filter(Boolean); if(!pads.length) return;
+  document.documentElement.classList.add("gamepad");
+  const st={};
+  pads.forEach(g=>{ g.buttons.forEach((b,i)=>{ if(MAP[i]&&(b.pressed||b.value>.5)) st[i]=true; });
+   const ax=g.axes||[], x=ax[0]||0, y=ax[1]||0;
+   if(x<-.5) st[14]=true; if(x>.5) st[15]=true; if(y<-.5) st[12]=true; if(y>.5) st[13]=true; });
+  if(st[8]&&st[9]){ if(!held.combo){ held.combo=true; send("p","keydown"); send("p","keyup"); } delete st[8]; delete st[9]; }
+  else if(!st[8]&&!st[9]) held.combo=false;
+  Object.keys(MAP).forEach(i=>set(i,MAP[i],!!st[i]));
+ };
+ addEventListener("gamepadconnected",()=>{ document.documentElement.classList.add("gamepad"); if(!raf) poll(); });
+ if([...navigator.getGamepads()].some(Boolean)) poll();
 })();
 </script>
 </body></html>
