@@ -15,7 +15,12 @@ typedef int8_t s8; typedef int16_t s16; typedef int32_t s32;
 
 #define SW 240
 #define SH 160
+#ifdef IWRAM_OV   /* código de un modo: va a su "overlay" y se copia a IWRAM al entrar (ov_load) */
+#define IWRAM_CODE __attribute__((section(IWRAM_OV), target("arm"), long_call, noinline))
+#else
 #define IWRAM_CODE __attribute__((section(".iwram"), target("arm"), long_call, noinline))
+#endif
+#define IWRAM_BASE __attribute__((section(".iwram"), target("arm"), long_call, noinline))
 #define EWRAM_BSS __attribute__((section(".ewram")))
 
 #ifndef C
@@ -46,12 +51,12 @@ void pool_reset(u32 mark);              /* libera todo lo reservado después de 
 
 /* ---------------------------------------------------------------- primitivas (recortan al destino) */
 void cls(u8 c);
-IWRAM_CODE void rect(int x, int y, int w, int h, u8 c);
-IWRAM_CODE void pset(int x, int y, u8 c);
-IWRAM_CODE void bits_draw(int x, int y, const u8 *bm, int nrows, int w, u8 c); /* filas de bits, MSB izq. */
+IWRAM_BASE void rect(int x, int y, int w, int h, u8 c);
+IWRAM_BASE void pset(int x, int y, u8 c);
+IWRAM_BASE void bits_draw(int x, int y, const u8 *bm, int nrows, int w, u8 c); /* filas de bits, MSB izq. */
 u8 pget(int x, int y);
 void line(int x0, int y0, int x1, int y1, u8 c, int t);   /* como line() del JS: cuadrados t x t */
-IWRAM_CODE void rect_lut(int x, int y, int w, int h, const u8 *lut); /* cambia cada píxel por lut[p] (sombras) */
+IWRAM_BASE void rect_lut(int x, int y, int w, int h, const u8 *lut); /* cambia cada píxel por lut[p] (sombras) */
 #define rect_dark(x, y, w, h) rect_lut(x, y, w, h, LUT_DARK)
 #define rect_light(x, y, w, h) rect_lut(x, y, w, h, LUT_LIGHT)
 void rect_dither(int x, int y, int w, int h, u8 c);       /* 50 % a cuadros */
@@ -61,11 +66,11 @@ void ring(int cx, int cy, int r, u8 c);                   /* circunferencia */
 void ellipse(int cx, int cy, int rx, int ry, u8 c);       /* elipse rellena */
 void poly(const s16 *pts, int n, u8 c);                   /* polígono relleno: pares x,y */
 void blit(const bmp_t *b, int x, int y, int flip);        /* 0 = transparente */
-IWRAM_CODE void blit_part(const bmp_t *b, int sx, int sy, int w, int h, int x, int y, int flip);
+IWRAM_BASE void blit_part(const bmp_t *b, int sx, int sy, int w, int h, int x, int y, int flip);
 void blit_scaled(const bmp_t *b, int x, int y, int w, int h, int flip);
 
 /* Sprites de cadenas como en el JS: cada carácter se busca en pal[128] (0 = no pinta). '.' nunca pinta. */
-IWRAM_CODE void rows(const char *const *spr, int n, int x, int y, const u8 *pal, int flip);
+IWRAM_BASE void rows(const char *const *spr, int n, int x, int y, const u8 *pal, int flip);
 bmp_t *rows_bmp(const char *const *spr, int n, const u8 *pal, int flip);
 void pal_load(u8 *pal, const char *chars, const u8 *cols); /* pal[chars[i]] = cols[i] */
 
@@ -132,4 +137,12 @@ int save_read(void *d, int n);          /* 1 si había datos válidos */
 
 u32 ticks(void);                        /* ciclos de CPU (16,78 MHz) para medir */
 void eng_init(void);
+/* overlays de código IWRAM por modo */
+#define OV_PB 0
+#define OV_REP 1
+#define OV_SH 2
+#define OV_CT 3
+#define OV_PLAT 4
+#define OV_RPG 5
+void ov_load(int id);
 #endif

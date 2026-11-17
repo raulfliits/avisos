@@ -14,8 +14,7 @@
 #define WHITE C(0xffffff)
 #define EDGE C(0x120b0c)
 
-extern int REP_STARS;
-__attribute__((weak)) int REP_STARS;
+#include "arc_rep.h"
 
 static const int SEL[4] = {CI_IVAN, CI_GERARD, CI_AZLAN, CI_RAUL};
 static const int SCREEN_OF[4] = {0, -1, 1, 2};
@@ -117,11 +116,11 @@ static int mode_screen(void) {
             text_small(x + 76, y + 19, SUB[i], on ? GOLD : MUTE, 0);
             if (FIN[i]) text(x + w - 14, y + 11, "✓", GREEN, 0);
         }
-        text_small(120, 150, "← → ELEGIR · A JUGAR · B VOLVER", MUTE, 1);
+        text_small(120, 150, "▲ ▼ ELEGIR · A JUGAR · B VOLVER", MUTE, 1);
         draw_toast();
         frame_end();
-        if (key_hit & K_LEFT) { c = (c + 2) % 3; sfx_tick(); }
-        if (key_hit & K_RIGHT) { c = (c + 1) % 3; sfx_tick(); }
+        if (key_hit & (K_LEFT | K_UP)) { c = (c + 2) % 3; sfx_tick(); }
+        if (key_hit & (K_RIGHT | K_DOWN)) { c = (c + 1) % 3; sfx_tick(); }
         if (key_hit & (K_A | K_START)) { sfx_open(); mode = c; return 1; }
         if (key_hit & K_B) { sfx_back(); return 0; }
     }
@@ -175,7 +174,7 @@ static int roster_screen(void) {
         else { char *p = str_cat(note, "Consigue las 3 monedas de oro: llevas "); p = str_num(p, gold()); str_cat(p, "/3."); }
         rect(0, 136, SW, 1, NIGHT2);
         text_small(120, 140, note, GOLD, 1);
-        text_small(120, 151, "← → · A ELEGIR · B MODOS · SELECT+START REPARTIDOR", MUTE, 1);
+        text_small(120, 151, "◀ ▶ · A ELEGIR · B MODOS · SELECT+START REPARTIDOR", MUTE, 1);
         draw_toast();
         frame_end();
         if (key_hit & K_LEFT) { c = (c + n - 1) % n; sfx_tick(); }
@@ -203,7 +202,7 @@ static int rider_screen(void) {
             rect(x + 8, y + 38, 34, 3, on ? PANEL2 : EDGE);
             text_small(x + 25, y + 50, REP_RIDERS[i].name, WHITE, 1);
         }
-        text_small(120, 150, "← → ELEGIR · A SEGUIR · B VOLVER", MUTE, 1);
+        text_small(120, 150, "◀ ▶ ELEGIR · A SEGUIR · B VOLVER", MUTE, 1);
         frame_end();
         if (key_hit & K_LEFT) { c = (c + 3) & 3; sfx_tick(); }
         if (key_hit & K_RIGHT) { c = (c + 1) & 3; sfx_tick(); }
@@ -226,7 +225,7 @@ static int veh_screen(int who_rep) {
             text_small(x + 37, y + 54, i == 2 ? "PATINETE" : VEH[i].n, WHITE, 1);
             for (int k = 0; k < 3; k++) { text_small(x + 6, y + 66 + k * 10, ST[k], DIM, 0); stars(x + 52, y + 66 + k * 10, VEH[i].st[k]); }
         }
-        text_small(120, 150, "← → ELEGIR · A ¡A REPARTIR! · B VOLVER", MUTE, 1);
+        text_small(120, 150, "◀ ▶ ELEGIR · A ¡A REPARTIR! · B VOLVER", MUTE, 1);
         frame_end();
         if (key_hit & K_LEFT) { c = (c + 2) % 3; sfx_tick(); }
         if (key_hit & K_RIGHT) { c = (c + 1) % 3; sfx_tick(); }
@@ -239,7 +238,7 @@ static int veh_screen(int who_rep) {
 static void win_card(int who, int screen, int rep) {
     menu_reset();
     char kick[48], msg[80], *p;
-    if (rep) { str_cat(str_cat(kick, "MODO REPARTIDOR · "), REP_RIDERS[rep_look].name); p = str_cat(msg, "¡Repartidor del mes! 3 pedidos · "); p = str_num(p, REP_STARS); str_cat(p, "/9 ★"); }
+    if (rep) { str_cat(str_cat(kick, "MODO REPARTIDOR · "), REP_RIDERS[rep_look].name); p = str_cat(msg, "¡Repartidor del mes! 3 pedidos · "); p = str_num(p, mode == 2 ? MZ_STARS : REP_STARS); str_cat(p, "/9 ★"); }
     else {
         p = str_cat(kick, MODE_N[mode]); p = str_cat(p, " · MUNDO "); p = str_num(p, screen + 1); p = str_cat(p, " · "); str_cat(p, CREW[who].name);
         if (gold() == 3) str_cat(msg, "¡3 monedas! Se desbloquea el personaje secreto.");
@@ -322,14 +321,14 @@ static void play_pick(int id) {
     RES_L1 = RES_L2 = 0;
     int won = 0;
     if (id == 1) {
-        if (mode == 0) won = platform_play(1, 0) && final_play();
-        else if (mode == 1) won = rpg_play(1);
-        else won = arcade_play(1, 1, 0, 0) && final_play();
+        if (mode == 0) won = (ov_load(OV_PLAT), platform_play(1, 0)) && (ov_load(OV_PLAT), final_play());
+        else if (mode == 1) { ov_load(OV_RPG); won = rpg_play(1); }
+        else won = arcade_play(1, 1, 0, 0) && (ov_load(OV_PLAT), final_play());
         if (won) do_credits();
         return;
     }
-    if (mode == 0) { if (!veh_screen(0)) return; won = platform_play(id, veh); }
-    else if (mode == 1) won = rpg_play(id);
+    if (mode == 0) { if (!veh_screen(0)) return; ov_load(OV_PLAT); won = platform_play(id, veh); }
+    else if (mode == 1) { ov_load(OV_RPG); won = rpg_play(id); }
     else won = arcade_play(id, id, 0, 0);
     if (won) {
         int s = SCREEN_OF[id];

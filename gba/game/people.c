@@ -76,7 +76,7 @@ static void draw_rows_upto(const char *const *spr, int x, int y, int r1) {
 }
 
 typedef struct { int key; u8 vi, f; rider_t r; } rcache_t;
-static rcache_t RC[48]; static int rc_n;
+static rcache_t RC[48] EWRAM_BSS; static int rc_n;
 void people_cache_reset(void) { rc_n = 0; extern void person_cache_reset(void); person_cache_reset(); }
 const rider_t *compose_rider_c(const crew_t *c, int key, int vi, int f) {
     f &= 7;
@@ -135,7 +135,7 @@ const rider_t *compose_rider_c(const crew_t *c, int key, int vi, int f) {
 }
 const rider_t *compose_rider(int ci, int vi, int f) { return compose_rider_c(&CREW[ci], ci, vi, f); }
 
-static char rep_rows[6][24][17]; static const char *rep_ptr[6][24]; static crew_t rep_c[6]; static u8 rep_ok[6];
+static char rep_rows[6][24][17] EWRAM_BSS; static const char *rep_ptr[6][24] EWRAM_BSS; static crew_t rep_c[6]; static u8 rep_ok[6];
 const crew_t *rep_crew(int L) {
     if (rep_ok[L]) return &rep_c[L];
     u32 S = 0; /* LOOKS[L].S como color: miramos el rojo del color de la paleta */
@@ -169,7 +169,7 @@ void draw_person(int li, int x, int y, int flip, int stride, int gear, int nrows
     if (gear & G_CASCO) helmet(x, y, CAND_T, 3);
 }
 typedef struct { u8 look, gear, flip; bmp_t *b; } pcache_t;
-static pcache_t PC[40]; static int pc_n;
+static pcache_t PC[40] EWRAM_BSS; static int pc_n;
 void person_cache_reset(void) { pc_n = 0; }
 bmp_t *person_bmp(int look, int gear, int flip) {
     gear &= ~G_MOCH; look %= 6;

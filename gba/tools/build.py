@@ -84,12 +84,11 @@ def glyph_rows(ch):
         rows.append(v)
     if ch in ACC:  # mayúsculas acentuadas legibles en 8 px: acento + letra de 5 filas
         base = glyph_rows(ACC[ch][0])[:7]
-        for _ in range(2):
-            n = len(base)
-            d = next((i for i in (3, 2, 4, 1, 5) if i < n-1 and (base[i] == base[i-1] or base[i] == base[i+1])), n//2)
-            base = base[:d] + base[d+1:]
+        n = len(base)
+        d = next((i for i in (3, 2, 4, 1, 5) if i < n-1 and (base[i] == base[i-1] or base[i] == base[i+1])), n//2)
+        base = base[:d] + base[d+1:]
         acc = int(ACC[ch][1].replace('#', '1').replace('.', '0'), 2)
-        rows = [acc, 0] + base + [0]
+        rows = [acc, 0] + base
     return rows
 font = [(cp, glyph_rows(chr(cp))) for cp in sorted(set(cps))]
 
@@ -137,8 +136,13 @@ wr(os.path.join(SRC, 'gen.h'), ''.join(gh)); wr(os.path.join(SRC, 'gen.c'), ''.j
 
 # ---------------------------------------------------------------- fuentes con colores sustituidos
 def subst(t): return COLRE.sub(lambda m: '((u8)%d)' % index[int(m.group(1), 16)], t)
+OVG = [('arc_pinball', 'pb'), ('arc_claw', 'pb'), ('arc_rep', 'rep'), ('arc_maze', 'rep'), ('arc_shooter', 'sh'), ('arc_citas', 'ct'), ('plat', 'plat'), ('rpg', 'rpg')]
 for f in srcs + hdrs:
-    wr(os.path.join(SRC, os.path.basename(f)), subst(open(f, encoding='utf-8').read()))
+    t = subst(open(f, encoding='utf-8').read()); b = os.path.basename(f)
+    if f.endswith('.c'):
+        g = next((o for pre, o in OVG if b.startswith(pre)), None)
+        if g: t = '#define IWRAM_OV ".iwov_%s"\n' % g + t
+    wr(os.path.join(SRC, b), t)
 for f in asms: shutil.copy(f, SRC)
 
 CC = 'arm-none-eabi-gcc'

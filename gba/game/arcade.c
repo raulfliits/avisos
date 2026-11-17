@@ -33,7 +33,7 @@ void arc_hire(const char *name) {
 }
 void arc_win(void) {
     MG.state = ST_WON;
-    arc_banner(MG.gk == 4 ? "¡REPARTIDOR DEL MES!" : MG.ci == 1 ? "¡OFICINA EN ORDEN!" : "¡3 CONTRATADOS!", MG.gk == 4 ? "3 PEDIDOS ENTREGADOS" : "¡MONEDA DE ORO!", 180);
+    arc_banner(MG.gk >= 4 ? "¡REPARTIDOR DEL MES!" : MG.ci == 1 ? "¡OFICINA EN ORDEN!" : "¡3 CONTRATADOS!", MG.gk >= 4 ? "3 PEDIDOS ENTREGADOS" : "¡MONEDA DE ORO!", 180);
     sfx_win(); sfx_coin();
     MG.endAt = MG.t + 180;
 }
@@ -47,7 +47,7 @@ static void draw_banner(int W, int H) {
     frame_rect(7, y - 5, W - 14, hh - 2, C(0xffd23f)); frame_rect(8, y - 4, W - 16, hh - 4, C(0xffd23f));
     arc_text(W / 2, y, MG.ban_t, C(0xffd23f), 1, 8);
     if (MG.ban_s) arc_text(W / 2, y + 14, MG.ban_s, C(0xffffff), 1, MG.ban_s && text_len(MG.ban_s) * 8 > W - 16 ? 6 : 8);
-    if (lost) arc_text(W / 2, y + 26, "A: OTRA · B: SALIR", (MG.t >> 4) & 1 ? C(0xffffff) : C(0xff8a92), 1, 8);
+    if (lost) arc_text(W / 2, y + 26, "A: OTRA · B: SALIR", (MG.t >> 4) & 1 ? C(0xffffff) : C(0xff8a92), 1, W < 160 + 16 ? 6 : 8);
 }
 
 static void intro_card(const arc_def_t *A) {
@@ -66,6 +66,8 @@ static void intro_card(const arc_def_t *A) {
 
 int arcade_play(int gk, int ci, int veh, int look) {
     const arc_def_t *A = def(gk);
+    static const u8 OVI[6] = {OV_PB, OV_CT, OV_PB, OV_SH, OV_REP, OV_REP};
+    ov_load(OVI[gk]);
     memset(&MG, 0, sizeof MG);
     MG.gk = gk; MG.ci = ci; MG.veh = veh; MG.look = look;
     u32 mark = pool_mark();
@@ -105,7 +107,11 @@ int arcade_play(int gk, int ci, int veh, int look) {
         clip_reset(); origin(0, 0); UI_W = SW;
         char pb[48];
         if (A->progress) A->progress(pb); else { char *p = str_cat(pb, "CONTRATADOS "); p = str_num(p, MG.hires); str_cat(p, "/3"); }
-        rect(0, SH - 7, text_len(pb) * 4 + 4, 7, C(0x120b0c)); text_small(2, SH - 6, pb, C(0xffd23f), 0);
+        static char lastpb[48]; static int pbt;
+        if (strcmp(pb, lastpb)) { strcpy(lastpb, pb); pbt = 150; }
+        if (pbt > 0) pbt -= n;
+        if (vh <= SH - 8) { rect(0, SH - 7, text_len(pb) * 4 + 4, 7, C(0x120b0c)); text_small(2, SH - 6, pb, C(0xffd23f), 0); }
+        else if (pbt > 0 || (key_held & K_SEL)) { int w = text_len(pb) * 4 + 4; rect(SW - w, 0, w, 7, C(0x120b0c)); text_small(SW - w + 2, 1, pb, C(0xffd23f), 0); }
     }
     RES_C1 = MG.c1; RES_C2 = MG.c2;
     pool_reset(mark); people_cache_reset();

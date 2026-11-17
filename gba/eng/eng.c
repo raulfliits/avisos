@@ -51,7 +51,7 @@ u8 col_mix(u8 a, u8 b, int k) {
 #define POOL_SZ (160 * 1024)
 static u8 pool[POOL_SZ] EWRAM_BSS __attribute__((aligned(4)));
 static u32 pool_top;
-static bmp_t bmp_hdr[256]; static int bmp_n;
+static bmp_t bmp_hdr[256] EWRAM_BSS; static int bmp_n;
 u32 pool_mark(void) { return pool_top | ((u32)bmp_n << 24); }
 void pool_reset(u32 m) { pool_top = m & 0xFFFFFF; bmp_n = m >> 24; }
 bmp_t *bmp_new(int w, int h) {
@@ -73,7 +73,7 @@ static s16 sv_ox, sv_oy, sv_c[4]; static bmp_t sv_t;
 void tgt_bmp(bmp_t *b) { sv_t = T; sv_ox = OX; sv_oy = OY; sv_c[0] = CX0; sv_c[1] = CY0; sv_c[2] = CX1; sv_c[3] = CY1; T = *b; OX = OY = 0; clip_reset(); }
 void tgt_back(void) { T = sv_t; OX = sv_ox; OY = sv_oy; CX0 = sv_c[0]; CY0 = sv_c[1]; CX1 = sv_c[2]; CY1 = sv_c[3]; }
 
-IWRAM_CODE void pset(int x, int y, u8 c) {
+IWRAM_BASE void pset(int x, int y, u8 c) {
     x += OX; y += OY;
     if (x < CX0 || x >= CX1 || y < CY0 || y >= CY1) return;
     u8 *p = T.px + y * T.w + x;
@@ -91,7 +91,7 @@ u8 pget(int x, int y) {
 void cls(u8 c) { int ox = OX, oy = OY; OX = OY = 0; rect(0, 0, T.w, T.h, c); OX = ox; OY = oy; }
 
 static volatile u32 dma_fill;
-IWRAM_CODE void rect(int x, int y, int w, int h, u8 c) {
+IWRAM_BASE void rect(int x, int y, int w, int h, u8 c) {
     x += OX; y += OY;
     const int cx0 = CX0, cy0 = CY0, cx1 = CX1, cy1 = CY1, tw = T.w, vram = T.vram;
     u8 *const px = T.px;
@@ -102,7 +102,7 @@ IWRAM_CODE void rect(int x, int y, int w, int h, u8 c) {
     u8 *row = px + y * tw;
     for (int j = 0; j < h; j++, row += tw) {
         int a = x; const int b = x + w;
-        if (!vram) { while (a < b && (a & 3)) row[a++] = c; int nw = (b - a) >> 2;
+        if (!vram) { while (a < b && ((u32)(row + a) & 3)) row[a++] = c; int nw = (b - a) >> 2;
             if (nw >= 8) { dma_fill = c4; REG32(0x040000D4) = (u32)&dma_fill; REG32(0x040000D8) = (u32)(row + a); REG32(0x040000DC) = 0x85000000u | nw; a += nw * 4; }
             while (a + 4 <= b) { *(u32 *)(row + a) = c4; a += 4; } while (a < b) row[a++] = c; continue; }
         if (a & 1) { volatile u16 *q = (u16 *)(row + a - 1); *q = (*q & 0x00FF) | (c << 8); a++; }
@@ -117,7 +117,7 @@ IWRAM_CODE void rect(int x, int y, int w, int h, u8 c) {
     }
 }
 /* dibuja nrows filas de bits (MSB = izquierda, ancho w) en color c: texto y glifos */
-IWRAM_CODE void bits_draw(int x, int y, const u8 *bm, int nrows, int w, u8 c) {
+IWRAM_BASE void bits_draw(int x, int y, const u8 *bm, int nrows, int w, u8 c) {
     x += OX; y += OY;
     const int cx0 = CX0, cy0 = CY0, cx1 = CX1, cy1 = CY1, tw = T.w, vram = T.vram; u8 *const px = T.px;
     if (x >= cx1 || x + w <= cx0 || y >= cy1 || y + nrows <= cy0) return;
@@ -147,7 +147,7 @@ IWRAM_CODE void bits_draw(int x, int y, const u8 *bm, int nrows, int w, u8 c) {
         }
     }
 }
-IWRAM_CODE void rect_lut(int x, int y, int w, int h, const u8 *lut) {
+IWRAM_BASE void rect_lut(int x, int y, int w, int h, const u8 *lut) {
     x += OX; y += OY;
     if (x < CX0) { w -= CX0 - x; x = CX0; } if (y < CY0) { h -= CY0 - y; y = CY0; }
     if (x + w > CX1) w = CX1 - x; if (y + h > CY1) h = CY1 - y;
@@ -209,7 +209,7 @@ void poly(const s16 *p, int n, u8 c) {
         for (int a = 0; a + 1 < k; a += 2) rect(xs[a], y, xs[a + 1] - xs[a], 1, c);
     }
 }
-IWRAM_CODE void blit_part(const bmp_t *b, int sx, int sy, int w, int h, int x, int y, int flip) {
+IWRAM_BASE void blit_part(const bmp_t *b, int sx, int sy, int w, int h, int x, int y, int flip) {
     x += OX; y += OY;
     const int cx0 = CX0, cy0 = CY0, cx1 = CX1, cy1 = CY1, tw = T.w, vram = T.vram, bw = b->w; u8 *const px = T.px;
     int i0 = 0, i1 = w;
@@ -237,7 +237,7 @@ void blit_scaled(const bmp_t *b, int x, int y, int w, int h, int flip) {
     }
 }
 void pal_load(u8 *pal, const char *chars, const u8 *cols) { for (int i = 0; chars[i]; i++) pal[(u8)chars[i] & 127] = cols[i]; }
-IWRAM_CODE void rows(const char *const *spr, int n, int x, int y, const u8 *pal, int flip) {
+IWRAM_BASE void rows(const char *const *spr, int n, int x, int y, const u8 *pal, int flip) {
     for (int r = 0; r < n; r++) {
         const char *s = spr[r]; int w = strlen(s);
         for (int q = 0; q < w; q++) { char ch = s[q]; if (ch == '.') continue; u8 c = pal[(u8)ch & 127]; if (c) pset(x + (flip ? w - 1 - q : q), y + r, c); }
@@ -440,4 +440,16 @@ void eng_init(void) {
     for (int i = 0; i < 256; i++) { LUT_DARK[i] = i ? col_shade(i, 128) : 0; LUT_LIGHT[i] = i ? col_mix(i, col_rgb(255, 255, 255), 102) : 0; }
     last_vbl = vbl_count;
     tgt_screen();
+}
+
+extern char __ov_vma[], __load_start_ov_pb[], __load_stop_ov_pb[], __load_start_ov_rep[], __load_stop_ov_rep[], __load_start_ov_sh[], __load_stop_ov_sh[],
+    __load_start_ov_ct[], __load_stop_ov_ct[], __load_start_ov_plat[], __load_stop_ov_plat[], __load_start_ov_rpg[], __load_stop_ov_rpg[];
+static int ov_cur = -1;
+void ov_load(int id) {
+    if (id == ov_cur) return;
+    char *a[6] = {__load_start_ov_pb, __load_start_ov_rep, __load_start_ov_sh, __load_start_ov_ct, __load_start_ov_plat, __load_start_ov_rpg};
+    char *b[6] = {__load_stop_ov_pb, __load_stop_ov_rep, __load_stop_ov_sh, __load_stop_ov_ct, __load_stop_ov_plat, __load_stop_ov_rpg};
+    u32 n = (u32)(b[id] - a[id]);
+    if (n) memcpy(__ov_vma, a[id], (n + 3) & ~3u);
+    ov_cur = id;
 }
