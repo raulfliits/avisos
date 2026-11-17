@@ -30,7 +30,7 @@ def dist(a, b): return 3*(a[0]-b[0])**2 + 4*(a[1]-b[1])**2 + 2*(a[2]-b[2])**2
 groups = [[v] for v in uniq]
 cent = [rgb(v) for v in uniq]
 weight = [max(cols.get(v, 1), 1) for v in uniq]
-while len(groups) > 255:
+while len(groups) > 247:  # 248..255 libres para el modo RPG
     best = None
     for i in range(len(cent)):
         for j in range(i+1, len(cent)):

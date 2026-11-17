@@ -30,9 +30,10 @@ static int gold(void) { return PROG[mode][0] + PROG[mode][1] + PROG[mode][2]; }
 static int raul_open(void) { return gold() >= 3; }
 
 /* ---------------------------------------------------------------- guardado */
-typedef struct { u8 prog[3][3], fin[3], rep_on, rep_done; } save_t;
-void game_save(void) { save_t s; memcpy(s.prog, PROG, 9); memcpy(s.fin, FIN, 3); s.rep_on = REP_ON; s.rep_done = REP_DONE; save_write(&s, sizeof s); }
-static void game_load(void) { save_t s; if (save_read(&s, sizeof s)) { memcpy(PROG, s.prog, 9); memcpy(FIN, s.fin, 3); REP_ON = s.rep_on; REP_DONE = s.rep_done; } }
+extern u8 rpg_pal;
+typedef struct { u8 prog[3][3], fin[3], rep_on, rep_done, rpg_pal; } save_t;
+void game_save(void) { save_t s; s.rpg_pal = rpg_pal; memcpy(s.prog, PROG, 9); memcpy(s.fin, FIN, 3); s.rep_on = REP_ON; s.rep_done = REP_DONE; save_write(&s, sizeof s); }
+static void game_load(void) { save_t s; if (save_read(&s, sizeof s)) { memcpy(PROG, s.prog, 9); memcpy(FIN, s.fin, 3); REP_ON = s.rep_on; REP_DONE = s.rep_done; rpg_pal = s.rpg_pal % 3; } }
 
 /* ---------------------------------------------------------------- dibujo común */
 static void menu_reset(void) { pool_reset(base_mark); people_cache_reset(); }

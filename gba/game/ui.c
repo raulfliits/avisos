@@ -39,11 +39,11 @@ int pause_menu(void) {
     u8 *front = (u8 *)((*dc & 0x10) ? 0x0600A000 : 0x06000000);
     static u8 snap[SW * SH] EWRAM_BSS;
     memcpy(snap, front, SW * SH);
+    { bmp_t sb = {snap, SW, SH, 0}; tgt_bmp(&sb); rect_dark(0, 0, SW, SH); rect_dark(40, 30, 160, 100); tgt_back(); }
     int c = 0; const char *msg = 0; int mt = 0;
     sfx_select();
     for (;;) {
-        extern bmp_t T; memcpy(T.px, snap, SW * SH);
-        rect_dark(0, 0, SW, SH); rect_dark(40, 30, 160, 100);
+        extern bmp_t T; volatile u32 *dma = (volatile u32 *)0x040000D4; dma[0] = (u32)snap; dma[1] = (u32)T.px; dma[2] = 0x84000000u | (SW * SH / 4);
         ui_box(40, 30, 160, 100, C(0x120b0c), C(0xffd23f));
         text(120, 40, "PARTIDA EN PAUSA", C(0xffd23f), 1);
         for (int i = 0; i < 3; i++) { if (i == c) text(52, 64 + i * 16, "▶", C(0xffd23f), 0); text(64, 64 + i * 16, OPT[i], i == c ? C(0xffffff) : C(0x9aa3b5), 0); }
