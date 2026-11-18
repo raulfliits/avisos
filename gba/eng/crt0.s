@@ -7,10 +7,10 @@ _start:
     .fill 188,1,0
 start_vector:
     mov r0, #0x12
-    msr cpsr_c, r0
+    msr cpsr_fc, r0
     ldr sp, =0x03007FA0
     mov r0, #0x1F
-    msr cpsr_c, r0
+    msr cpsr_fc, r0
     ldr sp, =0x03007F00
     ldr r0, =__iwram_lma
     ldr r1, =__iwram_start
