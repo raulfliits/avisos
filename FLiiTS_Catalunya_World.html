@@ -1615,23 +1615,23 @@ const SCREENS=[
  { who:0, type:"hire", len:1320, c1:"Contratados", c2:"Despedidos",
    land:[["sagrada",175],["valles",560]], places:[[150,"Barcelona"],[900,"Sabadell"]], bossName:"JEFE: MARTÍ",
    hint:"¡Uber + Glovo se contrata, el resto fuera!",
-   cities:[["Barcelona","709 riders · Glovo 509 · Uber Eats 196","108","601"],["Sabadell","130 riders · Glovo 110 · Uber Eats 19","25","105"],
-     ["Parets del Vallès","33 riders · Uber Eats","6","27"],["Martorell","26 riders · Uber Eats","2","24"],["Gavà","22 riders · Uber Eats","1","21"],["Mataró","21 riders · Uber Eats","6","15"],
-     ["Lleida","21 riders · Uber Eats","9","12"],["Sant Cugat","15 riders · Uber Eats","3","12"],["Molins de Rei","14 riders · Uber Eats","2","12"]],
+   cities:[["Barcelona","727 riders · Glovo 524 · Uber Eats 201","114","613"],["Sabadell","130 riders · Glovo 110 · Uber Eats 19","25","105"],
+     ["Parets del Vallès","34 riders · Uber Eats","6","28"],["Martorell","25 riders · Uber Eats","2","23"],["Gavà","23 riders · Uber Eats","1","22"],["Mataró","22 riders · Uber Eats","6","16"],
+     ["Lleida","21 riders · Uber Eats","9","12"],["Sant Cugat","14 riders · Uber Eats","3","11"],["Molins de Rei","14 riders · Uber Eats","2","12"]],
    intro:"¡Forecast perfecto! Así está Catalunya, ciudad por ciudad:",
    note:"~2 min. Foto de toda Catalunya: motos y bicis por ciudad (Rider forecast). Barcelona y Sabadell trabajan con Glovo y Uber Eats; el resto, con Uber Eats. Explica por qué solo contratamos a quien hace las dos plataformas.",
    npcs:[["s","¡Glovo y Uber!","hire"],["s","Solo Glovo","reject"],["r","Solo Glovo","fire"],["s","¡Glovo y Uber!","hire"],["r","Mañana no trabajo","fire"],["s","Solo Glovo","reject"],["s","¡Glovo y Uber!","hire"],["r","¡Este pedido está muy lejos!","fire"]] },
  { who:2, type:"docs", len:1320, c1:"Aprobados", c2:"Rechazados",
    land:[["sagrada",175],["beach",410],["mataro",600]], places:[[150,"Barcelona"],[620,"Gavà"],[1000,"Mataró"]], bossName:"JEFE: VALIDACIÓN",
    hint:"¡Pide los papeles a todos!",
-   cities:[["Barcelona","196 riders · Uber Eats","41","155"],["Gavà","22 riders · Uber Eats","1","21"],["Mataró","21 riders · Uber Eats","6","15"]],
+   cities:[["Barcelona","201 riders · Uber Eats","42","159"],["Gavà","23 riders · Uber Eats","1","22"],["Mataró","22 riders · Uber Eats","6","16"]],
    intro:"Todo validado: ALL APPROVED. Así quedan las ciudades de Gerard:",
    note:"~2 min. Barcelona (Uber), Gavà y Mataró. Comenta cuánto cuesta validar documentación (NIE, carnets, permisos) y cómo lo hemos agilizado.",
    npcs:[["NIE",1,"Aquí tienes mi NIE"],["Carnet de moto",0,"Tengo carnet extranjero"],["Pasaporte",1,"¡Pasaporte en regla!"],["Permiso de trabajo",0,"Me caducó en 2025..."],["Carnet de moto",1,"Carnet español, ¡toma!"],["NIE",0,"NIE caducado..."],["Permiso de trabajo",1,"Permiso vigente"],["Pasaporte",0,"Pasaporte caducado"]] },
  { who:3, type:"epis", len:1460, c1:"EPIs entregados", c2:"Riders completos",
    land:[["seu",170],["aqueduct",320],["monastery",470],["industrial",595],["valles",690]], places:[[140,"Lleida"],[440,"Martorell"],[740,"Sant Cugat"],[990,"Molins de Rei"],[1180,"Parets del Vallès"]], bossName:"ALMACÉN EPIs",
    hint:"¡Nadie se va sin su equipo!",
-   cities:[["Lleida","21 riders · Uber Eats","9","12"],["Martorell","26 riders · Uber Eats","2","24"],["Sant Cugat","15 riders · Uber Eats","3","12"],["Molins de Rei","14 riders · Uber Eats","2","12"],["Parets del Vallès","33 riders · Uber Eats","6","27"]],
+   cities:[["Lleida","21 riders · Uber Eats","9","12"],["Martorell","25 riders · Uber Eats","2","23"],["Sant Cugat","14 riders · Uber Eats","3","11"],["Molins de Rei","14 riders · Uber Eats","2","12"],["Parets del Vallès","34 riders · Uber Eats","6","28"]],
    intro:"¡Almacén superado! Así quedan las ciudades de Azlan:",
    note:"~2 min. En el almacén, Martí y Franco escanean y entregan los EPIs. Cinco ciudades: Lleida, Martorell, Sant Cugat, Molins de Rei y Parets. Después, el % de EPIs entregados en cada ciudad de Catalunya, lo que queda por entregar y el calendario de visitas para dejarlo todo entregado.",
    npcs:[["casco"],["chaqueta","guantes"],["mochila"],["casco","guantes"],["chaqueta"],["mochila","casco"],["guantes","chaqueta","mochila"]] }
@@ -3630,11 +3630,11 @@ function openCityPanel(){
   if(GAME_ONLY){ finishScreen(i); return; }
   if(S.type==="docs") return openMotoPanel(i);
   const many=S.cities.length>5;
-  const cards=S.cities.map((c,j)=>{ const id=`c4.${i}.${j}`;
+  const cards=S.cities.map((c,j)=>{ const id=`c5.${i}.${j}`;
     return `<div class="ccard">${K(`${id}.n`,c[0],"div","cn")}${K(`${id}.p`,c[1]||"—","div","cp")}
     <div class="cnums"><div><span>MOTOS</span>${K(`${id}.m`,c[2],"b","nmo")}</div><div><span>BICIS</span>${K(`${id}.b`,c[3],"b","nbi")}</div></div></div>`; }).join("");
   const html=`${K(`d2.${i}.intro`,S.intro,"p","intro")}<div class="runline">EN ESTA PARTIDA · ${S.c1.toUpperCase()}: ${c1} · ${S.c2.toUpperCase()}: ${c2}</div>
-    <div class="ccards${many?" many":""}">${cards}</div><div class="ctot" id="ctot"></div><div class="src">Riders activos por tipo de vehículo · Rider forecast, 16/11/2026</div>${S.type==="epis"?episHTML():""}${notes(`d.${i}.notes`,S.type==="epis"?S.note+" Después, el nuevo sistema de stock: escaneo del QR, kit según vehículo, firma y stock al momento; envíos caja a caja, pendientes, devoluciones y permisos por oficina.":S.note)}`;
+    <div class="ccards${many?" many":""}">${cards}</div><div class="ctot" id="ctot"></div><div class="src">Riders activos por tipo de vehículo · Rider forecast, 18/11/2026</div>${S.type==="epis"?episHTML():""}${notes(`d.${i}.notes`,S.type==="epis"?S.note+" Después, el nuevo sistema de stock: escaneo del QR, kit según vehículo, firma y stock al momento; envíos caja a caja, pendientes, devoluciones y permisos por oficina.":S.note)}`;
   const kick=`MUNDO ${i+1} · ${nm(S.who)}`;
   // Azlan: 1ª parte datos de EPIs; ENTER/ESPACIO pasa a la 2ª parte, el nuevo sistema de stock.
   if(S.type==="epis") return openPanel(kick,"¡PANTALLA SUPERADA!",html,"ENTER · VER SISTEMA DE STOCK",()=>openPanel(kick,"NUEVO SISTEMA DE STOCK",stockHTML(),STOCK_SHOTS.length?"ENTER · VER LA APP DE STOCK":"ENTER · GUARDAR MONEDA DE ORO",()=>STOCK_SHOTS.length?openPanel(kick,"ASÍ ES LA APP DE STOCK",
@@ -3740,10 +3740,10 @@ function openFinalPanel(){
   const html=`${K("f2.intro","Las mochilas se han rendido. Y llegan peticiones para abrir nuevas ciudades en Catalunya:","p","intro")}
    <div class="cities req" id="cities">${["Vic","Tarragona","Terrassa","Reus","Manresa"].map((c,i)=>K(`f5.c${i}`,c,"div","city-t")).join("")}</div>
    <div class="retos-h">PRÓXIMOS RETOS</div>
-   <div class="goal"><div><span>REPARTIDORES ACTIVOS EN CATALUNYA HOY</span><b>991</b></div><div class="arr">→</div><div class="g"><span>OBJETIVO CON TODO CUMPLIDO</span>${K("f2.goal","¿?","b")}</div></div>
+   <div class="goal"><div><span>REPARTIDORES ACTIVOS EN CATALUNYA HOY</span><b>1.010</b></div><div class="arr">→</div><div class="g"><span>OBJETIVO CON TODO CUMPLIDO</span>${K("f2.goal","¿?","b")}</div></div>
    <ul class="retos">${["Flota de empresa que cubra los mínimos de Barcelona: 114 motos (hoy 27: faltan 87) y las propias, como extra","Llegar al 100% de las motos que piden en el resto de Catalunya (hoy, 84%)","100% de EPIs entregados a una semana vista de la contratación del rider (hoy, 90%)","Mejorar la eficiencia de la flota y reducir el absentismo"].map((t,i)=>K(`f6.a${i}`,t,"li")).join("")}</ul>
-   <div class="src">Riders activos: suma de las 9 ciudades de Catalunya en el Rider forecast (16/11/2026).</div>
-   ${notes("f2.notes","~1:30 min. Raül junta las tres monedas: el trabajo de Ivan, Gerard y Azlan. Presenta las peticiones de nuevas ciudades y los retos: de 991 riders activos al objetivo, flota de empresa de 114 motos en Barcelona, 100% de las motos pedidas en el resto, EPIs al 100% a una semana de la contratación, más eficiencia de la flota y menos absentismo. Después, créditos y preguntas.")}`;
+   <div class="src">Riders activos: suma de las 9 ciudades de Catalunya en el Rider forecast (18/11/2026).</div>
+   ${notes("f2.notes","~1:30 min. Raül junta las tres monedas: el trabajo de Ivan, Gerard y Azlan. Presenta las peticiones de nuevas ciudades y los retos: de 1.010 riders activos al objetivo, flota de empresa de 114 motos en Barcelona, 100% de las motos pedidas en el resto, EPIs al 100% a una semana de la contratación, más eficiencia de la flota y menos absentismo. Después, créditos y preguntas.")}`;
   openPanel("FINAL · "+nm(1),"PETICIONES: NUEVAS CIUDADES",html,"ENTER · VER CRÉDITOS",showCredits,b=>{ [...b.querySelector("#cities").children].forEach((t,k)=>setTimeout(()=>{ if(open>0){ t.classList.add("on"); sfx.coin(); } },500+k*380)); });
 }
 
