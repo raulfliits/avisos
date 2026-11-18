@@ -44,8 +44,9 @@ static void bg_night(void) {
 }
 static void draw_toast(void) {
     if (toast_t <= 0) return; toast_t--;
-    int w = text_len(toast_s) * 8 + 12;
-    ui_box(120 - w / 2, 4, w, 14, PANEL, GOLD); text(120, 7, toast_s, WHITE, 1);
+    int small = text_len(toast_s) * 8 > 200, w = text_len(toast_s) * (small ? 4 : 8) + 12;
+    ui_box(120 - w / 2, 66, w, 16, PANEL, GOLD);
+    if (small) text_small(120, 71, toast_s, WHITE, 1); else text(120, 70, toast_s, WHITE, 1);
 }
 static void toast(const char *s) { strncpy(toast_s, s, 47); toast_t = 120; }
 static void silhouette(const char *const *spr, int x, int y) {
@@ -78,22 +79,24 @@ static void intro_screen(void) {
     for (;;) {
         int n = frame_end(); t += n;
         bg_night();
-        text(120, 10, "FLiiTS", RED, 1); text(120 + 28, 10, "", GOLD, 0); text(120, 22, "CATALUNYA", GOLD, 1);
+        text_s(120, 8, "FLiiTS", RED, 1, 2); text(120, 28, "CATALUNYA", GOLD, 1);
         rect(0, 120, SW, 40, C(0x2a1d1f)); rect(0, 120, SW, 1, C(0x5a3a3e));
         int k = imin(t, 90);
-        int xs[4] = {-20 + k * 120 / 90, 250 - k * 136 / 90, -40 + k * 128 / 90, 270 - k * 140 / 90};
-        if (stage == 2) { int d = imin(t, 40); xs[0] -= d * 4; xs[2] -= d * 5; xs[1] += d * 4; xs[3] += d * 5; }
+        /* Raül en el centro; Ivan (con Oreo) y Azlan llegan por la izquierda, Gerard por la derecha */
+        static const s16 X0[3] = {-30, 260, -70}, X1[3] = {66, 140, 90};
+        int xs[3]; for (int i = 0; i < 3; i++) xs[i] = X0[i] + (X1[i] - X0[i]) * k / 90;
+        if (stage == 2) { int d = imin(t, 40); xs[0] -= d * 4; xs[2] -= d * 5; xs[1] += d * 4; }
         int walk = k < 90 && ((t >> 3) & 1);
-        draw_spr(CREW[1].spr, 24, 112, 96, 0, 0);
-        draw_spr(CREW[0].spr, 24, xs[0], 96, 0, walk); draw_dog(t >> 3, xs[0] - 32, 102, 1);
-        draw_spr(CREW[2].spr, 24, xs[1], 96, 1, walk);
+        draw_spr(CREW[1].spr, 24, 114, 96, 0, 0);
+        draw_dog(t >> 3, xs[0] - 30, 102, 1); draw_spr(CREW[0].spr, 24, xs[0], 96, 0, walk);
         draw_spr(CREW[3].spr, 24, xs[2], 96, 0, walk);
+        draw_spr(CREW[2].spr, 24, xs[1], 96, 1, walk);
         if (stage == 0 && t > 50 && t < 140) text_sh(120, 66, "¡FIIIIIIII!", GOLD, EDGE, 1);
         if (stage == 0 && t >= 90) {
-            ui_box(14, 132, 212, 22, EDGE, GOLD); text(120, 139, "RAÜL: «¡CHICOS! ¡A CURRAR!»", WHITE, 1);
-            if ((t >> 4) & 1) text_small(120, 124, "A · CONTINUAR", MUTE, 1);
+            ui_box(8, 128, 224, 28, EDGE, GOLD); text(120, 132, "RAÜL:", GOLD, 1); text(120, 144, "«¡CHICOS! ¡A CURRAR!»", WHITE, 1);
+            if ((t >> 4) & 1) text_small(120, 121, "A · CONTINUAR", MUTE, 1);
         }
-        if (stage == 2) { ui_box(14, 132, 212, 22, EDGE, GOLD); text_small(120, 140, "¡REUNIÓN TERMINADA! CADA UNO A SU MISIÓN.", WHITE, 1); if (t > 45) { sfx_open(); return; } }
+        if (stage == 2) { ui_box(8, 128, 224, 28, EDGE, GOLD); text_small(120, 139, "¡REUNIÓN TERMINADA! CADA UNO A SU MISIÓN.", WHITE, 1); if (t > 45) { sfx_open(); return; } }
         if (t == 51 || (t > 50 && t < 53)) { if (stage == 0) { slide(1800, 2400, 300); } }
         if (key_hit & (K_A | K_B | K_START)) { if (stage == 0 && t < 90) t = 90; else if (stage == 0) { stage = 2; t = 0; } }
     }
@@ -270,9 +273,9 @@ static void win_card(int who, int screen, int rep) {
             int on = rep ? 1 : PROG[mode][k], nw = rep ? k == 2 : k == screen, cx = 90 + k * 30;
             if (on && (!nw || t > 30)) big_coin(cx, 84, nw ? t : 0); else { rect(cx - 9, 84, 18, 22, PANEL2); frame_rect(cx - 9, 84, 18, 22, EDGE); }
         }
-        text_wrap(120, 114, msg, WHITE, 25, 9, 1);
+        text_wrap(120, 115, msg, WHITE, 25, 9, 1);
         if (RES_L1 && !rep) { char b[48]; p = str_cat(b, RES_L1); p = str_cat(p, " "); p = str_num(p, RES_C1); if (RES_L2) { p = str_cat(p, " · "); p = str_cat(p, RES_L2); p = str_cat(p, " "); str_num(p, RES_C2); } text_small(120, 106, b, GOLD, 1); }
-        if ((t >> 4) & 1) text_small(120, 138, "A · CONTINUAR", WHITE, 1);
+        if ((t >> 4) & 1) text_small(120, 141, "A · CONTINUAR", WHITE, 1);
         if (key_hit & (K_A | K_START) && t > 20) { sfx_select(); return; }
         if (t > 300) return;
     }
@@ -309,7 +312,7 @@ static void credits(int new_rep) {
         p = str_cat(p, sc); p = str_cat(p, " · MONEDAS "); p = str_num(p, COINS); p = str_cat(p, " · ORO "); p = str_num(p, gold()); str_cat(p, "/3");
         text_small(120, y + 206, b, DIM, 1);
         if (new_rep) { text(120, y + 222, "¡MODO REPARTIDOR", GOLD, 1); text(120, y + 232, "DESBLOQUEADO!", GOLD, 1); text_small(120, y + 246, "YA APARECE EN EL SELECTOR DE JUGADORES", DIM, 1); }
-        if ((t >> 4) & 1) text_small(120, 152, "B · VOLVER", MUTE, 1);
+        rect(0, 149, SW, 11, NIGHT); if ((t >> 4) & 1) text_small(120, 152, "B · VOLVER", MUTE, 1);
         if (key_hit & (K_B | K_START) || (key_hit & K_A && t > 120)) { sfx_select(); return; }
     }
 }

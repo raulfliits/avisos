@@ -13,6 +13,9 @@ class Gba:
         self.rom = os.path.abspath(rom); self.elf = os.path.join(os.path.dirname(self.rom), 'fliits.elf')
         self.p = subprocess.Popen([os.path.join(HERE, 'hrn'), self.rom], stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
         self.held = 0; self.syms = None; self.n = 0
+        import atexit
+        if os.environ.get('TBADDUMP'): atexit.register(self.close)
+        self.closed = False
     def cmd(self, c):
         self.p.stdin.write(c + '\n'); self.p.stdin.flush()
         out = []
@@ -50,5 +53,11 @@ class Gba:
     def s32(self, a, off=0): return struct.unpack('<i', self.read(self.sym(a) + off if isinstance(a, str) else a + off, 4))[0]
     def u16(self, a, off=0): return struct.unpack('<H', self.read(self.sym(a) + off if isinstance(a, str) else a + off, 2))[0]
     def close(self):
+        if getattr(self, 'closed', False): return
+        self.closed = True
+        if os.environ.get('TBADDUMP'):
+            try:
+                import tbad; open(os.environ['TBADDUMP'], 'a').write('\n'.join(tbad.dump(self)) + '\n')
+            except Exception as e: open(os.environ['TBADDUMP'], 'a').write('ERR %s\n' % e)
         try: self.cmd('q')
         except Exception: pass

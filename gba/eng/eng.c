@@ -89,7 +89,14 @@ u8 pget(int x, int y) {
     if (!T.vram) return *p;
     u16 v = *(u16 *)((u32)p & ~1u); return (x & 1) ? v >> 8 : v & 255;
 }
-void cls(u8 c) { int ox = OX, oy = OY; OX = OY = 0; rect(0, 0, T.w, T.h, c); OX = ox; OY = oy; }
+#ifdef TEXTDBG
+static int trn;
+#endif
+void cls(u8 c) {
+#ifdef TEXTDBG
+    if (T.vram) trn = 0;
+#endif
+    int ox = OX, oy = OY; OX = OY = 0; rect(0, 0, T.w, T.h, c); OX = ox; OY = oy; }
 
 static volatile u32 dma_fill;
 IWRAM_BASE void rect(int x, int y, int w, int h, u8 c) {
@@ -265,18 +272,52 @@ static int glyph(int cp) {
     return FONT_Q; /* '?' */
 }
 int text_len(const char *s) { int n = 0; while (*s) { utf8(&s); n++; } return n; }
+
+#ifdef TEXTDBG
+/* Registro de textos que se salen de la pantalla/recorte o se pisan con otro texto en el mismo frame. */
+typedef struct { s16 x, y, w, h; char s[28]; } trec_t;
+static trec_t TR[96];
+typedef struct { char a[28], b[28]; s16 x, y, w, kind; } tbad_t;
+tbad_t TBAD[200] EWRAM_BSS; int tbad_n;
+static void tbad(int kind, const char *a, const char *b, int x, int y, int w) {
+    for (int i = 0; i < tbad_n; i++) if (TBAD[i].kind == kind && !strncmp(TBAD[i].a, a, 27) && !strncmp(TBAD[i].b, b ? b : "", 27)) return;
+    if (tbad_n >= 200) return;
+    tbad_t *t = &TBAD[tbad_n++]; strncpy(t->a, a, 27); t->a[27] = 0; strncpy(t->b, b ? b : "", 27); t->b[27] = 0; t->x = x; t->y = y; t->w = w; t->kind = kind;
+}
+static void trec(int x, int y, int w, int h, const char *s) {
+    if (!T.vram) return;
+    x += OX; y += OY;
+    if (y + h <= CY0 || y >= CY1) return;           /* fuera de la vista vertical: no cuenta */
+    if (x < CX0 || x + w > CX1) tbad(1, s, 0, x, y, w);
+    int nb = 0; while (s[nb] == ' ') nb++; if (!s[nb]) return;
+    for (int i = 0; i < trn; i++) {
+        trec_t *r = &TR[i];
+        if (!strncmp(r->s, s, 27) && iabs(r->x - x) <= 1 && iabs(r->y - y) <= 1) continue; /* sombra del mismo texto */
+        if (x < r->x + r->w && r->x < x + w && y < r->y + r->h && r->y < y + h) tbad(2, s, r->s, x, y, w);
+    }
+    if (trn < 96) { trec_t *r = &TR[trn++]; r->x = x; r->y = y; r->w = w; r->h = h; strncpy(r->s, s, 27); r->s[27] = 0; }
+}
+#define TREC(x, y, w, h, s) trec(x, y, w, h, s)
+#else
+#define TREC(x, y, w, h, s)
+#endif
+/* A partir de escala 2 el texto es proporcional (las letras estrechas como la i no dejan huecos). */
+static int gbounds(const u8 *g, int *l) { u8 m = 0; for (int r = 0; r < 8; r++) m |= g[r]; if (!m) { *l = 0; return 3; } int a = 0, b = 7; while (!(m & (0x80 >> a))) a++; while (!(m & (0x80 >> b))) b--; *l = a; return b - a + 1; }
+static int prop_w(const char *s) { int w = 0, l; while (*s) { int cp = utf8(&s); if (cp == ' ') w += 4; else w += gbounds(FONT_BM[glyph(cp)], &l) + 1; } return w ? w - 1 : 0; }
 int text_s(int x, int y, const char *s, u8 col, int align, int sc) {
-    int w = text_len(s) * 8 * sc;
+    int prop = sc >= 2;
+    int w = prop ? prop_w(s) * sc : text_len(s) * 8 * sc;
     if (align == 1) x -= w / 2; else if (align == 2) x -= w;
+    TREC(x, y, w - sc, 7 * sc, s);
     while (*s) {
         int cp = utf8(&s);
-        if (cp != ' ') {
-            const u8 *g = FONT_BM[glyph(cp)];
-            if (sc == 1) bits_draw(x, y, g, 8, 8, col);
-            else for (int r = 0; r < 8; r++) { u8 bits = g[r]; if (!bits) continue;
-                for (int q = 0; q < 8; q++) if (bits & (0x80 >> q)) rect(x + q * sc, y + r * sc, sc, sc, col); }
-        }
-        x += 8 * sc;
+        if (cp == ' ') { x += (prop ? 4 : 8) * sc; continue; }
+        const u8 *g = FONT_BM[glyph(cp)];
+        int l = 0, gw = prop ? gbounds(g, &l) : 8;
+        if (sc == 1) bits_draw(x, y, g, 8, 8, col);
+        else for (int r = 0; r < 8; r++) { u8 bits = g[r]; if (!bits) continue;
+            for (int q = 0; q < 8; q++) if (bits & (0x80 >> q)) rect(x + (q - l) * sc, y + r * sc, sc, sc, col); }
+        x += (prop ? gw + 1 : 8) * sc;
     }
     return w;
 }
@@ -285,6 +326,7 @@ int text_sh(int x, int y, const char *s, u8 col, u8 sh, int align) { text_s(x + 
 int text_small(int x, int y, const char *s, u8 col, int align) {
     int w = text_len(s) * 4;
     if (align == 1) x -= w / 2; else if (align == 2) x -= w;
+    TREC(x, y, w - 1, 5, s);
     while (*s) {
         int cp = utf8(&s), k = -1;
         for (int i = 0; i < SMALL_N; i++) if (SMALL_CP[i] == cp) { k = i; break; }
@@ -413,6 +455,9 @@ static u32 last_vbl;
 static void vblank_wait(void) { while (VCOUNT >= 160) {} while (VCOUNT < 160) {} }
 static u32 last_tick;
 int frame_end(void) {
+#ifdef TEXTDBG
+    trn = 0;
+#endif
     vblank_wait();
     DISPCNT ^= 0x10;
     tgt_screen();

@@ -208,7 +208,7 @@ static void cl_update(void) {
     /* vista: pinza y montón; al soltar, la rampa y la bandeja */
     { float tgt;
       if (G->hold > 0) G->hold--;
-      if (G->phase == PH_DROP || G->drop >= 0 || G->hold > 0) tgt = 130;
+      if (G->phase == PH_DROP || G->drop >= 0 || G->hold > 0) tgt = CH - SH;
       else if (G->phase == PH_DOWN || G->phase == PH_CLOSE || G->phase == PH_UP) tgt = fclamp(G->cy - 50, 50, CH - SH);
       else tgt = 50;
       G->view += (tgt - G->view) * (MG.t < 50 ? .04f : .12f); MG.view_y = (int)(G->view + .5f); }

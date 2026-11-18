@@ -53,10 +53,20 @@ static void draw_banner(int W, int H) {
 static void intro_card(const arc_def_t *A) {
     for (;;) {
         cls(C(0x120b0c));
-        text(120, 10, MG.gk == 4 ? "MODO REPARTIDOR" : "MINI ARCADE", C(0xff8a92), 1);
+        text(120, 10, MG.gk >= 4 ? "MODO LIBRE" : "MINI ARCADE", C(0xff8a92), 1);
         text(120, 24, A->title, C(0xffd23f), 1);
         rect(20, 36, 200, 1, C(0xffd23f));
-        text_wrap(120, 46, A->help, C(0xffffff), 28, 11, 1);
+        /* ayuda: un control por línea (se parte en " · " y en ". ") */
+        { char buf[256]; strncpy(buf, A->help, 255); buf[255] = 0; int y = 44; char *p = buf;
+          while (*p && y < 136) {
+              char *e = strstr(p, " · "), *d = strstr(p, ". ");
+              char *cut = e; int skip = 4;           /* " · " son 4 bytes (· = 2) */
+              if (d && (!cut || d < cut)) { cut = d + 1; skip = 1; }
+              if (cut) *cut = 0;
+              char *col = strchr(p, ':'); int ctl = col && col - p <= 12; /* controles en amarillo, frases en blanco */
+              y += text_wrap(120, y, p, ctl ? C(0xffd23f) : C(0xffffff), 28, 10, 1) * 10 + 2;
+              if (!cut) break; p = cut + skip; while (*p == ' ') p++;
+          } }
         if ((frame_no >> 4) & 1) text(120, 144, "A: EMPEZAR · B: VOLVER", C(0x62d26f), 1);
         frame_end();
         if (key_hit & (K_A | K_START)) { sfx_select(); return; }
@@ -111,7 +121,7 @@ int arcade_play(int gk, int ci, int veh, int look) {
         if (strcmp(pb, lastpb)) { strcpy(lastpb, pb); pbt = 150; }
         if (pbt > 0) pbt -= n;
         if (vh <= SH - 8) { rect(0, SH - 7, text_len(pb) * 4 + 4, 7, C(0x120b0c)); text_small(2, SH - 6, pb, C(0xffd23f), 0); }
-        else if (pbt > 0 || (key_held & K_SEL)) { int w = text_len(pb) * 4 + 4; rect(SW - w, 0, w, 7, C(0x120b0c)); text_small(SW - w + 2, 1, pb, C(0xffd23f), 0); }
+        else if (key_held & K_SEL) { int w = text_len(pb) * 4 + 4; rect(SW - w, 0, w, 7, C(0x120b0c)); text_small(SW - w + 2, 1, pb, C(0xffd23f), 0); }
     }
     RES_C1 = MG.c1; RES_C2 = MG.c2;
     pool_reset(mark); people_cache_reset();

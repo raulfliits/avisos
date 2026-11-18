@@ -330,7 +330,11 @@ void say(const char *t, int an, int ref, int wx, int wy, int frames, int cls) {
     bub_t *b = &bubs[nbub++];
     strncpy(b->t, t, 71); b->t[71] = 0; b->an = an; b->ref = ref; b->wx = wx; b->wy = wy; b->dy = wy; b->until = pfr + frames; b->pri = pri; b->cls = cls; b->slot = -1; b->id = ++bub_ids; if (!b->id) b->id = ++bub_ids;
 }
-void plane_say(const char *t, int cls, int frames) { say(t, AN_PLANE, 0, 0, 0, frames, BC_PLANE | cls); }
+/* el avión solo dice una cosa a la vez: el bocadillo nuevo sustituye al anterior (así no se apilan sobre el marcador) */
+void plane_say(const char *t, int cls, int frames) {
+    for (int i = 0; i < nbub; i++) if (bubs[i].an == AN_PLANE && strcmp(bubs[i].t, t)) { for (int j = i; j < nbub - 1; j++) bubs[j] = bubs[j + 1]; nbub--; i--; }
+    say(t, AN_PLANE, 0, 0, 0, frames, BC_PLANE | cls);
+}
 
 /* corta el texto en líneas de como mucho 'cols' caracteres (UTF-8) */
 static int wrap_lines(const char *s, int cols, char out[][48], int maxl) {
@@ -409,11 +413,13 @@ void draw_hud_top(int show_ctr, int c1, int c2, const char *l1, const char *l2) 
         p = b; *p = 0; { s32 s = SCORE; char d[12]; str_num(d, s); for (int k = strlen(d); k < 6; k++) *p++ = '0'; *p = 0; p = str_cat(p, d); }
         p = str_cat(p, "  x"); if (COINS < 10) p = str_cat(p, "0"); str_num(p, COINS);
         int w = text_len(b) * 4; int x = VW - 3 - w;
-        stext(x + 1, 4, b, K, 0); stext(x, 3, b, W, 0);
+        rect(x - 2, 1, w + 4, show_ctr ? 23 : 9, K);
+        stext(x, 3, b, W, 0);
         int cx = x + 6 * 4 + 4; rect(cx - 1, 2, 5, 7, K); rect(cx, 3, 3, 5, C(0xffd23f));
         if (show_ctr) for (int r = 0; r < 2; r++) {
             int v = r ? c2 : c1; p = str_cat(b, r ? l2 : l1); p = str_cat(p, " "); if (v < 10) p = str_cat(p, "0"); str_num(p, v);
-            stext(VW - 3 + 1, 11 + r * 7 + 1, b, K, 2); stext(VW - 3, 11 + r * 7, b, r ? C(0xff8a92) : C(0x62d26f), 2);
+            int bw = text_len(b) * 4; rect(VW - 5 - bw, 9 + r * 7, bw + 4, 8, K);
+            stext(VW - 3, 11 + r * 7, b, r ? C(0xff8a92) : C(0x62d26f), 2);
         }
         if (HUDB) { origin(0, 0); tgt_back(); rle_build(&HUDR, HUDB, 26 * 24); }
     }

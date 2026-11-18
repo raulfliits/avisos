@@ -598,7 +598,7 @@ static void draw_play(void) {
 /* ---------------------------------------------------------------- bucle */
 static void plane_step(void) {
     float tx = B.on ? 40 : fclamp((pl.x - pcam) + 70, 46, VW - 52);
-    plane.sx += (tx - plane.sx) * .04f; plane.sy = (B.on ? 30 : 38) + fsin(pfr / 25.0f) * 3;
+    plane.sx += (tx - plane.sx) * .04f; plane.sy = (B.on ? 52 : 58) + fsin(pfr / 25.0f) * 3; /* más bajo que en el web: sus bocadillos no tapan el marcador */
 }
 static int step(void) {
     pfr++; st_t++;
