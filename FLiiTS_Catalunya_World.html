@@ -3584,7 +3584,7 @@ addEventListener("resize",()=>{ if(open>0) fitPanel(); });
 function closePanel(){ if(open<0) return; open=-1; $("#lvlOv").hidden=true; const f=panelDone; panelDone=null; if(f) f(); }
 $("#clearBtn").addEventListener("click",closePanel);
 // EPIs entregados por ciudad: riders con el documento de EPIs firmado (Control de stock FLiiTS, solo totales por ciudad).
-const EPIS=[["Barcelona",709,673],["Sabadell",130,95],["Parets del Vallès",33,32],["Martorell",26,24],["Gavà",21,15],["Mataró",21,20],["Lleida",21,16],["Sant Cugat",15,11],["Molins de Rei",14,13]];
+const EPIS=[["Barcelona",727,685],["Sabadell",130,95],["Parets del Vallès",34,32],["Martorell",25,23],["Gavà",23,16],["Mataró",22,19],["Lleida",21,21],["Sant Cugat",14,10],["Molins de Rei",14,13]];
 function episHTML(){
   let T=0,D=0;
   const rows=EPIS.map(([n,t,d])=>{ T+=t; D+=d; const p=Math.round(100*d/t);
@@ -3594,7 +3594,7 @@ function episHTML(){
    <div class="eps" id="eps">${rows}</div>
    <div class="ctot">TOTAL CATALUNYA: ${Math.round(100*D/T)}% ENTREGADO · ${fmtN(D)} DE ${fmtN(T)} RIDERS · ${T-D} POR ENTREGAR</div>
    <div class="cal">${K("ep.cal","Tenemos un calendario de visitas a las ciudades para dejarlo todo entregado.","span")}</div>
-   <div class="src">${K("ep3.src","Control de stock FLiiTS · riders con el documento de EPIs firmado, 16/11/2026","span")}</div>`;
+   <div class="src">${K("ep4.src","Control de stock FLiiTS · riders con el documento de EPIs firmado, 18/11/2026","span")}</div>`;
 }
 function animEpis(b){ const e=b.querySelector("#eps"); if(e) setTimeout(()=>{ if(open>0){ e.classList.add("on"); sfx.tick(); } },500); }
 // Novedades del nuevo sistema de control de stock (se muestran en el panel de Azlan).
@@ -3614,7 +3614,7 @@ function stockHTML(){
      <div class="mrow hl"><span>Hechas con la app de escaneo</span>${K("st4.n1","83%","b")}</div>
      <div class="mrow"><span>Productos devueltos registrados</span>${K("st4.n2","26","b")}</div>
      <div class="mrow"><span>Productos extra entregados y controlados</span>${K("st4.n3","156","b")}</div>
-     <div class="mrow nx"><span>Pendientes de entregar (8 Sabadell · 7 Barcelona)</span>${K("st4.n4","15","b")}</div>
+     <div class="mrow nx"><span>Riders con EPIs por entregar (35 Sabadell · 60 Barcelona)</span>${K("st4.n4b","95","b")}</div>
    </div>
    <div class="cal alert">${K("st4.alert","Barcelona: sin cascos ni chaquetas de moto (0 de cada). Sabadell: por debajo del punto de reposición (9 chalecos).","span")}</div>
    <div class="retos-h" style="margin-top:18px">TRACKERS DE ANTES vs SISTEMA FLiiTS</div>
@@ -3741,7 +3741,7 @@ function openFinalPanel(){
    <div class="cities req" id="cities">${["Vic","Tarragona","Terrassa","Reus","Manresa"].map((c,i)=>K(`f5.c${i}`,c,"div","city-t")).join("")}</div>
    <div class="retos-h">PRÓXIMOS RETOS</div>
    <div class="goal"><div><span>REPARTIDORES ACTIVOS EN CATALUNYA HOY</span><b>991</b></div><div class="arr">→</div><div class="g"><span>OBJETIVO CON TODO CUMPLIDO</span>${K("f2.goal","¿?","b")}</div></div>
-   <ul class="retos">${["Flota de empresa que cubra los mínimos de Barcelona: 114 motos (hoy 27: faltan 87) y las propias, como extra","Llegar al 100% de las motos que piden en el resto de Catalunya (hoy, 84%)","100% de EPIs entregados a una semana vista de la contratación del rider (hoy, 91%)","Mejorar la eficiencia de la flota y reducir el absentismo"].map((t,i)=>K(`f6.a${i}`,t,"li")).join("")}</ul>
+   <ul class="retos">${["Flota de empresa que cubra los mínimos de Barcelona: 114 motos (hoy 27: faltan 87) y las propias, como extra","Llegar al 100% de las motos que piden en el resto de Catalunya (hoy, 84%)","100% de EPIs entregados a una semana vista de la contratación del rider (hoy, 90%)","Mejorar la eficiencia de la flota y reducir el absentismo"].map((t,i)=>K(`f6.a${i}`,t,"li")).join("")}</ul>
    <div class="src">Riders activos: suma de las 9 ciudades de Catalunya en el Rider forecast (16/11/2026).</div>
    ${notes("f2.notes","~1:30 min. Raül junta las tres monedas: el trabajo de Ivan, Gerard y Azlan. Presenta las peticiones de nuevas ciudades y los retos: de 991 riders activos al objetivo, flota de empresa de 114 motos en Barcelona, 100% de las motos pedidas en el resto, EPIs al 100% a una semana de la contratación, más eficiencia de la flota y menos absentismo. Después, créditos y preguntas.")}`;
   openPanel("FINAL · "+nm(1),"PETICIONES: NUEVAS CIUDADES",html,"ENTER · VER CRÉDITOS",showCredits,b=>{ [...b.querySelector("#cities").children].forEach((t,k)=>setTimeout(()=>{ if(open>0){ t.classList.add("on"); sfx.coin(); } },500+k*380)); });
