@@ -162,6 +162,7 @@ r = subprocess.run([CC, '-mcpu=arm7tdmi', '-mthumb', '-mthumb-interwork', '-nost
 if r.stderr: sys.stderr.write(r.stderr)
 if r.returncode: sys.exit('error enlazando')
 subprocess.run(['arm-none-eabi-objcopy', '-O', 'binary', elf, OUT], check=True)
+pad = open(OUT, 'rb').read(); sz = 1 << max(18, (len(pad) - 1).bit_length()); open(OUT, 'wb').write(pad + b'\xff' * (sz - len(pad)))
 subprocess.run([os.path.join(TOOLS, 'gbafix'), OUT, '-tFLIITS WORLD', '-cFLCW', '-mFL', '-r1'], check=True, capture_output=True)
 sz = subprocess.run(['arm-none-eabi-size', elf], capture_output=True, text=True).stdout.splitlines()[-1].split()
 print('colores %d (paleta %d)  rom %d KB  iwram data+bss %s+%s' % (len(uniq), len(cent) + 1, os.path.getsize(OUT) // 1024, sz[1], sz[2]))
