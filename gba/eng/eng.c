@@ -408,7 +408,10 @@ int save_read(void *d, int n) {
 
 /* ---------------------------------------------------------------- bucle */
 static u32 last_vbl;
-static void vblank_wait(void) { __asm__ volatile("swi 0x05" ::: "r0", "r1", "r2", "r3", "memory"); }
+/* Espera al inicio del siguiente VBlank leyendo VCOUNT (sin llamar a la BIOS: funciona igual con o sin BIOS). */
+#define VCOUNT REG16(0x04000006)
+static void vblank_wait(void) { while (VCOUNT >= 160) {} while (VCOUNT < 160) {} }
+static u32 last_tick;
 int frame_end(void) {
     vblank_wait();
     DISPCNT ^= 0x10;
@@ -416,8 +419,9 @@ int frame_end(void) {
     u16 k = (~KEYINPUT) & 0x3FF;
     IME = 0; u16 h = key_irq_hit; key_irq_hit = 0; IME = 1;
     key_hit = (k & ~key_held) | h; key_held = k;
-    int n = (int)(vbl_count - last_vbl); last_vbl = vbl_count;
-    if (n < 1) n = 1; if (n > 3) n = 3;
+    /* frames transcurridos medidos con el temporizador (280896 ciclos por frame) */
+    u32 now = ticks(); int n = (int)((now - last_tick + 140448) / 280896); last_tick += (u32)n * 280896; (void)last_vbl;
+    if (n < 1) { n = 1; last_tick = now; } if (n > 3) { n = 3; last_tick = now; }
     frame_no += n;
     snd_update(n);
     rnd();
@@ -440,7 +444,7 @@ void eng_init(void) {
     DISPSTAT = 0x0008; IE = 0x0001; IME = 1;
     SNDCNT_X = 0x80; SNDCNT_L = 0xFF77; SNDCNT_H = 0x0002;
     for (int i = 0; i < 256; i++) { LUT_DARK[i] = i ? col_shade(i, 128) : 0; LUT_LIGHT[i] = i ? col_mix(i, col_rgb(255, 255, 255), 102) : 0; }
-    last_vbl = vbl_count;
+    last_vbl = vbl_count; last_tick = ticks();
     tgt_screen();
 }
 
