@@ -35,6 +35,10 @@ int main(int argc, char **argv) {
             unsigned a, n; sscanf(line + 2, "%x %u", &a, &n);
             for (unsigned i = 0; i < n; i++) printf("%02x", core->busRead8(core, a + i));
             printf("\n");
+        } else if (c == 'g') {
+            const char *rn[] = {"r0","r1","r2","r3","r4","r5","r6","r7","r8","r9","r10","r11","r12","sp","lr","pc","cpsr"};
+            for (int i = 0; i < 17; i++) { uint32_t v = 0; core->readRegister(core, rn[i], &v); printf("%s=%08x ", rn[i], v); }
+            printf("\n");
         } else if (c == 'q') break;
         printf("ok %lu\n", fr); fflush(stdout);
     }
